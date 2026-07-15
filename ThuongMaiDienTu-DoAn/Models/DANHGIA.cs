@@ -15,12 +15,14 @@ namespace ThuongMaiDienTu_DoAn.Models
     public partial class DANHGIA
     {
         public int MaDG { get; set; }
-        public Nullable<int> MaKH { get; set; }
-        public Nullable<int> MaSP { get; set; }
-        public Nullable<int> SoSao { get; set; }
+        public int MaKH { get; set; }
+        public int MaSP { get; set; }
+        public int MaHD { get; set; }
+        public int SoSao { get; set; }
         public string NoiDung { get; set; }
         public Nullable<System.DateTime> NgayDG { get; set; }
     
+        public virtual CT_HOADON CT_HOADON { get; set; }
         public virtual NGUOIDUNG NGUOIDUNG { get; set; }
         public virtual SANPHAM SANPHAM { get; set; }
     }

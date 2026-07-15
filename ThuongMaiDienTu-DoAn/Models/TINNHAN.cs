@@ -21,6 +21,7 @@ namespace ThuongMaiDienTu_DoAn.Models
         public string NoiDung { get; set; }
         public Nullable<int> MaSP { get; set; }
         public Nullable<bool> DaDoc { get; set; }
+        public string Anh { get; set; }
     
         public virtual NGUOIDUNG NGUOIDUNG { get; set; }
         public virtual NGUOIDUNG NGUOIDUNG1 { get; set; }

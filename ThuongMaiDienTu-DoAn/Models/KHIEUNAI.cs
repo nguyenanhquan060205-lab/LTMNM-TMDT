@@ -18,9 +18,9 @@ namespace ThuongMaiDienTu_DoAn.Models
         public Nullable<int> MaKH { get; set; }
         public Nullable<int> MaSP { get; set; }
         public string MoTa { get; set; }
-        public string TrangThai { get; set; }
-        public Nullable<System.DateTime> NgayGui { get; set; }
         public string PhanHoi { get; set; }
+        public Nullable<System.DateTime> NgayGui { get; set; }
+        public string TrangThai { get; set; }
     
         public virtual NGUOIDUNG NGUOIDUNG { get; set; }
         public virtual SANPHAM SANPHAM { get; set; }

@@ -51,34 +51,31 @@ namespace ThuongMaiDienTu_DoAn.Controllers
             return View(ds);
         }
 
-        //  THÊM SẢN PHẨM  
         public ActionResult Them(int id)
         {
             var user = Session["user"] as NGUOIDUNG;
-            if (user == null) return RedirectToAction("DangNhap", "TaiKhoan");
+            if (user == null)
+            {
+                TempData["Error"] = "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.";
+                return RedirectToAction("DangNhap", "TaiKhoan");
+            }
 
+ 
             var sp = db.SANPHAMs.Find(id);
             if (sp == null || sp.TrangThai != "Đã duyệt")
+            {
+                TempData["Error"] = "Sản phẩm không tồn tại hoặc không còn được bán.";
                 return RedirectToAction("Index", "SanPham");
+            }
 
-            //  Không cho người bán tự mua hàng của chính mình
+ 
             if (sp.MaKH == user.MaKH)
             {
-                TempData["CartError"] = "Bạn không thể mua sản phẩm của chính mình!";
+                TempData["Error"] = "Bạn không thể mua sản phẩm của chính mình!";
                 return RedirectToAction("ChiTiet", "SanPham", new { id });
             }
-
-            //  Kiểm tra xem có ai khác đã mua (đơn thật)
-            bool daBan = db.CT_HOADON.Any(x => x.MaSP == id &&
-                (x.HOADON.TrangThai == "Đã thanh toán" || x.HOADON.TrangThai == "Đang vận chuyển"));
-            if (daBan || sp.SoLuong <= 0)
-            {
-                TempData["CartError"] = "Sản phẩm này đã được đặt mua bởi người khác!";
-                return RedirectToAction("Index", "SanPham");
-            }
-
-            //  Lấy giỏ hàng người dùng
-            var gio = db.GIOHANGs.FirstOrDefault(g => g.MaKH == user.MaKH);
+ 
+            var gio = db.GIOHANGs.Include(g => g.CT_GIOHANG).FirstOrDefault(g => g.MaKH == user.MaKH);
             if (gio == null)
             {
                 gio = new GIOHANG { MaKH = user.MaKH };
@@ -86,23 +83,56 @@ namespace ThuongMaiDienTu_DoAn.Controllers
                 db.SaveChanges();
             }
 
-            //   Thêm sản phẩm vào chi tiết giỏ hàng
-            var ct = db.CT_GIOHANG.FirstOrDefault(c => c.MaGH == gio.MaGH && c.MaSP == id);
-            if (ct == null)
-                db.CT_GIOHANG.Add(new CT_GIOHANG { MaGH = gio.MaGH, MaSP = id, SoLuong = 1, ThanhTien = sp.Gia });
+ 
+            var ctGioHang = gio.CT_GIOHANG.FirstOrDefault(c => c.MaSP == id);
+            int soLuongHienTai = ctGioHang?.SoLuong ?? 0;
+            int soLuongThem = 1;  
+
+ 
+            int soLuongMoi = soLuongHienTai + soLuongThem;
+
+ 
+            if (sp.SoLuong <= 0)
+            {
+                TempData["Error"] = "Sản phẩm này vừa hết hàng! Ai nhanh tay thì còn.";
+                return RedirectToAction("ChiTiet", "SanPham", new { id });
+            }
+
+ 
+            if (soLuongMoi > sp.SoLuong)
+            {
+                TempData["Error"] = $"Sản phẩm '{sp.TenSP}' chỉ còn {sp.SoLuong} sản phẩm. Không thể thêm thêm.";
+                return RedirectToAction("ChiTiet", "SanPham", new { id });
+            }
+
+ 
+            if (ctGioHang == null)
+            {
+                // Thêm mới
+                db.CT_GIOHANG.Add(new CT_GIOHANG
+                {
+                    MaGH = gio.MaGH,
+                    MaSP = id,
+                    SoLuong = soLuongThem,
+                    ThanhTien = sp.Gia * soLuongThem
+                });
+            }
             else
-                ct.SoLuong = 1; // Sản phẩm chỉ được 1 cái duy nhất (vì hàng cũ)
+            {
+ 
+                ctGioHang.SoLuong = soLuongMoi;
+                ctGioHang.ThanhTien = sp.Gia * soLuongMoi;
+            }
 
             db.SaveChanges();
 
-            //  Cập nhật lại số lượng giỏ hàng trong session
+            // 7. Cập nhật lại số lượng giỏ hàng trong session
             var gioUpdate = db.GIOHANGs.FirstOrDefault(g => g.MaKH == user.MaKH);
             Session["CartCount"] = gioUpdate?.TongSoLuong ?? 0;
 
-            TempData["CartOK"] = "Đã thêm sản phẩm vào giỏ hàng!";
-            return RedirectToAction("Index");
+            TempData["Success"] = "Đã thêm sản phẩm vào giỏ hàng!";
+            return RedirectToAction("Index", "SanPham"); 
         }
-
         // TĂNG SỐ LƯỢNG 
         public ActionResult Tang(int id)
         {

@@ -67,6 +67,82 @@
         }
     </div>
 </div>
+@{
+    int current = ViewBag.Page;
+    int total = ViewBag.TotalPages;
+}
+
+@if (total > 1)
+{
+    <nav class="mt-4 d-flex justify-content-center">
+        <ul class="pagination">
+
+            <!-- Previous -->
+            <li class="page-item @(current == 1 ? "disabled" : "")">
+                <a class="page-link"
+                   href="@Url.Action("Index", new { page = current - 1, q = ViewBag.q, maloai = ViewBag.maloai })">
+                    «
+                </a>
+            </li>
+
+            <!-- Trang 1 luôn xuất hiện -->
+            <li class="page-item @(current == 1 ? "active" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { page = 1, q = ViewBag.q, maloai = ViewBag.maloai })">1</a>
+            </li>
+
+            <!-- Dấu ... sau trang 1 -->
+            @if (current > 3)
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">…</span>
+                </li>
+            }
+
+            <!-- Các trang ở giữa (current-1, current, current+1) -->
+            @for (int i = current - 1; i <= current + 1; i++)
+            {
+                if (i > 1 && i < total)
+                {
+                    <li class="page-item @(i == current ? "active" : "")">
+                        <a class="page-link"
+                           href="@Url.Action("Index", new { page = i, q = ViewBag.q, maloai = ViewBag.maloai })">
+                            @i
+                        </a>
+                    </li>
+                }
+            }
+
+            <!-- Dấu ... trước trang cuối -->
+            @if (current < total - 2)
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">…</span>
+                </li>
+            }
+
+            <!-- Trang cuối luôn xuất hiện nếu > 1 -->
+            @if (total > 1)
+            {
+                <li class="page-item @(current == total ? "active" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new { page = total, q = ViewBag.q, maloai = ViewBag.maloai })">
+                        @total
+                    </a>
+                </li>
+            }
+
+            <!-- Next -->
+            <li class="page-item @(current == total ? "disabled" : "")">
+                <a class="page-link"
+                   href="@Url.Action("Index", new { page = current + 1, q = ViewBag.q, maloai = ViewBag.maloai })">
+                    »
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+}
+
 
 <style>
     /* Thêm font-family để tránh lỗi font */

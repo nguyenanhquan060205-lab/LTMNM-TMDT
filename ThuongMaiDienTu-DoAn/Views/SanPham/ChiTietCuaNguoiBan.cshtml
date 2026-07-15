@@ -28,7 +28,9 @@
             <div class="main-img-box position-relative mx-auto mb-3">
                 <img id="mainImg"
                      src="~/Content/Images/@anhBia"
-                     class="main-img" />
+                     class="main-img" 
+                     onclick="openLightbox()"
+                     style="cursor: zoom-in;" />
 
                 <!-- Mũi tên chuyển ảnh -->
                 <button class="img-nav left" onclick="prevImage()">❮</button>
@@ -81,17 +83,29 @@
 
             <p>
                 <b>Đánh giá:</b>
+
+                @{
+                    double rating = trungBinh;
+                    int fullStars = (int)Math.Floor(rating);
+                    bool hasHalfStar = (rating - fullStars) >= 0.5;
+                }
+
                 @for (int i = 1; i <= 5; i++)
                 {
-                    if (i <= Math.Round(trungBinh))
+                    if (i <= fullStars)
                     {
                         <i class="bi bi-star-fill text-warning"></i>
+                    }
+                    else if (i == fullStars + 1 && hasHalfStar)
+                    {
+                        <i class="bi bi-star-half text-warning"></i>
                     }
                     else
                     {
                         <i class="bi bi-star text-warning"></i>
                     }
                 }
+
                 <span> (@tongDanhGia đánh giá)</span>
             </p>
 
@@ -122,52 +136,162 @@
 
         </div>
     </div>
+    <!-- ========================== -->
+    <!-- ĐÁNH GIÁ TỪ NGƯỜI MUA -->
+    <!-- ========================== -->
+    <h4 class="fw-bold mt-4">Đánh giá từ người mua</h4>
+
+    @if (ViewBag.ListDanhGia != null && ((List<ThuongMaiDienTu_DoAn.Models.DANHGIA>)ViewBag.ListDanhGia).Count > 0)
+    {
+        var list = ViewBag.ListDanhGia as List<ThuongMaiDienTu_DoAn.Models.DANHGIA>;
+
+        foreach (var dg in list)
+        {
+            <div class="review-box p-3 mt-3 rounded shadow-sm" style="background:#fafafa;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center"
+                         style="width:38px; height:38px;">
+                        @dg.NGUOIDUNG.HoTen.Substring(0, 1)
+                    </div>
+
+                    <div>
+                        <b>@dg.NGUOIDUNG.HoTen</b> <br />
+                        <span class="text-warning">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= dg.SoSao)
+                                {
+                                    <i class="bi bi-star-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-star"></i>
+                                }
+                            }
+                        </span>
+                        <span class="text-muted small">
+                            • @(dg.NgayDG?.ToString("dd/MM/yyyy HH:mm"))
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mt-2">
+                    <p class="mb-1">@dg.NoiDung</p>
+                </div>
+            </div>
+        }
+
+        <!-- PHÂN TRANG -->
+        int current = ViewBag.PageDG;
+        int total = ViewBag.TotalPageDG;
+
+        if (total > 1)
+        {
+            <nav class="mt-3 d-flex justify-content-center">
+                <ul class="pagination">
+
+                    <li class="page-item @(current == 1 ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("ChiTiet", new { id = Model.MaSP, pageDG = current - 1, pageSP = ViewBag.PageSP })">«</a>
+                    </li>
+
+                    <li class="page-item @(current == 1 ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("ChiTiet", new { id = Model.MaSP, pageDG = 1, pageSP = ViewBag.PageSP })">1</a>
+                    </li>
+
+                    @if (current > 3)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                    }
+
+                    @for (int i = current - 1; i <= current + 1; i++)
+                    {
+                        if (i > 1 && i < total)
+                        {
+                            <li class="page-item @(i == current ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("ChiTiet", new { id = Model.MaSP, pageDG = i, pageSP = ViewBag.PageSP })">@i</a>
+                            </li>
+                        }
+                    }
+
+                    @if (current < total - 2)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                    }
+
+                    @if (total > 1)
+                    {
+                        <li class="page-item @(current == total ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("ChiTiet", new { id = Model.MaSP, pageDG = total, pageSP = ViewBag.PageSP })">@total</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(current == total ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("ChiTiet", new { id = Model.MaSP, pageDG = current + 1, pageSP = ViewBag.PageSP })">»</a>
+                    </li>
+
+                </ul>
+            </nav>
+        }
+    }
+    else
+    {
+        <p class="text-muted">Chưa có đánh giá nào.</p>
+    }
 
     <!-- ========================== -->
     <!-- SẢN PHẨM LIÊN QUAN -->
     <!-- ========================== -->
-    <h3 class="fw-bold mt-5 mb-4 text-center">Sản phẩm liên quan</h3>
+    @*<h3 class="fw-bold mt-5 mb-4 text-center">Sản phẩm liên quan</h3>
 
-    <div class="row g-4 justify-content-center">
+        <div class="row g-4 justify-content-center">
 
-        @if (related != null && related.Count > 0)
-        {
-            foreach (var item in related)
+            @if (related != null && related.Count > 0)
             {
-                var anh = item.HINHANHSPs.FirstOrDefault(a => a.AnhBia == true)?.URLAnh ?? "no-image.jpg";
+                foreach (var item in related)
+                {
+                    var anh = item.HINHANHSPs.FirstOrDefault(a => a.AnhBia == true)?.URLAnh ?? "no-image.jpg";
 
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="card product-card border-0 shadow-sm h-100">
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="card product-card border-0 shadow-sm h-100">
 
-                        <a href="@Url.Action("ChiTiet","SanPham", new { id = item.MaSP })">
-                            <div class="ratio ratio-1x1 bg-light rounded-top overflow-hidden">
-                                <img src="~/Content/Images/@anh"
-                                     class="card-img-top p-3"
-                                     style="object-fit: contain; width:100%; height:100%;" />
-                            </div>
-                        </a>
-
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <div>
-                                <h6 class="fw-semibold text-truncate">@item.TenSP</h6>
-                                <p class="text-danger fw-bold mb-1">@String.Format("{0:N0} ₫", item.Gia)</p>
-                                <p class="small text-muted">@item.LOAISANPHAM.TenLoai</p>
-                            </div>
-
-                            <a href="@Url.Action("ChiTiet","SanPham", new { id = item.MaSP })"
-                               class="btn btn-warning w-100 fw-semibold mt-2 rounded-pill shadow-sm">
-                                Xem chi tiết
+                            <a href="@Url.Action("ChiTiet","SanPham", new { id = item.MaSP })">
+                                <div class="ratio ratio-1x1 bg-light rounded-top overflow-hidden">
+                                    <img src="~/Content/Images/@anh"
+                                         class="card-img-top p-3"
+                                         style="object-fit: contain; width:100%; height:100%;" />
+                                </div>
                             </a>
+
+                            <div class="card-body text-center d-flex flex-column justify-content-between">
+                                <div>
+                                    <h6 class="fw-semibold text-truncate">@item.TenSP</h6>
+                                    <p class="text-danger fw-bold mb-1">@String.Format("{0:N0} ₫", item.Gia)</p>
+                                    <p class="small text-muted">@item.LOAISANPHAM.TenLoai</p>
+                                </div>
+
+                                <a href="@Url.Action("ChiTiet","SanPham", new { id = item.MaSP })"
+                                   class="btn btn-warning w-100 fw-semibold mt-2 rounded-pill shadow-sm">
+                                    Xem chi tiết
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
             }
-        }
-        else
-        {
-            <p class="text-center text-muted">Không có sản phẩm liên quan.</p>
-        }
-    </div>
+            else
+            {
+                <p class="text-center text-muted">Không có sản phẩm liên quan.</p>
+            }
+        </div>*@
+</div>
+
+<div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close" onclick="closeLightbox()">×</span>
+    <img id="lightboxImg" class="lightbox-img" />
 </div>
 
 <!-- ================================= -->
@@ -231,6 +355,45 @@
         .img-nav:hover {
             background: rgba(0,0,0,0.7);
         }
+
+    .lightbox {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        inset: 0;
+        background: rgba(0,0,0,0.85);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .lightbox-img {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        animation: zoomIn 0.3s ease;
+    }
+
+    .lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        font-size: 40px;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    @@keyframes zoomIn {
+        from {
+            transform: scale(0.85);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
 </style>
 
 <!-- ======================= -->
@@ -268,5 +431,15 @@
     function prevImage() {
         currentIndex = (currentIndex - 1 + images.length) % images.length;
         updateMainImg();
+    }
+
+    function openLightbox() {
+        const src = document.getElementById("mainImg").src;
+        document.getElementById("lightboxImg").src = src;
+        document.getElementById("lightbox").style.display = "flex";
+    }
+
+    function closeLightbox() {
+        document.getElementById("lightbox").style.display = "none";
     }
 </script>

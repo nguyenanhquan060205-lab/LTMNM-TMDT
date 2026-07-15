@@ -75,10 +75,31 @@
                 </button>
             </li>
         </ul>
+    </div>
 
-        <div class="input-group search-box" style="max-width: 300px;">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="text-muted fw-semibold"><i class="fa-solid fa-filter me-1"></i> Lọc theo trạng thái:</span>
+            <button class="btn btn-sm btn-outline-primary active" onclick="filterStatus('all', this)">
+                <i class="fa-solid fa-list me-1"></i> Tất cả
+            </button>
+            <button class="btn btn-sm btn-outline-warning" onclick="filterStatus('Đang chờ xử lý', this)">
+                <i class="fa-solid fa-clock me-1"></i> Đang chờ xử lý
+            </button>
+            <button class="btn btn-sm btn-outline-success" onclick="filterStatus('Đã thanh toán', this)">
+                <i class="fa-solid fa-check-circle me-1"></i> Đã thanh toán
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="filterStatus('Đã Huỷ', this)">
+                <i class="fa-solid fa-times-circle me-1"></i> Đã Huỷ
+            </button>
+        </div>
+
+        <div class="input-group search-box" style="max-width: 350px;">
             <span class="input-group-text"><i class="fa-solid fa-search"></i></span>
-            <input type="text" id="searchInput" class="form-control" placeholder="Tìm đơn hàng...">
+            <input type="text" id="searchInput" class="form-control" placeholder="Tìm tên người mua, người bán...">
+            <button class="btn btn-outline-secondary" type="button" onclick="resetSearch()">
+                <i class="fa-solid fa-rotate-right"></i> Reset
+            </button>
         </div>
     </div>
 
@@ -102,20 +123,8 @@
                                     <th style="width: 15%;" onclick="sortTable(3, this)">
                                         Tổng tiền <i class="fa-solid fa-sort float-end text-muted mt-1"></i>
                                     </th>
-                                    <th style="width: 20%;" class="text-center">
-                                        <div class="dropdown d-inline-block">
-                                            <span class="dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
-                                                Trạng thái
-                                            </span>
-                                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                                                <li><a class="dropdown-item" href="#" onclick="filterStatus('all')">Tất cả</a></li>
-                                                <li><hr class="dropdown-divider"></li>
-                                                <li><a class="dropdown-item text-warning" href="#" onclick="filterStatus('Đang chờ xử lý')">Đang chờ xử lý</a></li>
-                                                <li><a class="dropdown-item text-info" href="#" onclick="filterStatus('Đang vận chuyển')">Đang vận chuyển</a></li>
-                                                <li><a class="dropdown-item text-success" href="#" onclick="filterStatus('Đã thanh toán')">Đã thanh toán</a></li>
-                                                <li><a class="dropdown-item text-danger" href="#" onclick="filterStatus('Đã Huỷ')">Đã Huỷ</a></li>
-                                            </ul>
-                                        </div>
+                                    <th style="width: 20%;" onclick="sortTable(4, this)">
+                                        Trạng thái <i class="fa-solid fa-sort float-end text-muted mt-1"></i>
                                     </th>
                                     <th style="width: 10%;">Chi tiết</th>
                                 </tr>
@@ -183,29 +192,56 @@
 </div>
 
 <script>
+    let currentFilter = 'all';
+
     document.getElementById('searchInput').addEventListener('keyup', function () {
         let filter = this.value.toLowerCase();
         let rows = document.querySelectorAll('#tableBody tr.status-row');
         rows.forEach(row => {
             let textMua = row.cells[0].textContent.toLowerCase();
             let textBan = row.cells[1].textContent.toLowerCase();
-            if ((textMua.includes(filter) || textBan.includes(filter))) {
-                if (row.getAttribute('data-filtered') !== 'hidden') row.style.display = '';
+            let matchesSearch = (textMua.includes(filter) || textBan.includes(filter));
+            let matchesStatus = (currentFilter === 'all' || row.getAttribute('data-status') === currentFilter);
+
+            if (matchesSearch && matchesStatus) {
+                row.style.display = '';
             } else {
                 row.style.display = 'none';
             }
         });
     });
 
-    function filterStatus(status) {
+    function resetSearch() {
+        document.getElementById('searchInput').value = '';
+        filterStatus('all', document.querySelector('.btn-outline-primary.active'));
+    }
+
+    function filterStatus(status, buttonElement) {
+        currentFilter = status;
+
+        // Remove active class from all buttons
+        document.querySelectorAll('.btn-outline-primary, .btn-outline-warning, .btn-outline-info, .btn-outline-success, .btn-outline-danger').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Add active class to clicked button
+        if (buttonElement) {
+            buttonElement.classList.add('active');
+        }
+
+        let searchFilter = document.getElementById('searchInput').value.toLowerCase();
         let rows = document.querySelectorAll('.status-row');
+
         rows.forEach(row => {
             let rowStatus = row.getAttribute('data-status');
-            if (status === 'all' || rowStatus === status) {
-                row.setAttribute('data-filtered', 'visible');
+            let textMua = row.cells[0].textContent.toLowerCase();
+            let textBan = row.cells[1].textContent.toLowerCase();
+            let matchesSearch = !searchFilter || (textMua.includes(searchFilter) || textBan.includes(searchFilter));
+            let matchesStatus = (status === 'all' || rowStatus === status);
+
+            if (matchesSearch && matchesStatus) {
                 row.style.display = '';
             } else {
-                row.setAttribute('data-filtered', 'hidden');
                 row.style.display = 'none';
             }
         });

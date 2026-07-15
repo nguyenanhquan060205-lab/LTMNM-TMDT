@@ -32,10 +32,10 @@ namespace ThuongMaiDienTu_DoAn.Models
         public string MoTa { get; set; }
         public Nullable<decimal> Gia { get; set; }
         public Nullable<int> SoLuong { get; set; }
-        public string TrangThai { get; set; }
-        public Nullable<System.DateTime> NgayTao { get; set; }
         public Nullable<double> DanhGiaTB { get; set; }
         public Nullable<int> TongDanhGia { get; set; }
+        public string TrangThai { get; set; }
+        public Nullable<System.DateTime> NgayTao { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CT_GIOHANG> CT_GIOHANG { get; set; }

@@ -1,0 +1,167 @@
+﻿@model IEnumerable<ThuongMaiDienTu_DoAn.Models.ChiTietHoaDonViewModel>
+
+@{
+    var hd = ViewBag.HoaDon as ThuongMaiDienTu_DoAn.Models.HOADON;
+
+    bool DonHuy = hd.TrangThai != null &&
+                  hd.TrangThai.Trim().Equals("Đã Huỷ", StringComparison.OrdinalIgnoreCase);
+}
+
+<style>
+    .order-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .order-title {
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .table thead th {
+        background: #1e1e1e;
+        color: white;
+    }
+
+    .price-red {
+        color: #e60000;
+        font-weight: 700;
+    }
+
+    .badge-status {
+        font-size: 13px;
+        padding: 6px 10px;
+        border-radius: 6px;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="order-card">
+
+        <h2 class="order-title mb-4">
+            Chi tiết hóa đơn #@hd.MaHD
+        </h2>
+
+        <!-- THÔNG TIN HÓA ĐƠN -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Ngày đặt:</strong> @(hd.NgayDat?.ToString("dd/MM/yyyy HH:mm") ?? "-")</p>
+                <p><strong>Ngày thanh toán:</strong> @(hd.NgayTT?.ToString("dd/MM/yyyy HH:mm") ?? "-")</p>
+            </div>
+
+            <div class="col-md-6">
+                <p><strong>Địa chỉ giao hàng:</strong> @hd.DiaChiGiaoHang</p>
+
+                <p>
+                    <strong>Trạng thái hóa đơn:</strong>
+                    @if (DonHuy)
+                    {
+                        <span class="badge bg-danger badge-status">Đã huỷ</span>
+                    }
+                    else if (hd.TrangThai == "Đã thanh toán")
+                    {
+                        <span class="badge bg-success badge-status">Đã thanh toán</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark badge-status">Đang chờ xử lý</span>
+                    }
+                </p>
+            </div>
+        </div>
+
+        <hr />
+
+        <!-- DANH SÁCH SẢN PHẨM CỦA NGƯỜI BÁN -->
+        <h4 class="mb-3">Sản phẩm bạn đã bán</h4>
+
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Tên sản phẩm</th>
+                    <th class="text-center">Số lượng</th>
+                    <th class="text-end">Thành tiền</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    bool HuyCT = item.TrangThaiCT != null &&
+                                 item.TrangThaiCT.Trim().Equals("Đã Huỷ", StringComparison.OrdinalIgnoreCase);
+
+                    <tr>
+                        <td class="fw-semibold">@item.TenSP</td>
+
+                        <td class="text-center">@item.SoLuong</td>
+
+                        <td class="text-end price-red">
+                            @String.Format("{0:N0} đ", item.ThanhTien)
+                        </td>
+
+                        <td class="text-center">
+                            @if (DonHuy || HuyCT)
+                            {
+                                <span class="badge bg-danger badge-status">Đã huỷ</span>
+                            }
+                            else if (item.TrangThaiCT == "Đã xác nhận")
+                            {
+                                <span class="badge bg-success badge-status">Đã xác nhận</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary badge-status">Chờ xác nhận</span>
+                            }
+                        </td>
+
+                        <td class="text-center text-nowrap">
+                            <!-- XEM SẢN PHẨM -->
+                            <a class="btn btn-primary btn-sm"
+                               href="@Url.Action("ChiTiet", "SanPham", new { id = item.MaSP })">
+                                <i class="bi bi-eye-fill"></i> Xem
+                            </a>
+                        </td>
+                    </tr>
+                }
+
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            Không có sản phẩm nào thuộc hóa đơn này
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- FOOTER -->
+        <div class="d-flex justify-content-between mt-4">
+            <a href="@Url.Action("SanPhamDaBan", "SanPham")"
+               class="btn btn-secondary px-4">
+                ⬅ Quay lại
+            </a>
+
+            @if (!DonHuy && Model.Any(x => x.TrangThaiCT == "Chờ xác nhận"))
+            {
+                <form action="@Url.Action("HoanThanhHoaDon", "SanPham")"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="return confirm('Xác nhận hoàn thành toàn bộ sản phẩm trong hóa đơn này?')">
+
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@hd.MaHD" />
+
+                    <button type="submit" class="btn btn-success px-4">
+                        ✅ Hoàn thành đơn
+                    </button>
+                </form>
+            }
+        </div>
+
+    </div>
+</div>

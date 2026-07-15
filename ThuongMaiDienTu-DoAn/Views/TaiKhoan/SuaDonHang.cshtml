@@ -1,11 +1,11 @@
-﻿@model ThuongMaiDienTu_DoAn.Models.HOADON
+﻿﻿@model ThuongMaiDienTu_DoAn.Models.HOADON
 
 <h2>Sửa đơn hàng</h2>
 @if (!ViewData.ModelState.IsValid)
 {
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-    @Html.ValidationSummary(false, "", new { @class = "mb-0" })
-</div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+    </div>
 }
 
 @using (Html.BeginForm("SuaDonHang", "TaiKhoan", FormMethod.Post))

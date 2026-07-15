@@ -46,11 +46,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
+      <HintPath>..\packages\BouncyCastle.Cryptography.2.4.0\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.5.1\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.5.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="itextsharp, Version=5.5.13.4, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\iTextSharp.5.5.13.4\lib\net461\itextsharp.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
@@ -144,6 +150,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AdminProductViewModel.cs" />
+    <Compile Include="Models\ChiTietHoaDonViewModel.cs" />
     <Compile Include="Models\CT_GIOHANG.cs">
       <DependentUpon>TMDT.tt</DependentUpon>
     </Compile>
@@ -164,9 +171,11 @@
     <Compile Include="Models\HOADON.cs">
       <DependentUpon>TMDT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\HoaDonDaBanViewModel.cs" />
     <Compile Include="Models\KHIEUNAI.cs">
       <DependentUpon>TMDT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\KhieuNaiViewModel.cs" />
     <Compile Include="Models\LichSuViewModel.cs" />
     <Compile Include="Models\LOAISANPHAM.cs">
       <DependentUpon>TMDT.tt</DependentUpon>
@@ -199,6 +208,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\avatars\Admin.jpg" />
     <Content Include="Content\avatars\Default.jpg" />
     <Content Include="Content\avatars\user_2_638977859542721589.jpg" />
     <Content Include="Content\avatars\user_2_638977860946692533.jpg" />
@@ -260,6 +270,7 @@
     <Content Include="Models\TMDT.edmx.diagram">
       <DependentUpon>TMDT.edmx</DependentUpon>
     </Content>
+    <Content Include="Content\fonts\DejaVuSans.ttf" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -310,9 +321,19 @@
     <Content Include="Views\LoaiSanPham\Them.cshtml" />
     <Content Include="Views\LoaiSanPham\Xoa.cshtml" />
     <Content Include="Views\LoaiSanPham\Sua.cshtml" />
+    <Content Include="Views\TaiKhoan\CT_LichSu.cshtml" />
+    <Content Include="Views\TaiKhoan\DanhGia.cshtml" />
+    <Content Include="Views\TaiKhoan\LichSu.cshtml" />
+    <Content Include="Views\TaiKhoan\SuaDonHang.cshtml" />
+    <Content Include="Views\SanPham\SanPhamDaBan.cshtml" />
+    <Content Include="Views\SanPham\ThongTinNguoiBan.cshtml" />
+    <Content Include="Views\SanPham\CT_SanPhamDaBan.cshtml" />
+    <Content Include="Views\TaiKhoan\KhieuNai.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\BankLogos\" />
+    <Folder Include="Content\chat_images\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

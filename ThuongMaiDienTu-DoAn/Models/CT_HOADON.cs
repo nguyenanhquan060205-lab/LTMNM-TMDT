@@ -14,12 +14,22 @@ namespace ThuongMaiDienTu_DoAn.Models
     
     public partial class CT_HOADON
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public CT_HOADON()
+        {
+            this.DANHGIAs = new HashSet<DANHGIA>();
+        }
+    
         public int MaHD { get; set; }
         public int MaSP { get; set; }
-        public Nullable<int> SoLuong { get; set; }
-        public Nullable<decimal> ThanhTien { get; set; }
+        public int SoLuong { get; set; }
+        public decimal ThanhTien { get; set; }
+        public string TrangThaiCT { get; set; }
+        public bool DaDanhGia { get; set; }
     
         public virtual HOADON HOADON { get; set; }
         public virtual SANPHAM SANPHAM { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<DANHGIA> DANHGIAs { get; set; }
     }
 }
