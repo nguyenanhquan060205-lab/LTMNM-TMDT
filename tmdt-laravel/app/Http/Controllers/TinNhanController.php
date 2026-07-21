@@ -25,17 +25,23 @@ class TinNhanController extends Controller
         
         $activeUser = null;
         $NguoiNhanID = 0;
+        $NguoiNhanTen = '';
         if ($idNguoiNhan) {
             $activeUser = NguoiDung::find($idNguoiNhan);
-            $NguoiNhanID = $activeUser ? $activeUser->MaKH : 0;
+            if ($activeUser) {
+                $NguoiNhanID = $activeUser->MaKH;
+                $NguoiNhanTen = $activeUser->HoTen;
+            }
         }
 
         $UserChuaDoc = TinNhan::where('NguoiNhan', $currentUser->MaKH)
             ->where('DaDoc', false)
             ->pluck('NguoiGui')
             ->toArray();
+            
+        $NguoiGuiID = $currentUser->MaKH;
 
-        return view('tinnhan.chat', compact('dsNguoiDung', 'activeUser', 'mode', 'NguoiNhanID', 'UserChuaDoc'));
+        return view('tinnhan.chat', compact('dsNguoiDung', 'activeUser', 'mode', 'NguoiNhanID', 'NguoiNhanTen', 'NguoiGuiID', 'UserChuaDoc'));
     }
 
     public function loadTinNhan(Request $request)
