@@ -54,7 +54,24 @@ class TinNhanController extends Controller
             })->orWhere(function ($q) use ($idNguoiGui, $idNguoiNhan) {
                 $q->where('NguoiGui', $idNguoiNhan)
                   ->where('NguoiNhan', $idNguoiGui);
-            })->orderBy('NgayGui', 'asc')->get();
+            })->orderBy('NgayGui', 'asc')->get()
+            ->map(function ($tn) {
+                $avatar = $tn->nguoiGui->AnhDaiDien ?? 'Default.jpg';
+                if (!file_exists(public_path('Content/avatars/' . $avatar))) {
+                    $avatar = 'Default.jpg';
+                }
+                
+                return [
+                    'MaTN' => $tn->MaTN,
+                    'NguoiGui' => $tn->NguoiGui,
+                    'NguoiNhan' => $tn->NguoiNhan,
+                    'NoiDung' => $tn->NoiDung,
+                    'Anh' => $tn->Anh,
+                    'Gio' => $tn->NgayGui ? \Carbon\Carbon::parse($tn->NgayGui)->format('H:i d/m') : '',
+                    'AvatarGui' => $avatar,
+                    'DaDoc' => $tn->DaDoc ? true : false,
+                ];
+            });
 
         return response()->json($messages);
     }
