@@ -282,6 +282,10 @@
                                                             <button type="submit" name="tt" value="Đã duyệt" class="btn btn-success btn-sm fw-bold shadow-sm" style="width: 80px;">
                                                                 <i class="fa-solid fa-unlock me-1"></i> Mở
                                                             </button>
+                                                        @elseif ($sp->TrangThai == "Chưa duyệt" || $sp->TrangThai == "Chờ duyệt")
+                                                            <button type="submit" name="tt" value="Đã duyệt" class="btn btn-primary btn-sm fw-bold shadow-sm" style="width: 80px;">
+                                                                <i class="fa-solid fa-check me-1"></i> Duyệt
+                                                            </button>
                                                         @else
                                                             <button type="button" class="btn btn-light btn-sm border" style="width: 80px;" disabled>
                                                                 <i class="fa-solid fa-ban"></i>
