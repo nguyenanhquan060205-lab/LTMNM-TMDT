@@ -42,6 +42,15 @@ class TaiKhoanController extends Controller
 
         Session::put('user', $user);
 
+        // Fetch Cart Count
+        $gio = \App\Models\GioHang::where('MaKH', $user->MaKH)->first();
+        if ($gio) {
+            $tong = \App\Models\CtGioHang::where('MaGH', $gio->MaGH)->sum('SoLuong');
+            Session::put('CartCount', $tong);
+        } else {
+            Session::put('CartCount', 0);
+        }
+
         if ($user->VaiTro == 'Admin') {
             return redirect()->route('admin.index');
         } else {

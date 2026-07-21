@@ -66,7 +66,7 @@
                         @endphp
                         <a href="{{ route('giohang.index') }}" class="btn btn-outline-light position-relative" style="border: none;">
                             <i class="fa fa-shopping-cart fa-lg"></i>
-                            @if ($cartCount > 0)
+                            @if ($user && $cartCount > 0)
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                     {{ $cartCount }}
                                 </span>
