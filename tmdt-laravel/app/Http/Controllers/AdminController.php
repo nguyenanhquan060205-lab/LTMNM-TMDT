@@ -143,9 +143,10 @@ class AdminController extends Controller
         }
     }
 
-    public function doiTrangThaiNguoiDung(Request $request, $id)
+    public function doiTrangThaiNguoiDung(Request $request)
     {
         $this->checkAdmin();
+        $id = $request->input('id');
         $user = NguoiDung::find($id);
         if (!$user) return redirect()->route('admin.quanlynguoidung')->with('error', 'Không tìm thấy tài khoản!');
 
