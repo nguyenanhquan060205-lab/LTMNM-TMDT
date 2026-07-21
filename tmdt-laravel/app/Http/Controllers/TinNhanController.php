@@ -64,19 +64,29 @@ class TinNhanController extends Controller
         $currentUser = Session::get('user');
         if (!$currentUser) return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
 
-        $nguoiNhan = $request->input('idNguoiNhan');
+        $nguoiNhan = $request->input('nguoiNhan');
         $noiDung = $request->input('noiDung');
 
-        if ($nguoiNhan && $noiDung) {
+        if ($nguoiNhan && ($noiDung || $request->hasFile('anh'))) {
+            $fileName = null;
+            if ($request->hasFile('anh')) {
+                $file = $request->file('anh');
+                $ext = strtolower($file->getClientOriginalExtension());
+                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                    $fileName = 'chat_' . time() . '_' . $currentUser->MaKH . '.' . $ext;
+                    $file->move(public_path('Content/chat_images'), $fileName);
+                }
+            }
+
             $tn = TinNhan::create([
                 'NguoiGui' => $currentUser->MaKH,
                 'NguoiNhan' => $nguoiNhan,
                 'NoiDung' => $noiDung,
+                'Anh' => $fileName,
                 'NgayGui' => now(),
                 'DaDoc' => false
             ]);
             
-            // Format response to match loadTinNhan JSON objects if needed
             return response()->json(['success' => true, 'message' => clone $tn]);
         }
 
