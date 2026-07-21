@@ -91,8 +91,8 @@ Route::prefix('khieunai')->name('khieunai.')->group(function() {
 // LoaiSanPham
 Route::prefix('loaisanpham')->name('loaisanpham.')->group(function() {
     Route::post('/them', [LoaiSanPhamController::class, 'store'])->name('them');
-    Route::post('/sua/{id}', [LoaiSanPhamController::class, 'update'])->name('sua');
-    Route::post('/xoa/{id}', [LoaiSanPhamController::class, 'delete'])->name('xoa');
+    Route::post('/sua', [LoaiSanPhamController::class, 'update'])->name('sua');
+    Route::post('/xoa', [LoaiSanPhamController::class, 'delete'])->name('xoa');
 });
 
 // TinNhan

@@ -46,27 +46,29 @@ class LoaiSanPhamController extends Controller
         return view('loaisanpham.edit', compact('loai'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $this->checkAdmin();
+        $id = $request->input('id');
         $loai = LoaiSanPham::find($id);
         if (!$loai) abort(404);
 
-        $request->validate(['TenLoai' => 'required|string|max:100']);
-        $loai->TenLoai = $request->TenLoai;
+        $request->validate(['TenLoaiMoi' => 'required|string|max:100']);
+        $loai->TenLoai = $request->TenLoaiMoi;
         $loai->save();
 
-        return redirect()->route('loaisanpham.index')->with('success', 'Cập nhật thành công!');
+        return redirect()->route('admin.quanlysanpham')->with('success', 'Cập nhật danh mục thành công!');
     }
 
-    public function delete($id)
+    public function delete(Request $request)
     {
         $this->checkAdmin();
+        $id = $request->input('id');
         $loai = LoaiSanPham::find($id);
         if ($loai) {
             $loai->delete();
-            return redirect()->route('loaisanpham.index')->with('success', 'Đã xoá loại sản phẩm!');
+            return redirect()->route('admin.quanlysanpham')->with('success', 'Đã xoá danh mục sản phẩm!');
         }
-        return redirect()->route('loaisanpham.index');
+        return redirect()->route('admin.quanlysanpham');
     }
 }
