@@ -205,6 +205,7 @@ class TaiKhoanController extends Controller
     public function dangXuat()
     {
         Session::forget('user');
+        Session::forget('CartCount');
         return redirect()->route('home.index');
     }
 
