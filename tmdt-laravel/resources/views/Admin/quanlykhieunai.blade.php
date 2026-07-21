@@ -197,7 +197,7 @@
                                     </td>
 
                                     <td>
-                                        @if ($item->TrangThai == "Chưa xử lý")
+                                        @if ($item->TrangThai == "Chưa xử lý" || $item->TrangThai == "Đang chờ xử lý" || $item->TrangThai == "Đang chờ xữ lý")
                                             <form action="{{ route('admin.capnhattrangthaikn') }}" method="post">
                                                 @csrf
                                                 <input type="hidden" name="id" value="{{ $item->MaKN }}" />
