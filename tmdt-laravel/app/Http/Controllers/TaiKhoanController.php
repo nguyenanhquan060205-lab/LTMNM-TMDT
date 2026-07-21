@@ -259,12 +259,11 @@ class TaiKhoanController extends Controller
         $chiTietVm = CtHoaDon::with('sanPham')
             ->where('MaHD', $id)
             ->get()
-            ->map(function ($ct) {
+            ->map(function ($ct) use ($kh) {
                 $ct->TenSP = $ct->sanPham->TenSP ?? '';
                 $ct->DaDanhGia = DanhGia::where('MaHD', $ct->MaHD)->where('MaSP', $ct->MaSP)->exists();
-                // We use KhieuNai where MaHD and MaSP maybe?
-                // In C#: db.KHIEUNAIs.Any(k => k.MaSP == ct.MaHD && k.MaSP == ct.MaSP) -> this is a typo in C# code, it probably means MaHD == ct.MaHD
-                $ct->DaKhieuNai = KhieuNai::where('MaHD', $ct->MaHD)->exists(); 
+                // We use KhieuNai where MaSP and MaKH since KhieuNai doesn't have MaHD
+                $ct->DaKhieuNai = KhieuNai::where('MaSP', $ct->MaSP)->where('MaKH', $kh->MaKH)->exists(); 
                 return $ct;
             });
 

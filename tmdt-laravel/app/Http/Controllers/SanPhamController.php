@@ -156,7 +156,7 @@ class SanPhamController extends Controller
 
                         HinhAnhSP::create([
                             'MaSP' => $sp->MaSP,
-                            'DuongDan' => $fileName,
+                            'URLAnh' => $fileName,
                             'AnhBia' => $firstImage
                         ]);
                         if($firstImage) {
@@ -170,7 +170,7 @@ class SanPhamController extends Controller
         } else {
             HinhAnhSP::create([
                 'MaSP' => $sp->MaSP,
-                'DuongDan' => 'noimage.jpg',
+                'URLAnh' => 'noimage.jpg',
                 'AnhBia' => true
             ]);
             $sp->AnhBia = 'noimage.jpg';
@@ -228,8 +228,8 @@ class SanPhamController extends Controller
                 $ext = strtolower($anhBiaMoi->getClientOriginalExtension());
                 if (in_array($ext, $allow)) {
                     $anhBiaCu = HinhAnhSP::where('MaSP', $sp->MaSP)->where('AnhBia', true)->first();
-                    if ($anhBiaCu && $anhBiaCu->DuongDan != 'noimage.jpg') {
-                        @unlink($imgPath . $anhBiaCu->DuongDan);
+                    if ($anhBiaCu && $anhBiaCu->URLAnh != 'noimage.jpg') {
+                        @unlink($imgPath . $anhBiaCu->URLAnh);
                         $anhBiaCu->delete();
                     }
 
@@ -238,7 +238,7 @@ class SanPhamController extends Controller
 
                     HinhAnhSP::create([
                         'MaSP' => $sp->MaSP,
-                        'DuongDan' => $fileName,
+                        'URLAnh' => $fileName,
                         'AnhBia' => true
                     ]);
                     $sp->AnhBia = $fileName;
@@ -251,7 +251,7 @@ class SanPhamController extends Controller
             if (count($validFiles) > 0 && $validFiles[0] != null) {
                 $anhChiTietCu = HinhAnhSP::where('MaSP', $sp->MaSP)->where('AnhBia', false)->get();
                 foreach ($anhChiTietCu as $anhCu) {
-                    @unlink($imgPath . $anhCu->DuongDan);
+                    @unlink($imgPath . $anhCu->URLAnh);
                 }
                 HinhAnhSP::where('MaSP', $sp->MaSP)->where('AnhBia', false)->delete();
 
@@ -264,7 +264,7 @@ class SanPhamController extends Controller
 
                             HinhAnhSP::create([
                                 'MaSP' => $sp->MaSP,
-                                'DuongDan' => $fileName,
+                                'URLAnh' => $fileName,
                                 'AnhBia' => false
                             ]);
                         }
@@ -291,8 +291,8 @@ class SanPhamController extends Controller
             $hinhAnh = HinhAnhSP::where('MaSP', $id)->get();
             $path = public_path('Content/Images/');
             foreach ($hinhAnh as $anh) {
-                if ($anh->DuongDan != 'noimage.jpg') {
-                    @unlink($path . $anh->DuongDan);
+                if ($anh->URLAnh != 'noimage.jpg') {
+                    @unlink($path . $anh->URLAnh);
                 }
             }
             HinhAnhSP::where('MaSP', $id)->delete();
