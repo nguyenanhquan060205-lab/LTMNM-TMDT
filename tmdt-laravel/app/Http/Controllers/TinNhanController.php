@@ -134,8 +134,8 @@ class TinNhanController extends Controller
         $idNguoiGui = $request->input('idNguoiGui');
         $idNguoiNhan = $request->input('idNguoiNhan');
 
-        TinNhan::where('NguoiGui', $idNguoiGui)
-               ->where('NguoiNhan', $idNguoiNhan)
+        TinNhan::where('NguoiGui', $idNguoiNhan)
+               ->where('NguoiNhan', $idNguoiGui)
                ->update(['DaDoc' => true]);
 
         return response()->json(['success' => true]);
