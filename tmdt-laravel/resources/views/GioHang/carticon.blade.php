@@ -1,10 +1,10 @@
-﻿@{
+@{
     int tongSoLuong = $TongSoLuong != null ? (int)$TongSoLuong : 0;
 }
 
 <a href="@Url.Action("Index", "GioHang")"
    class="btn btn-outline-light btn-sm px-3 position-relative d-inline-flex align-items-center fw-bold me-1">
-    <i class="bi bi-cart3 me-1"></i><span>Giỏ hàng</span>
+    <i class="bi bi-cart3 me-1"></i><span>Gi? h�ng</span>
 
     @if (tongSoLuong > 0)
     {

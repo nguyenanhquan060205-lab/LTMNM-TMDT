@@ -38,7 +38,7 @@ class SanPhamController extends Controller
             $query->where('MaLoai', $maloai);
         }
 
-        $dsSanPham = $query->orderBy('NgayDang', 'desc')->paginate(12);
+        $dsSanPham = $query->orderBy('NgayTao', 'desc')->paginate(12);
 
         $loai = LoaiSanPham::all();
 
@@ -68,7 +68,7 @@ class SanPhamController extends Controller
         $pageSizeDG = 5;
         $danhGiaQuery = DanhGia::where('MaSP', $id)->orderBy('NgayDG', 'desc');
         $tongDanhGia = $danhGiaQuery->count();
-        $trungBinhDanhGia = $tongDanhGia > 0 ? round($danhGiaQuery->avg('DiemDG') ?? 0, 1) : 0; // Note: 'DiemDG' in migration, 'SoSao' in C#. We mapped DiemDG in migration.
+        $trungBinhDanhGia = $tongDanhGia > 0 ? round($danhGiaQuery->avg('SoSao') ?? 0, 1) : 0;
 
         $totalPageDG = (int)ceil($tongDanhGia / $pageSizeDG);
         $listDanhGia = $danhGiaQuery->skip(($pageDG - 1) * $pageSizeDG)->take($pageSizeDG)->get();
@@ -80,7 +80,7 @@ class SanPhamController extends Controller
             ->where('MaLoai', $sp->MaLoai)
             ->where('MaSP', '!=', $sp->MaSP)
             ->where('TrangThai', 'Đã duyệt')
-            ->orderBy('NgayDang', 'desc');
+            ->orderBy('NgayTao', 'desc');
 
         $totalSPLienQuan = $spLienQuanQuery->count();
         $totalPageSP = (int)ceil($totalSPLienQuan / $pageSizeSP);
@@ -140,7 +140,7 @@ class SanPhamController extends Controller
         $sp->SoLuong = $request->SoLuong;
         $sp->MaLoai = $request->MaLoai;
         $sp->MaKH = $u->MaKH;
-        $sp->NgayDang = now();
+        $sp->NgayTao = now();
         $sp->TrangThai = 'Đã duyệt';
         $sp->save();
 
@@ -185,7 +185,7 @@ class SanPhamController extends Controller
         $u = Session::get('user');
         if (!$u) return redirect()->route('taikhoan.dangnhap');
 
-        $list = SanPham::where('MaKH', $u->MaKH)->orderBy('NgayDang', 'desc')->get();
+        $list = SanPham::where('MaKH', $u->MaKH)->orderBy('NgayTao', 'desc')->get();
         return view('sanpham.cuatoi', compact('list'));
     }
 

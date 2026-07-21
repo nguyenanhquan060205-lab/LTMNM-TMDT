@@ -1,109 +1,333 @@
-@extends('shared._layout')
+@extends('layouts.app')
+
+@section('title', 'Thông tin người bán')
+
 @section('content')
-@php
-    $avatar = $nguoiBan && !empty($nguoiBan->AnhDaiDien) ? asset('Content/Avatars/' . $nguoiBan->AnhDaiDien) : asset('Content/Avatars/default.jpg');
-    $user = session('user');
-@endphp
-
-<div class="container mt-4 mb-5">
-    <!-- Nút Quay lại -->
-    <button onclick="history.back()" class="btn btn-outline-secondary mb-4 rounded-pill px-4 shadow-sm">
-        <i class="fa fa-arrow-left me-2"></i>Quay lại
-    </button>
-
+<div class="container mt-5 mb-5">
     <div class="row">
-        <!-- Cột trái: Thông tin cá nhân -->
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm border-0 rounded-4 text-center overflow-hidden">
-                <div class="bg-warning" style="height: 100px;"></div>
-                <div class="card-body position-relative pt-0">
-                    <img src="{{ $avatar }}"
-                         class="rounded-circle border border-4 border-white shadow bg-white"
-                         style="width: 120px; height: 120px; object-fit: cover; margin-top: -60px; z-index: 2; position: relative;" 
-                         onerror="this.src='{{ asset('Content/Avatars/default.jpg') }}';">
-                    
-                    <h3 class="fw-bold mt-3 mb-1 text-dark">{{ $nguoiBan->HoTen ?? 'Người dùng Ẩn danh' }}</h3>
-                    <p class="text-muted mb-3"><i class="fa fa-clock me-1"></i>Tham gia: {{ \Carbon\Carbon::parse($nguoiBan->NgayTao)->format('d/m/Y') }}</p>
-                    
-                    <div class="d-flex justify-content-center gap-4 mb-4 text-dark">
-                        <div>
-                            <h4 class="fw-bold mb-0 text-warning">{{ $tongSanPham }}</h4>
-                            <small class="text-muted">Sản phẩm</small>
-                        </div>
-                        <div>
-                            <h4 class="fw-bold mb-0 text-success">{{ $tongSanPhamDaBan }}</h4>
-                            <small class="text-muted">Đã bán</small>
-                        </div>
-                        <div>
-                            <h4 class="fw-bold mb-0 text-primary">{{ $diemDanhGiaTrungBinh }}/5</h4>
-                            <small class="text-muted">Đánh giá</small>
-                        </div>
-                    </div>
-                    
-                    <hr>
-                    
-                    <div class="text-start px-2">
-                        <p class="mb-2"><i class="fa fa-map-marker-alt me-2 text-danger"></i><strong>Khu vực:</strong> {{ $nguoiBan->DiaChi ?? 'Chưa cập nhật' }}</p>
-                        <p class="mb-2"><i class="fa fa-phone-alt me-2 text-success"></i><strong>Số ĐT:</strong> {{ $nguoiBan->SDT ?? 'Chưa cập nhật' }}</p>
-                        <p class="mb-0"><i class="fa fa-envelope me-2 text-primary"></i><strong>Email:</strong> {{ $nguoiBan->Email ?? 'Chưa cập nhật' }}</p>
-                    </div>
 
-                    @if ($user && $user->MaKH != $nguoiBan->MaKH)
-                        <div class="mt-4 d-flex justify-content-center">
-                            <a href="{{ route('tinnhan.index', ['userId' => $nguoiBan->MaKH]) }}" class="btn btn-warning rounded-pill px-4 shadow-sm w-100">
-                                <i class="fa-regular fa-comment-dots me-2"></i>Nhắn tin ngay
-                            </a>
-                        </div>
-                    @endif
-                </div>
-            </div>
+        <!-- ====================== -->
+        <!-- THÔNG TIN NGƯỜI BÁN -->
+        <!-- ====================== -->
+        <div class="col-md-4 text-center mb-4">
+            <img src="{{ asset('Content/Avatars/' . ($nguoiBan->AnhDaiDien ?? 'no-avatar.jpg')) }}"
+                 class="img-fluid rounded-circle mb-3"
+                 style="width:150px;height:150px;object-fit:cover;" />
+
+            <h4 class="fw-bold">{{ $nguoiBan->HoTen }}</h4>
+            <p class="text-muted mb-1">{{ $nguoiBan->Email }}</p>
+            <p class="text-muted mb-1">{{ $nguoiBan->SDT }}</p>
+            <p class="text-muted">{{ $nguoiBan->DiaChi }}</p>
+
+            <a href="javascript:void(0);"
+               class="btn btn-warning fw-bold px-4 btn-chuyen-khoan"
+               data-id="{{ $nguoiBan->MaKH }}">
+                <i class="fa-solid fa-credit-card"></i> Thông tin chuyển khoản
+            </a>
         </div>
 
-        <!-- Cột phải: Các sản phẩm đang bán -->
+        <!-- ====================== -->
+        <!-- DANH SÁCH SẢN PHẨM NGƯỜI BÁN -->
+        <!-- ====================== -->
         <div class="col-md-8">
-            <h4 class="fw-bold border-bottom pb-2 mb-4 text-dark"><i class="fa-solid fa-shop me-2"></i>Sản phẩm đang bán</h4>
-            
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                @foreach ($sanPham as $sp)
-                    @php
-                        $anh = $sp->hinhAnhs->where('AnhBia', true)->first();
-                        $anhUrl = $anh ? $anh->URLAnh : 'noimage.jpg';
-                    @endphp
-                    <div class="col">
-                        <div class="card card-product h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                            <div class="product-img bg-light d-flex justify-content-center align-items-center" style="height: 180px; overflow: hidden;">
+            <h4 class="fw-bold mb-4">Sản phẩm của {{ $nguoiBan->HoTen }}</h4>
+
+            @if ($SanPham && count($SanPham) > 0)
+                <div class="row g-4 justify-content-center">
+                    @foreach ($SanPham as $sp)
+                        @php
+                            $anhBiaObj = collect($sp->hinhAnhs)->firstWhere('AnhBia', true);
+                            $anhBia = $anhBiaObj ? $anhBiaObj->URLAnh : ($sp->AnhBia ?? "noimage.jpg");
+                        @endphp
+
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="card product-card border-0 shadow-sm h-100">
                                 <a href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP]) }}">
-                                    <img src="{{ asset('Content/Images/' . $anhUrl) }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='{{ asset('Content/Images/noimage.jpg') }}';" />
+                                    <div class="ratio ratio-1x1 bg-light rounded-top overflow-hidden">
+                                        <img src="{{ asset('Content/Images/' . $anhBia) }}"
+                                             class="card-img-top p-3"
+                                             style="object-fit: contain; width:100%; height:100%;" />
+                                    </div>
                                 </a>
-                            </div>
-                            <div class="card-body d-flex flex-column p-3">
-                                <h6 class="fw-semibold text-truncate mb-2">
-                                    <a href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP]) }}" class="text-decoration-none text-dark">{{ $sp->TenSP }}</a>
-                                </h6>
-                                <strong class="text-danger mb-2">{{ number_format($sp->Gia, 0, ',', '.') }}₫</strong>
-                                <small class="text-muted mt-auto"><i class="fa-solid fa-box me-1"></i>Còn lại: {{ $sp->SoLuong }}</small>
+
+                                <div class="card-body text-center d-flex flex-column justify-content-between">
+                                    <div>
+                                        <h6 class="fw-semibold text-truncate">{{ $sp->TenSP }}</h6>
+                                        <p class="text-danger fw-bold mb-1">{{ number_format($sp->Gia, 0, ',', '.') }} ₫</p>
+                                        <p class="small text-muted">{{ $sp->loaiSanPham->TenLoai ?? '' }}</p>
+                                    </div>
+
+                                    <a href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP]) }}"
+                                       class="btn btn-warning w-100 fw-semibold mt-2 rounded-pill shadow-sm">
+                                        Xem chi tiết
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
-
-            @if ($sanPham->isEmpty())
-                <div class="text-center p-5 bg-white shadow-sm rounded-4 border">
-                    <i class="fa-solid fa-box-open fa-3x text-muted mb-3"></i>
-                    <h5 class="text-muted">Người dùng này chưa có sản phẩm nào đang bán.</h5>
+                    @endforeach
                 </div>
+            @else
+                <p class="text-center text-muted">Người bán chưa có sản phẩm nào.</p>
             @endif
-
-            <div class="mt-4 d-flex justify-content-center">
-                {{ $sanPham->links('pagination::bootstrap-4') }}
-            </div>
         </div>
     </div>
 </div>
 
-<style>
-    .card-product { transition: transform 0.25s ease, box-shadow 0.25s; }
-    .card-product:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,.1); }
-</style>
+<!-- ======================= -->
+<!-- MODAL THÔNG TIN CHUYỂN KHOẢN -->
+<!-- ======================= -->
+<div class="modal fade" id="modalChuyenKhoan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thông tin chuyển khoản</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="chuyenKhoanBody">
+                <!-- Nội dung sẽ load bằng Ajax -->
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    $(document).ready(function() {
+        // Danh sách ngân hàng với thông tin màu sắc và logo
+        const bankStyles = {
+            'MB Bank': {
+                color: '#0032A0',
+                logo: 'mbbank.png',
+                gradient: 'linear-gradient(135deg, #0032A0 0%, #0052CC 100%)'
+            },
+            'Vietcombank': {
+                color: '#007C3F',
+                logo: 'vietcombank.png',
+                gradient: 'linear-gradient(135deg, #007C3F 0%, #00A854 100%)'
+            },
+            'Techcombank': {
+                color: '#E31E24',
+                logo: 'techcombank.png',
+                gradient: 'linear-gradient(135deg, #E31E24 0%, #FF4444 100%)'
+            },
+            'ACB': {
+                color: '#005BAA',
+                logo: 'acb.png',
+                gradient: 'linear-gradient(135deg, #005BAA 0%, #0077CC 100%)'
+            },
+            'VietinBank': {
+                color: '#ED1C24',
+                logo: 'viettinbank.png',
+                gradient: 'linear-gradient(135deg, #ED1C24 0%, #FF4444 100%)'
+            },
+            'Agribank': {
+                color: '#006838',
+                logo: 'agribank.png',
+                gradient: 'linear-gradient(135deg, #006838 0%, #008A4A 100%)'
+            },
+            'BIDV': {
+                color: '#005BAA',
+                logo: 'bidv.png',
+                gradient: 'linear-gradient(135deg, #005BAA 0%, #0077CC 100%)'
+            },
+            'VPBank': {
+                color: '#1BA05B',
+                logo: 'vpbank.png',
+                gradient: 'linear-gradient(135deg, #1BA05B 0%, #26D07C 100%)'
+            },
+            'TPBank': {
+                color: '#8B3FFD',
+                logo: 'tpbank.png',
+                gradient: 'linear-gradient(135deg, #8B3FFD 0%, #A366FF 100%)'
+            },
+            'Sacombank': {
+                color: '#004B9D',
+                logo: 'sacombank.png',
+                gradient: 'linear-gradient(135deg, #004B9D 0%, #0066CC 100%)'
+            }
+        };
+
+        $(".btn-chuyen-khoan").click(function() {
+            var idNguoiBan = $(this).data("id");
+
+            $.ajax({
+                url: '{{ route('taikhoan.thongtinchuyenkhoan') }}',
+                type: 'GET',
+                data: { idNguoiBan: idNguoiBan },
+                success: function(data) {
+                    if (data && data.SoTaiKhoan) {
+                        var bankInfo = bankStyles[data.TenNganHang] || {
+                            color: '#666',
+                            logo: 'default-bank.png',
+                            gradient: 'linear-gradient(135deg, #666 0%, #888 100%)'
+                        };
+
+                        var html = `
+                            <style>
+                                .bank-card {
+                                    background: ${bankInfo.gradient};
+                                    border-radius: 20px;
+                                    padding: 25px;
+                                    color: white;
+                                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                                    margin-bottom: 20px;
+                                }
+                                .bank-logo {
+                                    width: 80px;
+                                    height: 80px;
+                                    background: white;
+                                    border-radius: 15px;
+                                    padding: 10px;
+                                    margin-bottom: 15px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                }
+                                .bank-logo img {
+                                    max-width: 100%;
+                                    max-height: 100%;
+                                    object-fit: contain;
+                                }
+                                .account-info {
+                                    background: rgba(255,255,255,0.15);
+                                    backdrop-filter: blur(10px);
+                                    border-radius: 12px;
+                                    padding: 15px;
+                                    margin-top: 15px;
+                                }
+                                .info-row {
+                                    display: flex;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                    margin-bottom: 12px;
+                                }
+                                .info-row:last-child {
+                                    margin-bottom: 0;
+                                }
+                                .info-label {
+                                    font-size: 13px;
+                                    opacity: 0.9;
+                                    font-weight: 500;
+                                }
+                                .info-value {
+                                    font-size: 16px;
+                                    font-weight: bold;
+                                    text-align: right;
+                                }
+                                .account-number {
+                                    font-size: 24px !important;
+                                    letter-spacing: 2px;
+                                    font-family: 'Courier New', monospace;
+                                }
+                                .copy-btn {
+                                    background: white;
+                                    color: ${bankInfo.color};
+                                    border: none;
+                                    padding: 12px 25px;
+                                    border-radius: 25px;
+                                    font-weight: bold;
+                                    width: 100%;
+                                    margin-top: 15px;
+                                    cursor: pointer;
+                                    transition: all 0.3s;
+                                    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                                }
+                                .copy-btn:hover {
+                                    transform: translateY(-2px);
+                                    box-shadow: 0 7px 20px rgba(0,0,0,0.3);
+                                }
+                                .qr-section {
+                                    background: white;
+                                    border-radius: 15px;
+                                    padding: 20px;
+                                    text-align: center;
+                                    margin-top: 20px;
+                                }
+                                .qr-title {
+                                    color: #333;
+                                    font-size: 14px;
+                                    margin-bottom: 15px;
+                                    font-weight: 600;
+                                }
+                            </style>
+
+                            <div class="bank-card">
+                                <div class="bank-logo">
+                                    <img src="/Content/BankLogos/${bankInfo.logo}"
+                                         alt="${data.TenNganHang}"
+                                         onerror="this.src='/Content/BankLogos/default-bank.png'">
+                                </div>
+                                <h5 class="mb-3" style="font-weight: 600; font-size: 18px;">${data.TenNganHang}</h5>
+
+                                <div class="account-info">
+                                    <div class="info-row">
+                                        <span class="info-label">Chủ tài khoản</span>
+                                        <span class="info-value">${data.HoTen.toUpperCase()}</span>
+                                    </div>
+                                    <div class="info-row" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
+                                        <span class="info-label">Số tài khoản</span>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <span class="info-value account-number">${data.SoTaiKhoan}</span>
+                                    </div>
+                                </div>
+
+                                <button class="copy-btn" onclick="copyAccountNumber(event, '${data.SoTaiKhoan}')">
+                                    <i class="fa-solid fa-copy"></i> Sao chép số tài khoản
+                                </button>
+                            </div>
+
+                            <div class="qr-section">
+                                <div class="qr-title">
+                                    <i class="fa-solid fa-qrcode"></i> Quét mã QR để chuyển khoản
+                                </div>
+                                <div id="qrcode-container" style="display: flex; justify-content: center;"></div>
+                                <p class="text-muted small mt-2 mb-0">Sử dụng app ngân hàng để quét mã</p>
+                            </div>
+                        `;
+
+                        $("#chuyenKhoanBody").html(html);
+
+                        // Tạo QR Code (nếu có thư viện QRCode.js)
+                        if (typeof QRCode !== 'undefined') {
+                            new QRCode(document.getElementById("qrcode-container"), {
+                                text: `${data.TenNganHang}|${data.SoTaiKhoan}|${data.HoTen}`,
+                                width: 200,
+                                height: 200
+                            });
+                        }
+
+                        var myModal = new bootstrap.Modal(document.getElementById('modalChuyenKhoan'));
+                        myModal.show();
+                    } else {
+                        alert("Người bán chưa cập nhật thông tin chuyển khoản");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    alert("Không thể tải thông tin chuyển khoản");
+                }
+            });
+        });
+    });
+
+    function copyAccountNumber(event, accountNumber) {
+        navigator.clipboard.writeText(accountNumber).then(function () {
+            const btn = event.target.closest('.copy-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Đã sao chép!';
+            btn.style.background = '#4CAF50';
+            btn.style.color = 'white';
+
+            setTimeout(function () {
+                btn.innerHTML = originalText;
+                btn.style.background = 'white';
+                btn.style.color = '';
+            }, 2000);
+        }).catch(function (err) {
+            alert("Không thể sao chép. Vui lòng thử lại!");
+        });
+    }
+</script>
 @endsection

@@ -1,30 +1,28 @@
-﻿{{-- @model ThuongMaiDienTu_DoAn.Models.NGUOIDUNG --}}
-@extends('shared._layout')
+@extends('layouts.app')
 
+@section('title', 'Thông tin khách hàng')
+
+@section('content')
 <section class="container my-5">
     <h3 class="fw-bold mb-4">Thông tin khách hàng</h3>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
-    }
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
 
-    @using (Html.BeginForm("CapNhatThongTin", "TaiKhoan", FormMethod.Post, new { enctype = "multipart/form-data" }))
-    {
-        @Html.AntiForgeryToken()
-
-        @Html.HiddenFor(m => m.MaKH)
+    <form method="POST" action="{{ route('taikhoan.capnhatthongtin') }}" enctype="multipart/form-data">
+        @csrf
+        <input type="hidden" name="MaKH" value="{{ $targetUser->MaKH }}" />
 
         <div class="row">
             <!-- Ảnh đại diện -->
             <div class="col-md-3 text-center">
                 <div class="avatar-upload position-relative mb-3">
                     <img id="previewAvatar"
-                         src="{{ asset('Content/') }}/Avatars/@(Model.AnhDaiDien ?? "default.jpg")"
+                         src="{{ asset('Content/Avatars/' . ($targetUser->AnhDaiDien ?: 'default.jpg')) }}"
                          class="rounded-circle shadow-sm avatar-img"
                          style="width: 130px; height: 130px; object-fit: cover; border: 3px solid #f1f1f1;" />
 
@@ -42,30 +40,32 @@
                 </button>
             </div>
 
-
             <!-- Thông tin -->
             <div class="col-md-9">
                 <div class="mb-3">
-                    @Html.LabelFor(m => m.HoTen)
-                    @Html.TextBoxFor(m => m.HoTen, new { @class = "form-control" })
+                    <label>Họ tên</label>
+                    <input type="text" name="HoTen" class="form-control" value="{{ $targetUser->HoTen }}" />
                 </div>
                 <div class="mb-3">
-                    @Html.LabelFor(m => m.Email)
-                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    <label>Email</label>
+                    <input type="email" name="Email" class="form-control" value="{{ $targetUser->Email }}" />
                 </div>
                 <div class="mb-3">
-                    @Html.LabelFor(m => m.SDT, "Số điện thoại")
-                    @Html.TextBoxFor(m => m.SDT, new { @class = "form-control" })
+                    <label>Số điện thoại</label>
+                    <input type="text" name="SDT" class="form-control" value="{{ $targetUser->SDT }}" />
                 </div>
                 <div class="mb-3">
-                    @Html.LabelFor(m => m.DiaChi)
-                    @Html.TextBoxFor(m => m.DiaChi, new { @class = "form-control" })
+                    <label>Địa chỉ</label>
+                    <input type="text" name="DiaChi" class="form-control" value="{{ $targetUser->DiaChi }}" />
                 </div>
                 <div class="mb-3">
-                    @Html.LabelFor(m => m.GioiTinh)
-                    @Html.DropDownListFor(m => m.GioiTinh,
-                        new SelectList(new[] { "Nam", "Nữ", "Khác" }, Model.GioiTinh),
-                        "Chọn giới tính", new { @class = "form-control" })
+                    <label>Giới tính</label>
+                    <select name="GioiTinh" class="form-control">
+                        <option value="">Chọn giới tính</option>
+                        <option value="Nam" {{ $targetUser->GioiTinh == 'Nam' ? 'selected' : '' }}>Nam</option>
+                        <option value="Nữ" {{ $targetUser->GioiTinh == 'Nữ' ? 'selected' : '' }}>Nữ</option>
+                        <option value="Khác" {{ $targetUser->GioiTinh == 'Khác' ? 'selected' : '' }}>Khác</option>
+                    </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                 <!-- Nút mở modal -->
@@ -77,7 +77,7 @@
                 </button>
             </div>
         </div>
-    }
+    </form>
 </section>
 
 <!-- Modal Đổi mật khẩu -->
@@ -89,25 +89,24 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                @using (Html.BeginForm("CapNhatMatKhau", "TaiKhoan", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.HiddenFor(m => m.MaKH)
+                <form method="POST" action="{{ route('taikhoan.doimatkhau') }}">
+                    @csrf
+                    <input type="hidden" name="MaKH" value="{{ $targetUser->MaKH }}" />
 
                     <div class="mb-3">
-                        @Html.Label("Mật khẩu hiện tại")
-                        <input type="password" name="MatKhauHienTai" class="form-control" />
+                        <label>Mật khẩu hiện tại</label>
+                        <input type="password" name="MatKhauHienTai" class="form-control" required />
                     </div>
                     <div class="mb-3">
-                        @Html.Label("Mật khẩu mới")
-                        <input type="password" name="MatKhauMoi" class="form-control" />
+                        <label>Mật khẩu mới</label>
+                        <input type="password" name="MatKhauMoi" class="form-control" required />
                     </div>
                     <div class="mb-3">
-                        @Html.Label("Xác nhận mật khẩu mới")
-                        <input type="password" name="XacNhanMatKhauMoi" class="form-control" />
+                        <label>Xác nhận mật khẩu mới</label>
+                        <input type="password" name="XacNhanMatKhauMoi" class="form-control" required />
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Cập nhật</button>
-                }
+                </form>
             </div>
         </div>
     </div>
@@ -122,32 +121,23 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            @using (Html.BeginForm("CapNhatChuyenKhoan", "TaiKhoan", FormMethod.Post))
-            {
-                @Html.AntiForgeryToken()
-                @Html.HiddenFor(m => m.MaKH)
+            <form method="POST" action="/taikhoan/capnhatchuyenkhoan">
+                @csrf
+                <input type="hidden" name="MaKH" value="{{ $targetUser->MaKH }}" />
 
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="SoTaiKhoan" class="form-label">Số tài khoản</label>
-                        @Html.TextBoxFor(m => m.SoTaiKhoan, new { @class = "form-control", placeholder = "Nhập số tài khoản" })
+                        <input type="text" name="SoTaiKhoan" class="form-control" placeholder="Nhập số tài khoản" value="{{ $targetUser->SoTaiKhoan }}" />
                     </div>
                     <div class="mb-3">
                         <label for="TenNganHang" class="form-label">Ngân hàng</label>
-                        @Html.DropDownListFor(m => m.TenNganHang,
-                            new SelectList(new[] {
-                                "MB Bank",
-                                "Vietcombank",
-                                "Techcombank",
-                                "ACB",
-                                "VietinBank",
-                                "Agribank",
-                                "BIDV",
-                                "VPBank",
-                                "TPBank",
-                                "Sacombank"
-                            }, Model.TenNganHang),
-                            "Chọn ngân hàng", new { @class = "form-control" })
+                        <select name="TenNganHang" class="form-control">
+                            <option value="">Chọn ngân hàng</option>
+                            @foreach (["MB Bank", "Vietcombank", "Techcombank", "ACB", "VietinBank", "Agribank", "BIDV", "VPBank", "TPBank", "Sacombank"] as $bank)
+                                <option value="{{ $bank }}" {{ $targetUser->TenNganHang == $bank ? 'selected' : '' }}>{{ $bank }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
 
@@ -155,13 +145,13 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                     <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                 </div>
-            }
+            </form>
         </div>
     </div>
 </div>
+@endsection
 
-@section('Scripts')
-
+@section('scripts')
     <script>
         function previewFile(event) {
             const img = document.getElementById("previewAvatar");
@@ -172,4 +162,5 @@
             $("#modalChuyenKhoan").modal("show");
         });
     </script>
-}
+@endsection
+

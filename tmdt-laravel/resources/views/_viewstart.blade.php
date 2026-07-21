@@ -1,1 +1,2 @@
-﻿@extends('shared._layout')
+@extends('shared._layout')
+

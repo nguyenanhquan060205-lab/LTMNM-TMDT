@@ -1,93 +1,205 @@
-@extends('shared._layout')
+@extends('layouts.app')
+
+@section('title', 'Đăng tin bán hàng')
+
 @section('content')
-<div class="container mt-4 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card border-0 shadow-lg rounded-4">
-                <div class="card-body p-5">
-                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
-                        <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill shadow-sm me-3">
-                            <i class="fa fa-arrow-left"></i>
-                        </button>
-                        <h3 class="fw-bold text-dark mb-0"><i class="fa fa-plus-circle text-warning me-2"></i>Đăng Bán Sản Phẩm Mới</h3>
-                    </div>
+<style>
+    .form-box {
+        border-radius: 18px;
+        padding: 30px;
+        background: #ffffff;
+        border: 1px solid #e6e6e6;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
 
-                    @if(session('error'))
-                        <div class="alert alert-danger shadow-sm"><i class="fa fa-exclamation-triangle me-2"></i>{{ session('error') }}</div>
-                    @endif
+    .form-label i {
+        margin-right: 6px;
+        color: #0d6efd;
+    }
 
-                    <form action="{{ route('sanpham.taomoi') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Tên Sản Phẩm <span class="text-danger">*</span></label>
-                            <input type="text" name="TenSP" class="form-control form-control-lg bg-light" placeholder="Nhập tên sản phẩm (VD: iPhone 13 Pro Max 256GB)" required>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Giá bán (VNĐ) <span class="text-danger">*</span></label>
-                                <input type="number" name="Gia" class="form-control form-control-lg bg-light text-danger fw-bold" placeholder="VD: 15000000" min="0" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Số lượng <span class="text-danger">*</span></label>
-                                <input type="number" name="SoLuong" class="form-control form-control-lg bg-light" placeholder="VD: 1" min="1" required>
-                            </div>
-                        </div>
+    .form-control, .form-select {
+        border-radius: 10px !important;
+        padding: 10px 14px;
+        border: 1px solid #d6d6d6;
+        transition: .2s;
+    }
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Loại Sản Phẩm <span class="text-danger">*</span></label>
-                                <select name="MaLoai" class="form-select form-select-lg bg-light" required>
-                                    <option value="" disabled selected>-- Chọn loại sản phẩm --</option>
-                                    @foreach($loaiSP as $loai)
-                                        <option value="{{ $loai->MaLoai }}">{{ $loai->TenLoai }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Tình trạng <span class="text-danger">*</span></label>
-                                <select name="TinhTrang" class="form-select form-select-lg bg-light" required>
-                                    <option value="Mới 100%">Mới 100%</option>
-                                    <option value="Mới 99%">Mới 99% (Like New)</option>
-                                    <option value="Mới 95%">Mới 95%</option>
-                                    <option value="Cũ">Cũ</option>
-                                    <option value="Hỏng/Xác">Hỏng / Bán xác</option>
-                                </select>
-                            </div>
-                        </div>
+        .form-control:focus, .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
+        }
 
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Mô tả chi tiết <span class="text-danger">*</span></label>
-                            <textarea name="MoTa" class="form-control bg-light" rows="6" placeholder="Mô tả chi tiết tình trạng, xuất xứ, phụ kiện đi kèm..." required></textarea>
-                        </div>
+    #previewCoverImg {
+        border-radius: 10px;
+        margin-top: 10px;
+        border: 2px solid #ffc107;
+    }
 
-                        <div class="mb-5 p-4 border rounded-3 bg-light">
-                            <label class="form-label fw-bold mb-3"><i class="fa fa-image text-primary me-2"></i>Ảnh Sản Phẩm (Tối đa 3 ảnh)</label>
-                            
-                            <div class="mb-3">
-                                <label class="form-label small fw-semibold text-muted">Ảnh bìa chính <span class="text-danger">*</span></label>
-                                <input type="file" name="AnhBia" class="form-control" accept="image/*" required>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3 mb-md-0">
-                                    <label class="form-label small fw-semibold text-muted">Ảnh phụ 1 (Không bắt buộc)</label>
-                                    <input type="file" name="AnhPhu1" class="form-control" accept="image/*">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-semibold text-muted">Ảnh phụ 2 (Không bắt buộc)</label>
-                                    <input type="file" name="AnhPhu2" class="form-control" accept="image/*">
-                                </div>
-                            </div>
-                        </div>
+    .preview-thumb {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #eee;
+        transition: .2s;
+    }
 
-                        <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold shadow-sm rounded-pill py-3">
-                            <i class="fa fa-paper-plane me-2"></i>Đăng Bán Ngay
-                        </button>
-                    </form>
+        .preview-thumb:hover {
+            transform: scale(1.05);
+            border-color: #0d6efd;
+        }
+
+    .btn-submit {
+        padding: 10px 35px;
+        font-weight: 600;
+        font-size: 17px;
+        border-radius: 10px;
+        background: linear-gradient(90deg, #ffca2c, #ffc107);
+        color: #000;
+        transition: 0.2s;
+    }
+
+        .btn-submit:hover {
+            transform: scale(1.05);
+            background: linear-gradient(90deg, #ffd953, #ffcd29);
+        }
+
+    .title-icon {
+        color: #dc3545;
+        font-size: 28px;
+    }
+</style>
+
+<div class="container py-4 mb-5">
+
+    <h3 class="fw-bold mb-4">
+        <i class="bi bi-megaphone-fill title-icon"></i> Đăng tin bán hàng
+    </h3>
+
+    <form method="POST" action="{{ route('sanpham.taomoi') }}" enctype="multipart/form-data">
+        @csrf
+        <div class="form-box">
+
+            <div class="row">
+
+                <!-- CỘT TRÁI -->
+                <div class="col-md-6">
+
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-tag-fill"></i> Tên sản phẩm
+                    </label>
+                    <input type="text" name="TenSP" class="form-control mb-3" placeholder="Nhập tên sản phẩm..." required />
+
+
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-grid-fill"></i> Danh mục
+                    </label>
+                    <select name="MaLoai" class="form-select mb-3" required>
+                        <option value="">Chọn danh mục</option>
+                        @foreach($loaiSP as $loai)
+                            <option value="{{ $loai->MaLoai }}">{{ $loai->TenLoai }}</option>
+                        @endforeach
+                    </select>
+
+
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-cash-coin"></i> Giá bán (VNĐ)
+                    </label>
+                    <input name="Gia"
+                           class="form-control mb-3 no-spin"
+                           type="number" min="0" placeholder="Ví dụ: 1500000" required />
+
+
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-stack"></i> Số lượng
+                    </label>
+                    <input name="SoLuong"
+                           class="form-control mb-3 no-spin"
+                           type="number" min="1" placeholder="Nhập số lượng" required />
+
+
+                    <!-- ẢNH BÌA -->
+                    <label class="form-label fw-semibold mt-2">
+                        <i class="bi bi-image-fill"></i> Ảnh bìa sản phẩm
+                    </label>
+                    <input type="file" name="files[]"
+                           class="form-control mb-2"
+                           accept="image/*"
+                           required
+                           onchange="previewCover(this)" />
+
+                    <img id="previewCoverImg" class="d-none" style="width:180px;" />
                 </div>
+
+
+                <!-- CỘT PHẢI -->
+                <div class="col-md-6">
+
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-journal-text"></i> Mô tả chi tiết
+                    </label>
+                    <textarea name="MoTa" class="form-control mb-3" rows="7" placeholder="Mô tả tình trạng sản phẩm, phụ kiện đi kèm..." required></textarea>
+
+
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-images"></i> Ảnh chi tiết sản phẩm (nhiều ảnh)
+                    </label>
+                    <input type="file"
+                           name="files[]"
+                           class="form-control"
+                           multiple
+                           accept="image/*"
+                           onchange="previewImages(this)" />
+
+                    <small class="text-muted">Có thể chọn nhiều ảnh cùng lúc.</small>
+
+                    <div id="previewList" class="mt-3 d-flex flex-wrap gap-2"></div>
+                </div>
+
+
+                <!-- NÚT ĐĂNG -->
+                <div class="col-12 mt-4 text-end">
+                    <button type="submit" class="btn btn-submit">
+                        <i class="bi bi-cloud-upload-fill"></i> Đăng tin
+                    </button>
+                </div>
+
             </div>
         </div>
-    </div>
+    </form>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    // Preview ảnh bìa
+    function previewCover(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.getElementById("previewCoverImg");
+                img.src = e.target.result;
+                img.classList.remove("d-none");
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Preview nhiều ảnh chi tiết
+    function previewImages(input) {
+        const preview = document.getElementById("previewList");
+        preview.innerHTML = "";
+
+        [...input.files].forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.createElement("img");
+                img.src = e.target.result;
+                img.classList = "preview-thumb";
+                preview.appendChild(img);
+            }
+            reader.readAsDataURL(file);
+        });
+    }
+</script>
 @endsection

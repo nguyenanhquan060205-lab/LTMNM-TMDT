@@ -1,178 +1,477 @@
-@extends('shared._layout')
-@section('content')
+@extends('layouts.app')
+
+@section('title', 'Chi tiết sản phẩm')
+
 @php
-    $anh = $sanPham->hinhAnhs->where('AnhBia', true)->first();
-    $anhUrl = $anh ? $anh->URLAnh : 'noimage.jpg';
-    $user = session('user');
+    $trungBinh = $TrungBinhDanhGia ?? 0;
+    $tongDanhGia = $TongDanhGia ?? 0;
+
+    $anhBiaObj = collect($sp->hinhAnhs)->firstWhere('AnhBia', true);
+    $anhBia = $anhBiaObj ? $anhBiaObj->URLAnh : ($sp->AnhBia ?? "noimage.jpg");
+    
+    $related = $SPLienQuan ?? collect();
+    $currentUser = Session::get('user');
 @endphp
 
-<div class="container mt-4 mb-5">
-    <!-- Nút Quay lại -->
-    <a href="{{ route('sanpham.index') }}" class="btn btn-outline-secondary mb-4 rounded-pill px-4 shadow-sm">
-        <i class="fa fa-arrow-left me-2"></i>Tiếp tục mua sắm
-    </a>
+@section('content')
+<div class="container mt-5">
 
-    <!-- Flash message -->
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fa-solid fa-circle-check me-2"></i> {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
+    <div class="row">
 
-    <div class="row bg-white p-4 rounded-4 shadow-sm border">
-        <!-- ẢNH SẢN PHẨM -->
-        <div class="col-md-5 mb-4 mb-md-0 d-flex flex-column align-items-center">
-            <div class="border rounded-3 p-2 mb-3 shadow-sm d-flex justify-content-center align-items-center bg-light w-100" style="height: 400px; overflow: hidden;">
-                <img id="main-image" src="{{ asset('Content/Images/' . $anhUrl) }}" class="img-fluid rounded" style="max-height: 100%; object-fit: contain;" onerror="this.src='{{ asset('Content/Images/noimage.jpg') }}';" />
+        <!-- ====================== -->
+        <!-- ẢNH SẢN PHẨM CHÍNH -->
+        <!-- ====================== -->
+        <div class="col-md-6 text-center">
+
+            <!-- Hộp ảnh cố định giống CellphoneS -->
+            <div class="main-img-box position-relative mx-auto mb-3">
+                <img id="mainImg"
+                     src="{{ asset('Content/Images/' . $anhBia) }}"
+                     class="main-img" 
+                     onclick="openLightbox()"
+                     style="cursor: zoom-in;" />
+
+                <!-- Mũi tên chuyển ảnh -->
+                <button class="img-nav left" onclick="prevImage()">❮</button>
+                <button class="img-nav right" onclick="nextImage()">❯</button>
             </div>
 
-            @if($sanPham->hinhAnhs->count() > 1)
-                <div class="d-flex gap-2 justify-content-center flex-wrap w-100">
-                    @foreach($sanPham->hinhAnhs as $ha)
-                        <img src="{{ asset('Content/Images/' . $ha->URLAnh) }}"
-                             class="thumbnail-img rounded border shadow-sm"
-                             style="width: 70px; height: 70px; object-fit: cover; cursor: pointer; transition: transform 0.2s;"
-                             onmouseover="document.getElementById('main-image').src=this.src; this.style.transform='scale(1.1)';"
-                             onmouseout="this.style.transform='scale(1)';"
-                             onerror="this.src='{{ asset('Content/Images/noimage.jpg') }}';" />
-                    @endforeach
-                </div>
-            @endif
+            <!-- Thumbnail -->
+            <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
+
+                <!-- Ảnh bìa -->
+                <img src="{{ asset('Content/Images/' . $anhBia) }}"
+                     class="thumb thumb-active"
+                     onclick="changeImage(0)" />
+
+                <!-- Ảnh phụ -->
+                @foreach ($AnhChiTiet as $i => $anh)
+                    <img src="{{ asset('Content/Images/' . $anh->URLAnh) }}"
+                         class="thumb"
+                         onclick="changeImage({{ $i + 1 }})" />
+                @endforeach
+            </div>
+
         </div>
 
+        <!-- ====================== -->
         <!-- THÔNG TIN SẢN PHẨM -->
-        <div class="col-md-7 d-flex flex-column">
-            <h2 class="fw-bold text-dark mb-2">{{ $sanPham->TenSP }}</h2>
-            <p class="text-muted mb-3"><i class="fa fa-tags me-2"></i>{{ $sanPham->loaiSanPham->TenLoai ?? '' }}</p>
-            <h3 class="text-danger fw-bold mb-4">{{ number_format($sanPham->Gia, 0, ',', '.') }}₫</h3>
+        <!-- ====================== -->
+        <div class="col-md-6">
 
-            <div class="bg-light p-3 rounded-3 mb-4 shadow-sm border">
-                <p class="mb-2"><i class="fa fa-box me-2 text-secondary"></i><strong>Tình trạng:</strong> {{ $sanPham->TinhTrang }}</p>
-                <p class="mb-2"><i class="fa fa-cubes me-2 text-secondary"></i><strong>Số lượng còn:</strong> <span class="badge bg-warning text-dark">{{ $sanPham->SoLuong }}</span></p>
-                <p class="mb-0"><i class="fa fa-calendar-alt me-2 text-secondary"></i><strong>Ngày đăng:</strong> {{ \Carbon\Carbon::parse($sanPham->NgayDang)->format('d/m/Y') }}</p>
-            </div>
+            <h3 class="fw-bold mb-2">{{ $sp->TenSP }}</h3>
+            <p class="text-danger fs-3 fw-bold">{{ number_format($sp->Gia, 0, ',', '.') }} ₫</p>
 
-            <!-- CHỦ SỞ HỮU -->
-            <div class="border p-3 rounded-3 mb-4 d-flex align-items-center justify-content-between shadow-sm bg-white">
-                <div class="d-flex align-items-center">
-                    @php
-                        $avatar = $sanPham->nguoiDung && !empty($sanPham->nguoiDung->AnhDaiDien) ? asset('Content/Avatars/' . $sanPham->nguoiDung->AnhDaiDien) : asset('Content/Avatars/default.jpg');
-                    @endphp
-                    <img src="{{ $avatar }}" class="rounded-circle me-3 border shadow-sm" width="55" height="55" style="object-fit: cover;" onerror="this.src='{{ asset('Content/Avatars/default.jpg') }}';" />
-                    <div>
-                        <p class="mb-0 text-muted small">Người bán</p>
-                        <strong class="fs-5 text-dark">{{ $sanPham->nguoiDung->HoTen ?? 'Ẩn danh' }}</strong>
-                    </div>
-                </div>
-                <div>
-                    <a href="{{ route('sanpham.thongtinnguoiban', ['id' => $sanPham->MaKH]) }}" class="btn btn-outline-info btn-sm rounded-pill px-3 shadow-sm">
-                        <i class="fa fa-eye me-1"></i>Xem Shop
-                    </a>
-                </div>
-            </div>
+            <p><b>Mô tả:</b> {{ $sp->MoTa }}</p>
 
-            <div class="mt-auto d-flex gap-2">
-                @if ($sanPham->SoLuong > 0)
-                    @if ($user && $user->MaKH == $sanPham->MaKH)
-                        <div class="alert alert-warning w-100 mb-0"><i class="fa fa-info-circle me-2"></i>Đây là sản phẩm của bạn.</div>
+            <p>
+                <b>Số lượng còn:</b>
+                <span class="fw-bold {{ $sp->SoLuong > 0 ? 'text-success' : 'text-danger' }}">
+                    {{ $sp->SoLuong > 0 ? $sp->SoLuong : 'Hết hàng' }}
+                </span>
+            </p>
+
+            <p>
+                <b>Trạng thái:</b>
+                <span class="badge {{ $sp->TrangThai == 'Đã bán' ? 'bg-danger' :
+                                     ($sp->TrangThai == 'Đã duyệt' ? 'bg-success' : 'bg-secondary') }}">
+                    {{ $sp->TrangThai }}
+                </span>
+            </p>
+
+            <p>
+                <b>Đánh giá:</b>
+
+                @php
+                    $rating = (float)$trungBinh;
+                    $fullStars = (int)floor($rating);
+                    $hasHalfStar = ($rating - $fullStars) >= 0.5;
+                @endphp
+
+                @for ($i = 1; $i <= 5; $i++)
+                    @if ($i <= $fullStars)
+                        <i class="bi bi-star-fill text-warning"></i>
+                    @elseif ($i == $fullStars + 1 && $hasHalfStar)
+                        <i class="bi bi-star-half text-warning"></i>
                     @else
-                        <a href="{{ route('giohang.them', ['id' => $sanPham->MaSP]) }}" class="btn btn-warning btn-lg flex-grow-1 fw-bold rounded-pill shadow-sm">
-                            <i class="fa fa-cart-plus me-2"></i>Thêm vào giỏ
-                        </a>
-                        <a href="{{ route('giohang.them', ['id' => $sanPham->MaSP]) }}?buy=1" class="btn btn-danger btn-lg flex-grow-1 fw-bold rounded-pill shadow-sm">
-                            Mua ngay
-                        </a>
+                        <i class="bi bi-star text-warning"></i>
                     @endif
+                @endfor
+
+                <span> ({{ $tongDanhGia }} đánh giá)</span>
+            </p>
+
+            <hr>
+
+            <p>
+                <b>Người bán:</b>
+                <a href="{{ route('sanpham.thongtinnguoiban', ['id' => $sp->nguoiDung->MaKH]) }}" class="text-primary fw-bold">
+                    {{ $sp->nguoiDung->HoTen }}
+                </a><br />
+                <small class="text-muted">{{ $sp->nguoiDung->Email }}</small>
+            </p>
+
+            <div class="mt-4 d-flex flex-wrap gap-3">
+                @if ($sp->SoLuong > 0 && $sp->TrangThai != "Đã bán")
+                    <a href="{{ route('giohang.them', ['id' => $sp->MaSP]) }}"
+                       class="btn btn-warning fw-bold text-dark px-4">
+                        <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                    </a>
                 @else
-                    <button class="btn btn-secondary btn-lg w-100 rounded-pill shadow-sm" disabled>
-                        <i class="fa fa-ban me-2"></i>Hết hàng
+                    <button class="btn btn-secondary fw-bold px-4" disabled>
+                        <i class="bi bi-x-circle"></i> Hết hàng
                     </button>
                 @endif
-            </div>
-            
-            <div class="mt-3 text-end">
-                <a href="{{ route('khieunai.taokhieunai', ['id' => $sanPham->MaSP]) }}" class="text-danger small text-decoration-none">
-                    <i class="fa fa-flag me-1"></i>Báo cáo vi phạm
+
+                <a href="{{ route('tinnhan.chat', [
+                        'idNguoiNhan' => $sp->nguoiDung->MaKH,
+                        'maSP' => $sp->MaSP
+                    ]) }}"
+                   class="btn btn-outline-primary fw-bold px-4">
+                    <i class="bi bi-chat-dots"></i> Liên hệ
                 </a>
-            </div>
-        </div>
-    </div>
 
-    <!-- MÔ TẢ & ĐÁNH GIÁ -->
-    <div class="row mt-5">
-        <div class="col-md-8">
-            <h4 class="fw-bold mb-3 border-bottom pb-2 text-dark"><i class="fa-solid fa-file-lines me-2"></i>Mô tả sản phẩm</h4>
-            <div class="bg-white p-4 rounded-4 shadow-sm border mb-5 lh-lg" style="white-space: pre-line; font-size: 15px;">
-                {{ $sanPham->MoTa }}
-            </div>
-
-            <h4 class="fw-bold mb-3 border-bottom pb-2 text-dark"><i class="fa-solid fa-star text-warning me-2"></i>Đánh giá ({{ $danhGias->count() }})</h4>
-            <div class="bg-white p-4 rounded-4 shadow-sm border">
-                @if ($danhGias->isEmpty())
-                    <p class="text-muted text-center my-3"><i class="fa fa-inbox fa-2x mb-2 text-light"></i><br>Chưa có đánh giá nào.</p>
-                @else
-                    @foreach ($danhGias as $dg)
-                        <div class="d-flex mb-4 border-bottom pb-3">
-                            @php
-                                $dgAvatar = $dg->nguoiDung && !empty($dg->nguoiDung->AnhDaiDien) ? asset('Content/Avatars/' . $dg->nguoiDung->AnhDaiDien) : asset('Content/Avatars/default.jpg');
-                            @endphp
-                            <img src="{{ $dgAvatar }}" class="rounded-circle me-3 border" width="45" height="45" style="object-fit: cover;" onerror="this.src='{{ asset('Content/Avatars/default.jpg') }}';" />
-                            <div>
-                                <h6 class="fw-bold mb-1">{{ $dg->nguoiDung->HoTen ?? 'Ẩn danh' }}</h6>
-                                <div class="text-warning small mb-2">
-                                    @for ($i = 0; $i < $dg->Diem; $i++)
-                                        <i class="fa fa-star"></i>
-                                    @endfor
-                                    @for ($i = $dg->Diem; $i < 5; $i++)
-                                        <i class="fa-regular fa-star"></i>
-                                    @endfor
-                                    <span class="text-muted ms-2">{{ \Carbon\Carbon::parse($dg->NgayDG)->format('d/m/Y') }}</span>
-                                </div>
-                                <p class="mb-0 text-dark">{{ $dg->NhanXet }}</p>
-                            </div>
-                        </div>
-                    @endforeach
+                <!-- Nút khiếu nại: chỉ hiện nếu user KHÔNG PHẢI người bán -->
+                @if ($currentUser && $currentUser->MaKH != $sp->nguoiDung->MaKH)
+                    <a href="{{ route('khieunai.taokhieunai', ['idSanPham' => $sp->MaSP]) }}"
+                       class="btn btn-outline-danger fw-bold px-4">
+                        <i class="bi bi-exclamation-triangle"></i> Khiếu nại
+                    </a>
                 @endif
             </div>
-        </div>
 
-        <div class="col-md-4">
-            <h4 class="fw-bold mb-3 border-bottom pb-2 text-dark"><i class="fa-solid fa-layer-group me-2"></i>Cùng danh mục</h4>
-            <div class="d-flex flex-column gap-3">
-                @foreach ($sanPhamCungLoai as $spcl)
-                    @if ($spcl->MaSP != $sanPham->MaSP)
-                        @php
-                            $spclAnh = $spcl->hinhAnhs->where('AnhBia', true)->first();
-                            $spclAnhUrl = $spclAnh ? $spclAnh->URLAnh : 'noimage.jpg';
-                        @endphp
-                        <a href="{{ route('sanpham.chitiet', ['id' => $spcl->MaSP]) }}" class="text-decoration-none text-dark">
-                            <div class="d-flex bg-white rounded-3 p-2 shadow-sm border align-items-center transition-hover">
-                                <img src="{{ asset('Content/Images/' . $spclAnhUrl) }}" class="rounded me-3" width="70" height="70" style="object-fit: cover;" onerror="this.src='{{ asset('Content/Images/noimage.jpg') }}';" />
-                                <div>
-                                    <h6 class="mb-1 text-truncate" style="max-width: 200px;">{{ $spcl->TenSP }}</h6>
-                                    <strong class="text-danger">{{ number_format($spcl->Gia, 0, ',', '.') }}₫</strong>
-                                </div>
+        </div>
+    </div>
+    <h4 class="fw-bold mt-4">Đánh giá từ người mua</h4>
+
+    @if ($ListDanhGia && count($ListDanhGia) > 0)
+        @foreach ($ListDanhGia as $dg)
+            <div class="review-box p-3 mt-3 rounded shadow-sm" style="background:#fafafa;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center" style="width:38px; height:38px;">
+                        {{ strtoupper(substr($dg->nguoiDung->HoTen ?? 'U', 0, 1)) }}
+                    </div>
+                    <div>
+                        <b>{{ $dg->nguoiDung->HoTen ?? 'Khách hàng' }}</b> <br />
+                        <span class="text-warning">
+                            @for ($i = 1; $i <= 5; $i++)
+                                @if ($i <= $dg->SoSao ?? $dg->DiemDG)
+                                    <i class="bi bi-star-fill"></i>
+                                @else
+                                    <i class="bi bi-star"></i>
+                                @endif
+                            @endfor
+                        </span>
+                        <span class="text-muted small"> • {{ $dg->NgayDG ? \Carbon\Carbon::parse($dg->NgayDG)->format('d/m/Y HH:mm') : '' }}</span>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <p class="mb-1">{{ $dg->NoiDung }}</p>
+                </div>
+            </div>
+        @endforeach
+
+        <!-- PHÂN TRANG ĐÁNH GIÁ -->
+        @php
+            $current = $PageDG;
+            $total = $TotalPageDG;
+        @endphp
+
+        @if ($total > 1)
+            <nav class="mt-3 d-flex justify-content-center">
+                <ul class="pagination">
+                    <li class="page-item {{ $current == 1 ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $current - 1, 'pageSP' => $PageSP]) }}">«</a>
+                    </li>
+
+                    <li class="page-item {{ $current == 1 ? 'active' : '' }}">
+                        <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => 1, 'pageSP' => $PageSP]) }}">1</a>
+                    </li>
+
+                    @if ($current > 3)
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    @endif
+
+                    @for ($i = $current - 1; $i <= $current + 1; $i++)
+                        @if ($i > 1 && $i < $total)
+                            <li class="page-item {{ $i == $current ? 'active' : '' }}">
+                                <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $i, 'pageSP' => $PageSP]) }}">{{ $i }}</a>
+                            </li>
+                        @endif
+                    @endfor
+
+                    @if ($current < $total - 2)
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    @endif
+
+                    @if ($total > 1)
+                        <li class="page-item {{ $current == $total ? 'active' : '' }}">
+                            <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $total, 'pageSP' => $PageSP]) }}">{{ $total }}</a>
+                        </li>
+                    @endif
+
+                    <li class="page-item {{ $current == $total ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $current + 1, 'pageSP' => $PageSP]) }}">»</a>
+                    </li>
+                </ul>
+            </nav>
+        @endif
+    @else
+        <p class="text-muted">Chưa có đánh giá nào.</p>
+    @endif
+
+
+
+    <!-- ========================== -->
+    <!-- SẢN PHẨM LIÊN QUAN -->
+    <!-- ========================== -->
+    <h3 class="fw-bold mt-5 mb-4 text-center">Sản phẩm liên quan</h3>
+
+    <div class="row g-4 justify-content-center">
+        @if ($related->isNotEmpty())
+            @foreach ($related as $item)
+                @php
+                    $anhBiaItemObj = collect($item->hinhAnhs)->firstWhere('AnhBia', true);
+                    $anhBiaItem = $anhBiaItemObj ? $anhBiaItemObj->URLAnh : ($item->AnhBia ?? "noimage.jpg");
+                @endphp
+
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card border-0 shadow-sm h-100">
+                        <a href="{{ route('sanpham.chitiet', ['id' => $item->MaSP]) }}">
+                            <div class="ratio ratio-1x1 bg-light rounded-top overflow-hidden">
+                                <img src="{{ asset('Content/Images/' . $anhBiaItem) }}"
+                                     class="card-img-top p-3"
+                                     style="object-fit: contain; width:100%; height:100%;"
+                                     alt="{{ $item->TenSP }}" />
                             </div>
                         </a>
-                    @endif
-                @endforeach
-                @if ($sanPhamCungLoai->count() <= 1)
-                     <p class="text-muted small">Không có sản phẩm nào khác.</p>
-                @endif
-            </div>
-        </div>
+
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <div>
+                                <h6 class="fw-semibold text-truncate" title="{{ $item->TenSP }}">{{ $item->TenSP }}</h6>
+                                <p class="text-danger fw-bold mb-1">{{ number_format($item->Gia, 0, ',', '.') }} ₫</p>
+                                <p class="small text-muted mb-0">
+                                    <i class="bi bi-person"></i> {{ $item->nguoiDung->HoTen ?? '' }}
+                                </p>
+                            </div>
+
+                            <a href="{{ route('sanpham.chitiet', ['id' => $item->MaSP]) }}"
+                               class="btn btn-warning w-100 fw-semibold mt-3 rounded-pill shadow-sm">
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        @else
+            <p class="text-center text-muted">Không có sản phẩm liên quan.</p>
+        @endif
     </div>
+
+    <!-- PHÂN TRANG SẢN PHẨM LIÊN QUAN -->
+    @php
+        $currentSP = $PageSP ?? 1;
+        $totalSP = $TotalPageSP ?? 0;
+    @endphp
+
+    @if ($totalSP > 1)
+        <nav class="mt-4 d-flex justify-content-center">
+            <ul class="pagination">
+                <li class="page-item {{ $currentSP == 1 ? 'disabled' : '' }}">
+                    <a class="page-link"
+                       href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $PageDG, 'pageSP' => $currentSP - 1]) }}">«</a>
+                </li>
+
+                <li class="page-item {{ $currentSP == 1 ? 'active' : '' }}">
+                    <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $PageDG, 'pageSP' => 1]) }}">1</a>
+                </li>
+
+                @if ($currentSP > 3)
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                @endif
+
+                @for ($i = $currentSP - 1; $i <= $currentSP + 1; $i++)
+                    @if ($i > 1 && $i < $totalSP)
+                        <li class="page-item {{ $i == $currentSP ? 'active' : '' }}">
+                            <a class="page-link"
+                               href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $PageDG, 'pageSP' => $i]) }}">{{ $i }}</a>
+                        </li>
+                    @endif
+                @endfor
+
+                @if ($currentSP < $totalSP - 2)
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                @endif
+
+                @if ($totalSP > 1)
+                    <li class="page-item {{ $currentSP == $totalSP ? 'active' : '' }}">
+                        <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $PageDG, 'pageSP' => $totalSP]) }}">{{ $totalSP }}</a>
+                    </li>
+                @endif
+
+                <li class="page-item {{ $currentSP == $totalSP ? 'disabled' : '' }}">
+                    <a class="page-link"
+                       href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $PageDG, 'pageSP' => $currentSP + 1]) }}">»</a>
+                </li>
+            </ul>
+        </nav>
+    @endif
 </div>
 
+<div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close" onclick="closeLightbox()">×</span>
+    <img id="lightboxImg" class="lightbox-img" />
+</div>
+
+<!-- ================================= -->
+<!-- CSS CHO SLIDER ẢNH GIỐNG CELLPHONES -->
+<!-- ================================= -->
 <style>
-    .transition-hover { transition: transform 0.2s, box-shadow 0.2s; }
-    .transition-hover:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+    .main-img-box {
+        width: 450px;
+        height: 450px;
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .main-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .thumb {
+        width: 90px;
+        height: 90px;
+        object-fit: cover;
+        cursor: pointer;
+        border-radius: 6px;
+        border: 2px solid transparent;
+    }
+
+    .thumb-active {
+        border-color: #ff9800 !important;
+    }
+
+    .img-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: rgba(0,0,0,0.45);
+        color: white;
+        padding: 8px 12px;
+        font-size: 22px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+        .img-nav.left {
+            left: 12px;
+        }
+
+        .img-nav.right {
+            right: 12px;
+        }
+
+        .img-nav:hover {
+            background: rgba(0,0,0,0.7);
+        }
+
+    .lightbox {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        inset: 0;
+        background: rgba(0,0,0,0.85);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .lightbox-img {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        animation: zoomIn 0.3s ease;
+    }
+
+    .lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        font-size: 40px;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    @keyframes zoomIn {
+        from {
+            transform: scale(0.85);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
 </style>
+@endsection
+
+@section('scripts')
+<!-- ======================= -->
+<!-- SLIDER JS -->
+<!-- ======================= -->
+<script>
+    let images = [
+        "{{ $anhBia }}",
+        @foreach ($AnhChiTiet as $item)
+            "{!! $item->URLAnh !!}",
+        @endforeach
+    ];
+
+    let currentIndex = 0;
+
+    function updateMainImg() {
+        document.getElementById("mainImg").src = "/Content/Images/" + images[currentIndex];
+
+        document.querySelectorAll(".thumb").forEach((t, i) => {
+            t.classList.toggle("thumb-active", i === currentIndex);
+        });
+    }
+
+    function changeImage(index) {
+        currentIndex = index;
+        updateMainImg();
+    }
+
+    function nextImage() {
+        currentIndex = (currentIndex + 1) % images.length;
+        updateMainImg();
+    }
+
+    function prevImage() {
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        updateMainImg();
+    }
+
+    function openLightbox() {
+        const src = document.getElementById("mainImg").src;
+        document.getElementById("lightboxImg").src = src;
+        document.getElementById("lightbox").style.display = "flex";
+    }
+
+    function closeLightbox() {
+        document.getElementById("lightbox").style.display = "none";
+    }
+</script>
 @endsection

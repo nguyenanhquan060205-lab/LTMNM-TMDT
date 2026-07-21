@@ -11,49 +11,100 @@ class TinNhanController extends Controller
 {
     public function index($userId = null)
     {
+        return redirect()->route('tinnhan.chat');
+    }
+
+    public function chat(Request $request)
+    {
         $currentUser = Session::get('user');
         if (!$currentUser) return redirect()->route('taikhoan.dangnhap');
 
-        $users = NguoiDung::where('MaKH', '!=', $currentUser->MaKH)->get();
-
-        $messages = collect();
+        $dsNguoiDung = NguoiDung::where('MaKH', '!=', $currentUser->MaKH)->get();
+        $idNguoiNhan = $request->query('idNguoiNhan');
+        $mode = $request->query('mode');
+        
         $activeUser = null;
-
-        if ($userId) {
-            $activeUser = NguoiDung::find($userId);
-            if ($activeUser) {
-                $messages = TinNhan::where(function ($q) use ($currentUser, $userId) {
-                    $q->where('NguoiGui', $currentUser->MaKH)
-                      ->where('NguoiNhan', $userId);
-                })->orWhere(function ($q) use ($currentUser, $userId) {
-                    $q->where('NguoiGui', $userId)
-                      ->where('NguoiNhan', $currentUser->MaKH);
-                })->orderBy('NgayGui', 'asc')->get();
-            }
+        $NguoiNhanID = 0;
+        if ($idNguoiNhan) {
+            $activeUser = NguoiDung::find($idNguoiNhan);
+            $NguoiNhanID = $activeUser ? $activeUser->MaKH : 0;
         }
 
-        return view('tinnhan.index', compact('users', 'messages', 'activeUser'));
+        $UserChuaDoc = TinNhan::where('NguoiNhan', $currentUser->MaKH)
+            ->where('DaDoc', false)
+            ->pluck('NguoiGui')
+            ->toArray();
+
+        return view('tinnhan.chat', compact('dsNguoiDung', 'activeUser', 'mode', 'NguoiNhanID', 'UserChuaDoc'));
     }
 
-    public function send(Request $request)
+    public function loadTinNhan(Request $request)
+    {
+        $idNguoiGui = $request->query('idNguoiGui');
+        $idNguoiNhan = $request->query('idNguoiNhan');
+
+        if (!$idNguoiGui || !$idNguoiNhan) {
+            return response()->json([]);
+        }
+
+        $messages = TinNhan::with(['nguoiGui', 'nguoiNhan'])
+            ->where(function ($q) use ($idNguoiGui, $idNguoiNhan) {
+                $q->where('NguoiGui', $idNguoiGui)
+                  ->where('NguoiNhan', $idNguoiNhan);
+            })->orWhere(function ($q) use ($idNguoiGui, $idNguoiNhan) {
+                $q->where('NguoiGui', $idNguoiNhan)
+                  ->where('NguoiNhan', $idNguoiGui);
+            })->orderBy('NgayGui', 'asc')->get();
+
+        return response()->json($messages);
+    }
+
+    public function guiTinNhan(Request $request)
     {
         $currentUser = Session::get('user');
         if (!$currentUser) return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
 
-        $nguoiNhan = $request->input('nguoiNhan');
+        $nguoiNhan = $request->input('idNguoiNhan');
         $noiDung = $request->input('noiDung');
 
         if ($nguoiNhan && $noiDung) {
-            TinNhan::create([
+            $tn = TinNhan::create([
                 'NguoiGui' => $currentUser->MaKH,
                 'NguoiNhan' => $nguoiNhan,
                 'NoiDung' => $noiDung,
                 'NgayGui' => now(),
-                'TrangThai' => 'Đã gửi'
+                'DaDoc' => false
             ]);
-            return response()->json(['success' => true]);
+            
+            // Format response to match loadTinNhan JSON objects if needed
+            return response()->json(['success' => true, 'message' => clone $tn]);
         }
 
         return response()->json(['success' => false]);
+    }
+
+    public function xoaTinNhan(Request $request)
+    {
+        $id = $request->input('MaTN');
+        if (!$id) return back()->with('error', 'Không tìm thấy tin nhắn');
+        
+        $tn = TinNhan::find($id);
+        if ($tn) {
+            $tn->delete();
+        }
+        
+        return back()->with('success', 'Đã xoá tin nhắn');
+    }
+
+    public function danhDauDaDoc(Request $request)
+    {
+        $idNguoiGui = $request->input('idNguoiGui');
+        $idNguoiNhan = $request->input('idNguoiNhan');
+
+        TinNhan::where('NguoiGui', $idNguoiGui)
+               ->where('NguoiNhan', $idNguoiNhan)
+               ->update(['DaDoc' => true]);
+
+        return response()->json(['success' => true]);
     }
 }

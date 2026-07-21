@@ -1,88 +1,166 @@
-@extends('shared._layout')
+@extends('layouts.app')
+
+@section('title', 'Chi tiết hóa đơn')
+
+@php
+    $hd = $HoaDon;
+    $DonHuy = $hd->TrangThai != null && strcasecmp(trim($hd->TrangThai), "Đã huỷ") === 0 || strcasecmp(trim($hd->TrangThai), "Đã hủy") === 0;
+@endphp
+
 @section('content')
+<style>
+    .order-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .order-title {
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .table thead th {
+        background: #1e1e1e;
+        color: white;
+    }
+
+    .price-red {
+        color: #e60000;
+        font-weight: 700;
+    }
+
+    .badge-status {
+        font-size: 13px;
+        padding: 6px 10px;
+        border-radius: 6px;
+    }
+</style>
+
 <div class="container mt-4 mb-5">
-    <div class="d-flex align-items-center mb-4">
-        <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill px-4 shadow-sm me-3">
-            <i class="fa fa-arrow-left me-2"></i>Quay lại
-        </button>
-        <h3 class="fw-bold text-dark mb-0">Xử Lý Đơn Hàng #{{ $ctHoaDon->MaCTHD }}</h3>
-    </div>
+    <div class="order-card">
 
-    @if(session('success'))
-        <div class="alert alert-success shadow-sm"><i class="fa-solid fa-circle-check me-2"></i>{{ session('success') }}</div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger shadow-sm"><i class="fa-solid fa-triangle-exclamation me-2"></i>{{ session('error') }}</div>
-    @endif
+        <h2 class="order-title mb-4">
+            Chi tiết hóa đơn #{{ $hd->MaHD }}
+        </h2>
 
-    <div class="row">
-        <!-- Thông tin đơn hàng & Người nhận -->
-        <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold border-bottom pb-2 mb-3"><i class="fa fa-truck me-2 text-primary"></i>Thông Tin Giao Hàng</h5>
-                    @php $hd = $ctHoaDon->hoaDon; @endphp
-                    <p class="mb-2"><strong>Mã HĐ:</strong> #{{ $hd->MaHD }}</p>
-                    <p class="mb-2"><strong>Người nhận:</strong> {{ $hd->NguoiNhan }}</p>
-                    <p class="mb-2"><strong>Số ĐT:</strong> {{ $hd->SDTNhan }}</p>
-                    <p class="mb-2"><strong>Địa chỉ:</strong> {{ $hd->DiaChiNhan }}</p>
-                    <p class="mb-2"><strong>Ghi chú:</strong> {{ $hd->GhiChu ?? 'Không có' }}</p>
-                    <p class="mb-0"><strong>Ngày đặt:</strong> {{ \Carbon\Carbon::parse($hd->NgayLap)->format('d/m/Y H:i') }}</p>
-                </div>
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+        
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle-fill"></i> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        <!-- THÔNG TIN HÓA ĐƠN -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Ngày đặt:</strong> {{ $hd->NgayDat ? \Carbon\Carbon::parse($hd->NgayDat)->format('d/m/Y HH:mm') : '-' }}</p>
+                <p><strong>Ngày thanh toán:</strong> {{ $hd->NgayTT ? \Carbon\Carbon::parse($hd->NgayTT)->format('d/m/Y HH:mm') : '-' }}</p>
+            </div>
+
+            <div class="col-md-6">
+                <p><strong>Địa chỉ giao hàng:</strong> {{ $hd->DiaChiGiaoHang }}</p>
+
+                <p>
+                    <strong>Trạng thái hóa đơn:</strong>
+                    @if ($DonHuy)
+                        <span class="badge bg-danger badge-status">Đã huỷ</span>
+                    @elseif ($hd->TrangThai == "Đã thanh toán")
+                        <span class="badge bg-success badge-status">Đã thanh toán</span>
+                    @else
+                        <span class="badge bg-warning text-dark badge-status">Đang chờ xử lý</span>
+                    @endif
+                </p>
             </div>
         </div>
 
-        <!-- Chi tiết sản phẩm & Thao tác -->
-        <div class="col-md-8">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-body p-4 text-center">
-                    <h5 class="fw-bold border-bottom pb-2 mb-4 text-start"><i class="fa fa-box-open me-2 text-success"></i>Sản Phẩm Của Bạn</h5>
-                    
+        <hr />
+
+        <!-- DANH SÁCH SẢN PHẨM CỦA NGƯỜI BÁN -->
+        <h4 class="mb-3">Sản phẩm bạn đã bán</h4>
+
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Tên sản phẩm</th>
+                    <th class="text-center">Số lượng</th>
+                    <th class="text-end">Thành tiền</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @forelse ($chiTiet as $item)
                     @php
-                        $sp = $ctHoaDon->sanPham;
-                        $anh = $sp && $sp->hinhAnhs->where('AnhBia', true)->first() ? $sp->hinhAnhs->where('AnhBia', true)->first()->URLAnh : 'noimage.jpg';
+                        $HuyCT = $item->TrangThaiCT != null && (strcasecmp(trim($item->TrangThaiCT), "Đã huỷ") === 0 || strcasecmp(trim($item->TrangThaiCT), "Đã hủy") === 0);
                     @endphp
-                    
-                    <img src="{{ asset('Content/Images/' . $anh) }}" class="rounded shadow-sm mb-3" style="width: 150px; height: 150px; object-fit: cover;" onerror="this.src='{{ asset('Content/Images/noimage.jpg') }}';" />
-                    <h4 class="fw-bold">{{ $sp->TenSP ?? 'Sản phẩm đã xóa' }}</h4>
-                    <p class="text-muted mb-2">Số lượng đặt: <strong class="text-dark fs-5">{{ $ctHoaDon->SoLuong }}</strong></p>
-                    <p class="text-muted mb-4">Thành tiền: <strong class="text-danger fs-3">{{ number_format($ctHoaDon->ThanhTien, 0, ',', '.') }}₫</strong></p>
 
-                    <div class="border p-4 rounded-3 bg-light d-inline-block w-100" style="max-width: 500px;">
-                        <h6 class="fw-bold mb-3">Tình trạng: 
-                            @if ($ctHoaDon->TinhTrang == 'Đã xác nhận')
-                                <span class="badge bg-success fs-6">Đã xác nhận</span>
-                            @elseif ($ctHoaDon->TinhTrang == 'Đã hủy')
-                                <span class="badge bg-danger fs-6">Đã hủy</span>
+                    <tr>
+                        <td class="fw-semibold">{{ $item->sanPham->TenSP ?? '' }}</td>
+
+                        <td class="text-center">{{ $item->SoLuong }}</td>
+
+                        <td class="text-end price-red">
+                            {{ number_format($item->ThanhTien, 0, ',', '.') }} đ
+                        </td>
+
+                        <td class="text-center">
+                            @if ($DonHuy || $HuyCT)
+                                <span class="badge bg-danger badge-status">Đã huỷ</span>
+                            @elseif ($item->TrangThaiCT == "Đã xác nhận")
+                                <span class="badge bg-success badge-status">Đã xác nhận</span>
                             @else
-                                <span class="badge bg-warning text-dark fs-6">Chờ xác nhận</span>
+                                <span class="badge bg-secondary badge-status">Chờ xác nhận</span>
                             @endif
-                        </h6>
+                        </td>
 
-                        @if ($ctHoaDon->TinhTrang == 'Chưa xác nhận' || $ctHoaDon->TinhTrang == 'Đang xử lý')
-                            <div class="d-flex gap-3 justify-content-center mt-4">
-                                <form action="{{ route('sanpham.hoanthanhhoadon', ['id' => $ctHoaDon->MaCTHD]) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success btn-lg rounded-pill fw-bold shadow-sm px-4">
-                                        <i class="fa fa-check-circle me-2"></i>Xác nhận Giao Hàng
-                                    </button>
-                                </form>
-                                <form action="{{ route('sanpham.huyhoadonban', ['id' => $ctHoaDon->MaCTHD]) }}" method="POST" onsubmit="return confirm('Xác nhận TỪ CHỐI đơn hàng này?');">
-                                    @csrf
-                                    <button type="submit" class="btn btn-outline-danger btn-lg rounded-pill fw-bold px-4">
-                                        <i class="fa fa-times-circle me-2"></i>Từ chối
-                                    </button>
-                                </form>
-                            </div>
-                        @else
-                            <div class="alert alert-info mt-3 mb-0">
-                                Đơn hàng này đã được xử lý ({{ $ctHoaDon->TinhTrang }}).
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
+                        <td class="text-center text-nowrap">
+                            <!-- XEM SẢN PHẨM -->
+                            <a class="btn btn-primary btn-sm"
+                               href="{{ route('sanpham.chitiet', ['id' => $item->MaSP]) }}">
+                                <i class="bi bi-eye-fill"></i> Xem
+                            </a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            Không có sản phẩm nào thuộc hóa đơn này
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+
+        <!-- FOOTER -->
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{{ route('sanpham.daban') }}"
+               class="btn btn-secondary px-4">
+                ⬅ Quay lại
+            </a>
+
+            @if (!$DonHuy && collect($chiTiet)->contains('TrangThaiCT', 'Chờ xác nhận'))
+                <form action="{{ route('sanpham.hoanthanhhoadon', ['id' => $hd->MaHD]) }}"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="return confirm('Xác nhận hoàn thành toàn bộ sản phẩm trong hóa đơn này?')">
+                    @csrf
+                    <button type="submit" class="btn btn-success px-4">
+                        ✅ Hoàn thành đơn
+                    </button>
+                </form>
+            @endif
         </div>
+
     </div>
 </div>
 @endsection

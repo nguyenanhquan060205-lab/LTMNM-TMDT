@@ -1,7 +1,16 @@
-﻿{{-- @model ThuongMaiDienTu_DoAn.Models.SANPHAM --}}
+@extends('layouts.app')
 
-@extends('shared._layout')
+@section('title', 'Chi tiết sản phẩm')
 
+@php
+    $trungBinh = $TrungBinhDanhGia ?? 0;
+    $tongDanhGia = $TongDanhGia ?? 0;
+
+    $anhBiaObj = collect($sp->hinhAnhs)->firstWhere('AnhBia', true);
+    $anhBia = $anhBiaObj ? $anhBiaObj->URLAnh : ($sp->AnhBia ?? "noimage.jpg");
+@endphp
+
+@section('content')
 <div class="container mt-5">
 
     <div class="row">
@@ -14,7 +23,7 @@
             <!-- Hộp ảnh cố định giống CellphoneS -->
             <div class="main-img-box position-relative mx-auto mb-3">
                 <img id="mainImg"
-                     src="{{ asset('Content/') }}/Images/@anhBia"
+                     src="{{ asset('Content/Images/' . $anhBia) }}"
                      class="main-img" 
                      onclick="openLightbox()"
                      style="cursor: zoom-in;" />
@@ -28,17 +37,16 @@
             <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
 
                 <!-- Ảnh bìa -->
-                <img src="{{ asset('Content/') }}/Images/@anhBia"
+                <img src="{{ asset('Content/Images/' . $anhBia) }}"
                      class="thumb thumb-active"
                      onclick="changeImage(0)" />
 
                 <!-- Ảnh phụ -->
-                @for (int i = 0; i < anhChiTiet.Count; i++)
-                {
-                    <img src="{{ asset('Content/') }}/Images/@anhChiTiet[i].URLAnh"
+                @foreach ($AnhChiTiet as $i => $anh)
+                    <img src="{{ asset('Content/Images/' . $anh->URLAnh) }}"
                          class="thumb"
-                         onclick="changeImage(@(i+1))" />
-                }
+                         onclick="changeImage({{ $i + 1 }})" />
+                @endforeach
             </div>
 
         </div>
@@ -48,77 +56,74 @@
         <!-- ====================== -->
         <div class="col-md-6">
 
-            <h3 class="fw-bold mb-2">$Model.TenSP</h3>
-            <p class="text-danger fs-3 fw-bold">@String.Format("{0:N0} ₫", Model.Gia)</p>
+            <h3 class="fw-bold mb-2">{{ $sp->TenSP }}</h3>
+            <p class="text-danger fs-3 fw-bold">{{ number_format($sp->Gia, 0, ',', '.') }} ₫</p>
 
-            <p><b>Mô tả:</b> $Model.MoTa</p>
+            <p><b>Mô tả:</b> {{ $sp->MoTa }}</p>
 
             <p>
                 <b>Số lượng còn:</b>
-                <span class="fw-bold @(Model.SoLuong > 0 ? "text-success" : "text-danger")">
-                    @(Model.SoLuong > 0 ? Model.SoLuong.ToString() : "Hết hàng")
+                <span class="fw-bold {{ $sp->SoLuong > 0 ? 'text-success' : 'text-danger' }}">
+                    {{ $sp->SoLuong > 0 ? $sp->SoLuong : 'Hết hàng' }}
                 </span>
             </p>
 
             <p>
                 <b>Trạng thái:</b>
-                <span class="badge @(Model.TrangThai == "Đã bán" ? "bg-danger" :
-                                     Model.TrangThai == "Đã duyệt" ? "bg-success" : "bg-secondary")">
-                    $Model.TrangThai
+                <span class="badge {{ $sp->TrangThai == 'Đã bán' ? 'bg-danger' :
+                                     ($sp->TrangThai == 'Đã duyệt' ? 'bg-success' : 'bg-secondary') }}">
+                    {{ $sp->TrangThai }}
                 </span>
             </p>
 
             <p>
                 <b>Đánh giá:</b>
 
-                @{
-                    double rating = trungBinh;
-                    int fullStars = (int)Math.Floor(rating);
-                    bool hasHalfStar = (rating - fullStars) >= 0.5;
-                }
+                @php
+                    $rating = (float)$trungBinh;
+                    $fullStars = (int)floor($rating);
+                    $hasHalfStar = ($rating - $fullStars) >= 0.5;
+                @endphp
 
-                @for (int i = 1; i <= 5; i++)
-                {
-                    if (i <= fullStars)
-                    {
+                @for ($i = 1; $i <= 5; $i++)
+                    @if ($i <= $fullStars)
                         <i class="bi bi-star-fill text-warning"></i>
-                    }
-                    else if (i == fullStars + 1 && hasHalfStar)
-                    {
+                    @elseif ($i == $fullStars + 1 && $hasHalfStar)
                         <i class="bi bi-star-half text-warning"></i>
-                    }
-                    else
-                    {
+                    @else
                         <i class="bi bi-star text-warning"></i>
-                    }
-                }
+                    @endif
+                @endfor
 
-                <span> (@tongDanhGia đánh giá)</span>
+                <span> ({{ $tongDanhGia }} đánh giá)</span>
             </p>
 
             <hr>
 
             <p>
                 <b>Người bán:</b>
-                <span class="text-primary fw-bold">$Model.NGUOIDUNG.HoTen</span><br />
-                <small class="text-muted">$Model.NGUOIDUNG.Email</small>
+                <span class="text-primary fw-bold">{{ $sp->nguoiDung->HoTen ?? '' }}</span><br />
+                <small class="text-muted">{{ $sp->nguoiDung->Email ?? '' }}</small>
             </p>
 
             <div class="mt-4 d-flex flex-wrap gap-3">
 
                 <!-- NÚT CHO NGƯỜI BÁN (QUẢN LÝ) -->
-                <a href="@Url.Action("Sua", "SanPham", new { id = Model.MaSP })"
+                <a href="{{ route('sanpham.sua', ['id' => $sp->MaSP]) }}"
                    class="btn btn-primary fw-bold px-4">
                     <i class="bi bi-pencil-square"></i> Sửa sản phẩm
                 </a>
-                <a href="@Url.Action("Xoa", "SanPham", new { id = Model.MaSP })"
+                <form action="{{ route('sanpham.xoa', ['id' => $sp->MaSP]) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
+                    @csrf
+                    <!-- Note: Controller accepts simple get/post for xoa, we use form with POST for safety if needed, but original used Url.Action which is GET. Let's use GET as a link since route might be defined as GET in C#. In Laravel, I will use GET link as defined in web.php. -->
+                </form>
+                <a href="{{ route('sanpham.xoa', ['id' => $sp->MaSP]) }}"
                    class="btn btn-danger fw-bold px-4"
                    onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
                     <i class="bi bi-trash"></i> Xóa sản phẩm
                 </a>
 
                 <!-- KHÔNG HIỂN THỊ NÚT THÊM VÀO GIỎ / LIÊN HỆ -->
-                @* Nút Khiếu nại (Chủ sở hữu không bao giờ thấy nút khiếu nại) *@
             </div>
 
         </div>
@@ -128,152 +133,86 @@
     <!-- ========================== -->
     <h4 class="fw-bold mt-4">Đánh giá từ người mua</h4>
 
-    @if ($ListDanhGia != null && ((List<ThuongMaiDienTu_DoAn.Models.DANHGIA>)$ListDanhGia).Count > 0)
-    {
-        var list = $ListDanhGia as List<ThuongMaiDienTu_DoAn.Models.DANHGIA>;
-
-        foreach (var dg in list)
-        {
+    @if ($ListDanhGia && count($ListDanhGia) > 0)
+        @foreach ($ListDanhGia as $dg)
             <div class="review-box p-3 mt-3 rounded shadow-sm" style="background:#fafafa;">
                 <div class="d-flex align-items-center gap-2">
                     <div class="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center"
                          style="width:38px; height:38px;">
-                        @dg.NGUOIDUNG.HoTen.Substring(0, 1)
+                        {{ strtoupper(substr($dg->nguoiDung->HoTen ?? 'U', 0, 1)) }}
                     </div>
 
                     <div>
-                        <b>@dg.NGUOIDUNG.HoTen</b> <br />
+                        <b>{{ $dg->nguoiDung->HoTen ?? 'Khách hàng' }}</b> <br />
                         <span class="text-warning">
-                            @for (int i = 1; i <= 5; i++)
-                            {
-                                if (i <= dg.SoSao)
-                                {
+                            @for ($i = 1; $i <= 5; $i++)
+                                @if ($i <= $dg->SoSao ?? $dg->DiemDG)
                                     <i class="bi bi-star-fill"></i>
-                                }
-                                else
-                                {
+                                @else
                                     <i class="bi bi-star"></i>
-                                }
-                            }
+                                @endif
+                            @endfor
                         </span>
                         <span class="text-muted small">
-                            • @(dg.NgayDG?.ToString("dd/MM/yyyy HH:mm"))
+                            • {{ $dg->NgayDG ? \Carbon\Carbon::parse($dg->NgayDG)->format('d/m/Y HH:mm') : '' }}
                         </span>
                     </div>
                 </div>
 
                 <div class="mt-2">
-                    <p class="mb-1">@dg.NoiDung</p>
+                    <p class="mb-1">{{ $dg->NoiDung }}</p>
                 </div>
             </div>
-        }
+        @endforeach
 
         <!-- PHÂN TRANG -->
-        int current = $PageDG;
-        int total = $TotalPageDG;
+        @php
+            $current = $PageDG;
+            $total = $TotalPageDG;
+        @endphp
 
-        if (total > 1)
-        {
+        @if ($total > 1)
             <nav class="mt-3 d-flex justify-content-center">
                 <ul class="pagination">
-
-                    <li class="page-item @(current == 1 ? "disabled" : "")">
-                        <a class="page-link" href="@Url.Action("ChiTiet", new { id = Model.MaSP, pageDG = current - 1, pageSP = $PageSP })">«</a>
+                    <li class="page-item {{ $current == 1 ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $current - 1, 'pageSP' => $PageSP]) }}">«</a>
                     </li>
 
-                    <li class="page-item @(current == 1 ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("ChiTiet", new { id = Model.MaSP, pageDG = 1, pageSP = $PageSP })">1</a>
+                    <li class="page-item {{ $current == 1 ? 'active' : '' }}">
+                        <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => 1, 'pageSP' => $PageSP]) }}">1</a>
                     </li>
 
-                    @if (current > 3)
-                    {
-                        <li class="page-item disabled">
-                            <span class="page-link">…</span>
-                        </li>
-                    }
+                    @if ($current > 3)
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    @endif
 
-                    @for (int i = current - 1; i <= current + 1; i++)
-                    {
-                        if (i > 1 && i < total)
-                        {
-                            <li class="page-item @(i == current ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("ChiTiet", new { id = Model.MaSP, pageDG = i, pageSP = $PageSP })">@i</a>
+                    @for ($i = $current - 1; $i <= $current + 1; $i++)
+                        @if ($i > 1 && $i < $total)
+                            <li class="page-item {{ $i == $current ? 'active' : '' }}">
+                                <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $i, 'pageSP' => $PageSP]) }}">{{ $i }}</a>
                             </li>
-                        }
-                    }
+                        @endif
+                    @endfor
 
-                    @if (current < total - 2)
-                    {
-                        <li class="page-item disabled">
-                            <span class="page-link">…</span>
+                    @if ($current < $total - 2)
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    @endif
+
+                    @if ($total > 1)
+                        <li class="page-item {{ $current == $total ? 'active' : '' }}">
+                            <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $total, 'pageSP' => $PageSP]) }}">{{ $total }}</a>
                         </li>
-                    }
+                    @endif
 
-                    @if (total > 1)
-                    {
-                        <li class="page-item @(current == total ? "active" : "")">
-                            <a class="page-link" href="@Url.Action("ChiTiet", new { id = Model.MaSP, pageDG = total, pageSP = $PageSP })">@total</a>
-                        </li>
-                    }
-
-                    <li class="page-item @(current == total ? "disabled" : "")">
-                        <a class="page-link" href="@Url.Action("ChiTiet", new { id = Model.MaSP, pageDG = current + 1, pageSP = $PageSP })">»</a>
+                    <li class="page-item {{ $current == $total ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $current + 1, 'pageSP' => $PageSP]) }}">»</a>
                     </li>
-
                 </ul>
             </nav>
-        }
-    }
-    else
-    {
+        @endif
+    @else
         <p class="text-muted">Chưa có đánh giá nào.</p>
-    }
-
-    <!-- ========================== -->
-    <!-- SẢN PHẨM LIÊN QUAN -->
-    <!-- ========================== -->
-    @*<h3 class="fw-bold mt-5 mb-4 text-center">Sản phẩm liên quan</h3>
-
-        <div class="row g-4 justify-content-center">
-
-            @if (related != null && related.Count > 0)
-            {
-                foreach (var item in related)
-                {
-                    var anh = item.HINHANHSPs.FirstOrDefault(a => a.AnhBia == true)?.URLAnh ?? "no-image.jpg";
-
-                    <div class="col-lg-3 col-md-4 col-sm-6">
-                        <div class="card product-card border-0 shadow-sm h-100">
-
-                            <a href="@Url.Action("ChiTiet","SanPham", new { id = item.MaSP })">
-                                <div class="ratio ratio-1x1 bg-light rounded-top overflow-hidden">
-                                    <img src="{{ asset('Content/') }}/Images/@anh"
-                                         class="card-img-top p-3"
-                                         style="object-fit: contain; width:100%; height:100%;" />
-                                </div>
-                            </a>
-
-                            <div class="card-body text-center d-flex flex-column justify-content-between">
-                                <div>
-                                    <h6 class="fw-semibold text-truncate">@item.TenSP</h6>
-                                    <p class="text-danger fw-bold mb-1">@String.Format("{0:N0} ₫", item.Gia)</p>
-                                    <p class="small text-muted">@item.LOAISANPHAM.TenLoai</p>
-                                </div>
-
-                                <a href="@Url.Action("ChiTiet","SanPham", new { id = item.MaSP })"
-                                   class="btn btn-warning w-100 fw-semibold mt-2 rounded-pill shadow-sm">
-                                    Xem chi tiết
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                }
-            }
-            else
-            {
-                <p class="text-center text-muted">Không có sản phẩm liên quan.</p>
-            }
-        </div>*@
+    @endif
 </div>
 
 <div id="lightbox" class="lightbox" onclick="closeLightbox()">
@@ -370,7 +309,7 @@
         font-weight: bold;
     }
 
-    @@keyframes zoomIn {
+    @keyframes zoomIn {
         from {
             transform: scale(0.85);
             opacity: 0;
@@ -382,17 +321,18 @@
         }
     }
 </style>
+@endsection
 
+@section('scripts')
 <!-- ======================= -->
 <!-- SLIDER JS -->
 <!-- ======================= -->
 <script>
     let images = [
-        "@anhBia",
-        @foreach (var item in anhChiTiet)
-        {
-            {!! $"\"{item.URLAnh}\"," !!}
-        }
+        "{{ $anhBia }}",
+        @foreach ($AnhChiTiet as $item)
+            "{!! $item->URLAnh !!}",
+        @endforeach
     ];
 
     let currentIndex = 0;
@@ -430,3 +370,4 @@
         document.getElementById("lightbox").style.display = "none";
     }
 </script>
+@endsection

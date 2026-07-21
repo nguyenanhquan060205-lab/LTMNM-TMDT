@@ -1,9 +1,8 @@
-﻿{{-- @model ThuongMaiDienTu_DoAn.Models.DanhGiaViewModel --}}
+@extends('layouts.app')
 
-@{
-    $Title = "Đánh giá sản phẩm";
-}
+@section('title', 'Đánh giá sản phẩm')
 
+@section('content')
 <style>
     .rating-box {
         display: flex;
@@ -44,7 +43,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-    @@keyframes fadeIn {
+    @keyframes fadeIn {
         from {
             opacity: 0;
             transform: translateY(15px);
@@ -65,20 +64,19 @@
         </h2>
 
         <div class="product-preview mb-4">
-            <img src="@Url.Content("{{ asset('Content/') }}/Images/" + Model.Hinh)" />
+            <img src="{{ asset('Content/Images/' . $vm->Hinh) }}" />
             <div>
-                <h4 class="fw-bold">$Model.TenSP</h4>
+                <h4 class="fw-bold">{{ $vm->TenSP }}</h4>
                 <div class="text-muted">Hãy chia sẻ cảm nhận thực tế về sản phẩm!</div>
             </div>
         </div>
 
-        @using (Html.BeginForm("DanhGia", "TaiKhoan", FormMethod.Post))
-        {
-            @Html.AntiForgeryToken()
+        <form method="POST" action="{{ route('taikhoan.postdanhgia', ['maHD' => $vm->MaHD, 'maSP' => $vm->MaSP]) }}">
+            @csrf
 
-            @Html.Hidden("maHD", Model.MaHD)
-            @Html.Hidden("maSP", Model.MaSP)
-            @Html.Hidden("soSao", "", new { id = "ratingValue" })
+            <input type="hidden" name="maHD" value="{{ $vm->MaHD }}" />
+            <input type="hidden" name="maSP" value="{{ $vm->MaSP }}" />
+            <input type="hidden" name="soSao" id="ratingValue" value="" />
 
             <div class="mb-4">
                 <label class="fw-bold">Số sao:</label>
@@ -101,7 +99,7 @@
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-                <a href="@Url.Action("CT_LichSu", "TaiKhoan", new { id = Model.MaHD })"
+                <a href="{{ route('taikhoan.ct_lichsu', ['id' => $vm->MaHD]) }}"
                    class="btn btn-secondary btn-back">
                     <i class="bi bi-arrow-left"></i> Quay lại
                 </a>
@@ -110,11 +108,13 @@
                     <i class="bi bi-send"></i> Gửi đánh giá
                 </button>
             </div>
-        }
+        </form>
 
     </div>
 </div>
+@endsection
 
+@section('scripts')
 <script>
     const stars = document.querySelectorAll(".star");
     const ratingInput = document.getElementById("ratingValue");
@@ -148,3 +148,5 @@
         }
     });
 </script>
+@endsection
+

@@ -12,7 +12,7 @@ class HomeController extends Controller
     {
         // Lấy 3 sản phẩm mới nhất
         $sanPhamMoi = SanPham::where('TrangThai', 'Đã duyệt')
-            ->orderBy('NgayDang', 'desc')
+            ->orderBy('NgayTao', 'desc')
             ->take(3)
             ->get();
 

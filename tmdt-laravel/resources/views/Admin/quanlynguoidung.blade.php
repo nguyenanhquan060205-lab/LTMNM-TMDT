@@ -1,63 +1,298 @@
-@extends('shared._layoutadmin')
+@extends('layouts.admin')
+
 @section('content')
-<div class="card border-0 shadow-sm rounded-4">
-    <div class="card-body p-4">
-        <h5 class="fw-bold mb-4 border-bottom pb-3"><i class="fa fa-users me-2 text-primary"></i>Quản Lý Người Dùng</h5>
-        
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Tài khoản</th>
-                        <th>Họ tên</th>
-                        <th>Email</th>
-                        <th>Số ĐT</th>
-                        <th>Vai trò</th>
-                        <th>Trạng thái</th>
-                        <th class="text-center">Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($nguoiDungs as $nd)
-                        <tr>
-                            <td class="fw-bold">{{ $nd->TaiKhoan }}</td>
-                            <td>{{ $nd->HoTen }}</td>
-                            <td>{{ $nd->Email }}</td>
-                            <td>{{ $nd->SDT }}</td>
-                            <td>
-                                @if ($nd->VaiTro == 'Admin')
-                                    <span class="badge bg-primary">Admin</span>
-                                @else
-                                    <span class="badge bg-secondary">User</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if ($nd->Khoa)
-                                    <span class="badge bg-danger">Khóa</span>
-                                @else
-                                    <span class="badge bg-success">Hoạt động</span>
-                                @endif
-                            </td>
-                            <td class="text-center">
-                                @if ($nd->MaKH != session('user')->MaKH)
-                                    <form action="{{ route('admin.doitrangthainguoidung', ['id' => $nd->MaKH]) }}" method="POST">
-                                        @csrf
-                                        @if ($nd->Khoa)
-                                            <button class="btn btn-sm btn-success rounded-pill px-3">Mở khóa</button>
-                                        @else
-                                            <button class="btn btn-sm btn-danger rounded-pill px-3">Khóa</button>
-                                        @endif
-                                    </form>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        <div class="mt-3">
-            {{ $nguoiDungs->links('pagination::bootstrap-4') }}
+<style>
+    /* TAB */
+    .nav-tabs .nav-link {
+        color: #6c757d;
+        font-weight: 600;
+        border: none;
+        padding: 12px 20px;
+        transition: 0.2s;
+    }
+
+        .nav-tabs .nav-link.active {
+            color: #0d6efd;
+            border-bottom: 3px solid #0d6efd;
+            background: transparent;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: #0a58ca;
+        }
+
+    /* FILTER BUTTONS */
+    .ts-filter-btn {
+        border: 1px solid #d0d5dd;
+        background: #fff;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: .15s;
+        color: #555;
+    }
+
+        .ts-filter-btn:hover {
+            background: #f1f4f8;
+        }
+
+        .ts-filter-btn.active {
+            border-color: #0d6efd;
+            background: #e7f0ff;
+            color: #0d6efd;
+        }
+
+    .ts-role-admin {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+
+        .ts-role-admin.active {
+            background: #ffd9dd;
+        }
+
+    .ts-role-user {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+
+        .ts-role-user.active {
+            background: #eeeeee;
+        }
+
+    /* TABLE */
+    .table th {
+        background: #f8f9fa;
+        color: #495057;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: .85rem;
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .table th:hover {
+            background: #e9ecef;
+            color: #0d6efd;
+        }
+</style>
+
+<div class="container-fluid px-4 mt-4 pb-5">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+        <ul class="nav nav-tabs border-0 m-0">
+            <li class="nav-item">
+                <button class="nav-link active">
+                    <i class="fa-solid fa-users me-2"></i> Quản lý người dùng
+                </button>
+            </li>
+        </ul>
+
+        <!-- SEARCH BOX -->
+        <div class="input-group" style="max-width: 300px;">
+            <span class="input-group-text bg-white text-muted border-end-0">
+                <i class="fa-solid fa-search"></i>
+            </span>
+            <input id="searchInput" class="form-control border-start-0 shadow-none" placeholder="Tìm tên, email...">
         </div>
     </div>
+
+    <!-- FILTER SECTION -->
+    <div class="filter-section bg-white p-3 rounded border mb-3 d-flex flex-wrap gap-2 align-items-center">
+        <div class="fw-bold text-secondary d-flex align-items-center me-2">
+            <i class="fa-solid fa-filter text-muted me-2"></i> Lọc theo vai trò:
+        </div>
+
+        <button class="ts-filter-btn active" onclick="filterRole('all', this)">
+            <i class="fa-solid fa-list me-1"></i> Tất cả
+        </button>
+
+        <button class="ts-filter-btn ts-role-user" onclick="filterRole('User', this)">
+            <i class="fa-solid fa-user me-1"></i> User
+        </button>
+
+        <button class="ts-filter-btn ts-role-admin" onclick="filterRole('Admin', this)">
+            <i class="fa-solid fa-user-shield me-1"></i> Admin
+        </button>
+
+        <div class="ms-auto">
+            <button class="btn btn-outline-secondary btn-sm" onclick="resetFilters()">
+                <i class="fa-solid fa-rotate-right me-1"></i> Reset
+            </button>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="userTable">
+                    <thead>
+                        <tr class="text-center">
+                            <th style="text-align:left; padding-left:20px;" onclick="sortTable(0, this)">
+                                Họ và tên <i class="fa-solid fa-sort float-end text-muted mt-1"></i>
+                            </th>
+
+                            <th style="text-align:left;" onclick="sortTable(1, this)">
+                                Email <i class="fa-solid fa-sort float-end text-muted mt-1"></i>
+                            </th>
+
+                            <th onclick="sortTable(2, this)">
+                                Ngày tạo <i class="fa-solid fa-sort float-end text-muted mt-1"></i>
+                            </th>
+
+                            <th>Vai trò</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tableBody">
+                        @foreach ($dsNguoiDung as $nd)
+                            @php
+                                $isAdmin = $nd->VaiTro == "Admin";
+                                $roleBadge = $isAdmin ? "bg-danger" : "bg-secondary";
+
+                                // trạng thái khóa
+                                $statusBadge = $nd->Khoa ? "bg-dark text-white" : "bg-success";
+                                $statusText = $nd->Khoa ? "Đang khóa" : "Hoạt động";
+                            @endphp
+
+                            <tr class="status-row text-center" data-role="{{ $nd->VaiTro }}">
+
+                                <td class="text-start" style="padding-left:20px;">
+                                    <i class="fa-solid fa-circle-user me-2 text-muted"></i>
+                                    <span class="fw-bold text-primary">{{ $nd->HoTen }}</span>
+                                </td>
+
+                                <td class="text-start">{{ $nd->Email }}</td>
+
+                                <td data-date="{{ $nd->NgayTao ? \Carbon\Carbon::parse($nd->NgayTao)->format('YmdHis') : '0' }}">
+                                    {{ $nd->NgayTao ? \Carbon\Carbon::parse($nd->NgayTao)->format('d/m/Y') : '-' }}
+                                </td>
+
+                                <td>
+                                    <span class="badge {{ $roleBadge }} rounded-pill px-3 py-2">{{ $nd->VaiTro }}</span>
+                                </td>
+
+                                <td>
+                                    <span class="badge {{ $statusBadge }} rounded-pill px-3 py-2">{{ $statusText }}</span>
+                                </td>
+
+                                <td>
+                                    @if ($isAdmin)
+                                        <button class="btn btn-sm btn-outline-secondary" disabled>
+                                            <i class="fa-solid fa-ban"></i> Khóa
+                                        </button>
+                                    @else
+                                        <form method="post" action="{{ route('admin.doitrangthainguoidung') }}">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{ $nd->MaKH }}" />
+
+                                            @if ($nd->Khoa)
+                                                <button type="submit" class="btn btn-sm btn-success fw-bold">
+                                                    <i class="fa-solid fa-unlock"></i> Mở khóa
+                                                </button>
+                                            @else
+                                                <button type="submit" class="btn btn-sm btn-dark fw-bold">
+                                                    <i class="fa-solid fa-lock"></i> Khóa
+                                                </button>
+                                            @endif
+                                        </form>
+                                    @endif
+                                </td>
+
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    /* SEARCH */
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+        let value = this.value.toLowerCase();
+        document.querySelectorAll('#tableBody tr').forEach(row => {
+            let name = row.cells[0].innerText.toLowerCase();
+            let email = row.cells[1].innerText.toLowerCase();
+            row.style.display = (name.includes(value) || email.includes(value)) ? "" : "none";
+        });
+    });
+
+    /* FILTER ROLE */
+    function filterRole(role, btn) {
+        document.querySelectorAll('.ts-filter-btn').forEach(e => e.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.querySelectorAll('.status-row').forEach(row => {
+            let r = row.getAttribute('data-role');
+            row.style.display = (role === 'all' || r === role) ? "" : "none";
+        });
+    }
+
+    function resetFilters() {
+        document.getElementById('searchInput').value = "";
+        filterRole('all', document.querySelector('.ts-filter-btn'));
+    }
+
+    /* SORTING */
+    function sortTable(n, th) {
+        let table = document.getElementById("userTable");
+        let switching = true;
+        let dir = "asc";
+        let switchcount = 0;
+
+        let icons = table.querySelectorAll("th i");
+        icons.forEach(i => i.className = "fa-solid fa-sort float-end text-muted mt-1");
+
+        let icon = th.querySelector("i");
+
+        while (switching) {
+            switching = false;
+            let rows = table.rows;
+            let shouldSwitch = false;
+            let i;
+
+            for (i = 1; i < rows.length - 1; i++) {
+                let x = rows[i].getElementsByTagName("TD")[n];
+                let y = rows[i + 1].getElementsByTagName("TD")[n];
+
+                let xVal = n === 2 ? Number(x.dataset.date) : x.innerText.toLowerCase();
+                let yVal = n === 2 ? Number(y.dataset.date) : y.innerText.toLowerCase();
+
+                if ((dir === "asc" && xVal > yVal) ||
+                    (dir === "desc" && xVal < yVal)) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                switchcount++;
+            } else {
+                if (switchcount === 0 && dir === "asc") {
+                    dir = "desc";
+                    switching = true;
+                }
+            }
+        }
+
+        icon.className =
+            dir === "asc"
+                ? "fa-solid fa-sort-up float-end text-primary mt-2"
+                : "fa-solid fa-sort-down float-end text-primary mb-1";
+    }
+</script>
 @endsection

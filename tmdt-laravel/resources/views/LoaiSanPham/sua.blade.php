@@ -1,4 +1,4 @@
-﻿{{-- @model ThuongMaiDienTu_DoAn.Models.LOAISANPHAM --}}
+{{-- @model ThuongMaiDienTu_DoAn.Models.LOAISANPHAM --}}
 
 @extends('shared._layout')
 
@@ -33,3 +33,4 @@
 <div>
     @Html.ActionLink("Back to List", "Index")
 </div>
+

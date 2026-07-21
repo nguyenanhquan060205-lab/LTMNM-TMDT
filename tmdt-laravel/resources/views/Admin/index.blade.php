@@ -1,61 +1,217 @@
-@extends('shared._layoutadmin')
-@section('content')
-<div class="row g-4 mb-4">
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm rounded-4 bg-primary text-white h-100">
-            <div class="card-body p-4 d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="text-uppercase mb-1 opacity-75">Sản Phẩm Đang Chờ</h6>
-                    <h2 class="fw-bold mb-0">{{ $sanPhamChoDuyet }}</h2>
-                </div>
-                <i class="fa fa-box fa-3x opacity-50"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm rounded-4 bg-success text-white h-100">
-            <div class="card-body p-4 d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="text-uppercase mb-1 opacity-75">Tổng Người Dùng</h6>
-                    <h2 class="fw-bold mb-0">{{ $tongNguoiDung }}</h2>
-                </div>
-                <i class="fa fa-users fa-3x opacity-50"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm rounded-4 bg-warning text-dark h-100">
-            <div class="card-body p-4 d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="text-uppercase mb-1 opacity-75">Đơn Hàng Hôm Nay</h6>
-                    <h2 class="fw-bold mb-0">{{ $donHangMoi }}</h2>
-                </div>
-                <i class="fa fa-shopping-cart fa-3x opacity-50"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm rounded-4 bg-danger text-white h-100">
-            <div class="card-body p-4 d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="text-uppercase mb-1 opacity-75">Khiếu Nại Mới</h6>
-                    <h2 class="fw-bold mb-0">{{ $khieuNaiMoi }}</h2>
-                </div>
-                <i class="fa fa-exclamation-triangle fa-3x opacity-50"></i>
-            </div>
-        </div>
-    </div>
-</div>
+@extends('layouts.admin')
 
-<div class="row">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-body p-4">
-                <h5 class="fw-bold mb-4">Hoạt động gần đây</h5>
-                <p class="text-muted">Hệ thống đang hoạt động ổn định.</p>
-                <a href="{{ route('admin.quanlysanpham') }}" class="btn btn-primary rounded-pill px-4">Duyệt sản phẩm ngay</a>
-            </div>
+@section('content')
+<style>
+    /* Hiệu ứng hover cho card */
+    .card-hover {
+        transition: all 0.3s ease;
+        border: 1px solid #e0e0e0;
+    }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            cursor: pointer;
+            border-color: #00d9ff; /* Viền sáng lên khi hover */
+        }
+
+    /* Style cho tiêu đề từng mục */
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e1e3b; /* Màu tối giống sidebar */
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        margin-top: 30px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .section-title i {
+            color: #00d9ff; /* Icon màu xanh chủ đạo */
+        }
+</style>
+
+<div class="container-fluid px-4 pb-5">
+
+    <h2 class="fw-bold text-primary mt-4 mb-2">
+        Tổng quan hệ thống
+    </h2>
+    <p class="text-muted">Chào mừng quay trở lại, đây là bảng điều khiển trung tâm.</p>
+
+    <div class="section-title">
+        <i class="fa-solid fa-box"></i> Quản lý sản phẩm
+    </div>
+    <div class="row g-3">
+        <div class="col-md-4 col-xl-3">
+            <a href="{{ route('admin.quanlysanpham') }}" class="text-decoration-none text-reset">
+                <div class="card card-hover h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle p-3 me-3"
+                             style="background-color: rgba(111, 66, 193, 0.15);">
+                            <i class="fa-solid fa-tag fs-3"
+                               style="color:#6f42c1;"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-0">{{ $DaBan ?? 0 }}</h3>
+                            <span class="text-muted small">Đã bán</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
+        <div class="col-md-4 col-xl-3">
+            <a href="{{ route('admin.quanlysanpham') }}" class="text-decoration-none text-reset">
+                <div class="card card-hover h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-secondary bg-opacity-10 p-3 me-3">
+                            <i class="fa-solid fa-lock text-secondary fs-3"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-0">{{ $An ?? 0 }}</h3>
+                            <span class="text-muted small">Ẩn</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
+        <div class="col-md-4 col-xl-3">
+            <a href="{{ route('admin.quanlysanpham') }}" class="text-decoration-none text-reset">
+                <div class="card card-hover h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                            <i class="fa-solid fa-check-circle text-success fs-3"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-0">{{ $TinDaDuyet ?? 0 }}</h3>
+                            <span class="text-muted small">Tin đang hiển thị</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4 col-xl-3">
+            <a href="{{ route('admin.quanlysanpham') }}" class="text-decoration-none text-reset">
+                <div class="card card-hover h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                            <i class="fa-solid fa-boxes-stacked text-primary fs-3"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-0">{{ $TongSanPham ?? 0 }}</h3>
+                            <span class="text-muted small">Tổng sản phẩm</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4 col-xl-3">
+            <a href="{{ route('admin.quanlysanpham', ['tab' => 'category']) }}"
+               class="text-decoration-none text-reset">
+                <div class="card card-hover h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                            <i class="fa-solid fa-layer-group text-info fs-3"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">Danh mục</h5>
+                            <span class="text-muted small">Quản lý danh mục</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
+
+    <div class="section-title">
+        <i class="fa-solid fa-file-invoice"></i> Quản lý đơn hàng
+    </div>
+    <div class="row g-3">
+        <div class="col-md-6 col-xl-4">
+            <a href="{{ route('admin.quanlydonhang') }}" class="text-decoration-none text-reset">
+                <div class="card card-hover h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-danger bg-opacity-10 p-3 me-3">
+                            <i class="fa-solid fa-clipboard-list text-danger fs-3"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">Đơn hàng</h5>
+                            <span class="text-muted small">Xem và xử lý đơn hàng</span>
+                        </div>
+                        <div class="ms-auto text-end">
+                            <i class="fa-solid fa-arrow-right text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="section-title">
+        <i class="fa-solid fa-users"></i> Quản lý người dùng
+    </div>
+    <div class="row g-3">
+        <div class="col-md-4 col-xl-3">
+            <a href="{{ route('admin.quanlynguoidung') }}" class="text-decoration-none text-reset">
+                <div class="card card-hover h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                            <i class="fa-solid fa-user-group text-info fs-3"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-0">{{ $TongNguoiDung ?? 0 }}</h3>
+                            <span class="text-muted small">Tài khoản đăng ký</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="section-title">
+        <i class="fa-solid fa-headset"></i> Hỗ trợ & Khiếu nại
+    </div>
+    <div class="row g-3">
+        <div class="col-md-6 col-xl-4">
+            <a href="{{ route('admin.quanlykhieunai') }}" class="text-decoration-none text-reset">
+                <div class="card card-hover h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-secondary bg-opacity-10 p-3 me-3">
+                            <i class="fa-solid fa-triangle-exclamation text-secondary fs-3"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">Khiếu nại</h5>
+                            <span class="text-muted small">Giải quyết báo cáo</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <a href="{{ route('tinnhan.chat') }}" class="text-decoration-none text-reset">
+                <div class="card card-hover h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                            <i class="fa-solid fa-comments text-primary fs-3"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">Tin nhắn</h5>
+                            <span class="text-muted small">Hỗ trợ trực tuyến</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
 </div>
 @endsection

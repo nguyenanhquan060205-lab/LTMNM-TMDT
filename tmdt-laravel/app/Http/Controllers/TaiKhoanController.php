@@ -394,15 +394,11 @@ class TaiKhoanController extends Controller
         $kh = Session::get('user');
         if (!$kh) return redirect()->route('taikhoan.dangnhap');
 
-        // This requires joining KhieuNai, HoaDon, CtHoaDon, SanPham
-        // Since KhieuNais belongs to HoaDon, but the C# logic says `kn.SANPHAM.MaKH == kh.MaKH` ?
-        // Actually, KhieuNais has MaHD, MaKH, LyDo.
-        // Let's rewrite this part safely:
-        $dsKhieuNai = KhieuNai::with(['hoaDon.ctHoaDons.sanPham', 'nguoiDung'])
-            ->whereHas('hoaDon.ctHoaDons.sanPham', function($q) use ($kh) {
+        $dsKhieuNai = KhieuNai::with(['sanPham', 'nguoiDung'])
+            ->whereHas('sanPham', function($q) use ($kh) {
                 $q->where('MaKH', $kh->MaKH);
             })
-            ->orderBy('NgayTao', 'desc')
+            ->orderBy('NgayGui', 'desc')
             ->get();
 
         return view('taikhoan.khieunai', compact('dsKhieuNai'));

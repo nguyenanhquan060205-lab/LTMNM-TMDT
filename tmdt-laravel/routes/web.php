@@ -24,12 +24,11 @@ Route::prefix('sanpham')->name('sanpham.')->group(function() {
     Route::get('/cuatoi', [SanPhamController::class, 'cuaToi'])->name('cuatoi');
     Route::get('/sua/{id}', [SanPhamController::class, 'sua'])->name('sua');
     Route::post('/sua/{id}', [SanPhamController::class, 'postSua']);
-    Route::get('/xoa/{id}', [SanPhamController::class, 'xoa'])->name('xoa');
+    Route::post('/xoa', [SanPhamController::class, 'xoa'])->name('xoa');
     Route::get('/sanphamdaban', [SanPhamController::class, 'sanPhamDaBan'])->name('daban');
     Route::get('/ct_sanphamdaban/{id}', [SanPhamController::class, 'ctSanPhamDaBan'])->name('ctsanphamdaban');
-    Route::post('/hoanthanhhoadon/{id}', [SanPhamController::class, 'hoanThanhHoaDon'])->name('hoanthanhhoadon');
-    Route::post('/huyhoadonban/{id}', [SanPhamController::class, 'huyHoaDonBan'])->name('huyhoadonban');
-    Route::get('/hoanthanh/{maHD}/{maSP}', [SanPhamController::class, 'hoanThanh'])->name('hoanthanh');
+    Route::post('/hoanthanhhoadon', [SanPhamController::class, 'hoanThanhHoaDon'])->name('hoanthanhhoadon');
+    Route::post('/huyhoadonban', [SanPhamController::class, 'huyHoaDonBan'])->name('huyhoadonban');
 });
 
 // TaiKhoan
@@ -39,14 +38,16 @@ Route::prefix('taikhoan')->name('taikhoan.')->group(function() {
     Route::get('/dangnhap', [TaiKhoanController::class, 'dangNhap'])->name('dangnhap');
     Route::post('/dangnhap', [TaiKhoanController::class, 'postDangNhap']);
     Route::get('/dangxuat', [TaiKhoanController::class, 'dangXuat'])->name('dangxuat');
-    Route::get('/thongtin', [TaiKhoanController::class, 'thongTin'])->name('thongtin');
+    Route::get('/thongtin', [TaiKhoanController::class, 'thongTinKhachHang'])->name('thongtin');
     Route::post('/capnhatthongtin', [TaiKhoanController::class, 'capNhatThongTin'])->name('capnhatthongtin');
-    Route::get('/doimatkhau', [TaiKhoanController::class, 'doiMatKhau'])->name('doimatkhau');
-    Route::post('/doimatkhau', [TaiKhoanController::class, 'postDoiMatKhau']);
+    Route::post('/doimatkhau', [TaiKhoanController::class, 'capNhatMatKhau'])->name('doimatkhau');
     Route::get('/lichsu', [TaiKhoanController::class, 'lichSu'])->name('lichsu');
-    Route::get('/chitiethoadon/{id}', [TaiKhoanController::class, 'chiTietHoaDon'])->name('chitiethoadon');
-    Route::post('/huydonhang/{id}', [TaiKhoanController::class, 'huyDonHang'])->name('huydonhang');
-    Route::post('/danhgiasanpham', [TaiKhoanController::class, 'danhGiaSanPham'])->name('danhgiasanpham');
+    Route::get('/chitiethoadon/{id}', [TaiKhoanController::class, 'ctLichSu'])->name('ct_lichsu');
+    Route::post('/huydonhang/{id}', [HoaDonController::class, 'huyDon'])->name('huydonhang');
+    Route::post('/danhgiasanpham/{mahd}/{masp}', [TaiKhoanController::class, 'postDanhGia'])->name('danhgiasanpham');
+    Route::get('/suadonhang/{id}', [TaiKhoanController::class, 'suaDonHang'])->name('suadonhang');
+    Route::post('/suadonhang/{id}', [TaiKhoanController::class, 'postSuaDonHang']);
+    Route::post('/capnhatchuyenkhoan', [TaiKhoanController::class, 'capNhatChuyenKhoan'])->name('capnhatchuyenkhoan');
 });
 
 // GioHang
@@ -61,45 +62,45 @@ Route::prefix('giohang')->name('giohang.')->group(function() {
 
 // HoaDon
 Route::prefix('hoadon')->name('hoadon.')->group(function() {
-    Route::get('/dathang', [HoaDonController::class, 'datHang'])->name('dathang');
-    Route::post('/xacnhansanpham/{mahd}/{masp}', [HoaDonController::class, 'xacNhanSanPham'])->name('xacnhansanpham');
-    Route::post('/huydon/{id}', [HoaDonController::class, 'huyDon'])->name('huydon');
+    Route::post('/dathang', [HoaDonController::class, 'datHang'])->name('dathang');
     Route::get('/chitiet/{id}', [HoaDonController::class, 'chiTiet'])->name('chitiet');
-    Route::get('/inhoadon/{id}', [HoaDonController::class, 'inHoaDon'])->name('inhoadon');
+    Route::post('/xacnhanthanhtoan/{mahd}/{masp}', [HoaDonController::class, 'xacNhanSanPham'])->name('xacnhanthanhtoan');
 });
 
 // Admin
 Route::prefix('admin')->name('admin.')->group(function() {
     Route::get('/', [AdminController::class, 'index'])->name('index');
-    Route::post('/doitrangthai/{id}', [AdminController::class, 'doiTrangThai'])->name('doitrangthai');
+    Route::post('/doitrangthai', [AdminController::class, 'doiTrangThai'])->name('doitrangthai');
     Route::get('/quanlynguoidung', [AdminController::class, 'quanLyNguoiDung'])->name('quanlynguoidung');
-    Route::post('/doitrangthainguoidung/{id}', [AdminController::class, 'doiTrangThaiNguoiDung'])->name('doitrangthainguoidung');
+    Route::post('/doitrangthainguoidung', [AdminController::class, 'doiTrangThaiNguoiDung'])->name('doitrangthainguoidung');
     Route::get('/quanlysanpham', [AdminController::class, 'quanLySanPham'])->name('quanlysanpham');
+    Route::post('/doitrangthaisanpham', [AdminController::class, 'doiTrangThai'])->name('doitrangthaisanpham');
+    Route::post('/xoasanpham', [AdminController::class, 'xoa'])->name('xoasanpham');
     Route::get('/quanlydonhang', [AdminController::class, 'quanLyDonHang'])->name('quanlydonhang');
     Route::get('/quanlykhieunai', [AdminController::class, 'quanLyKhieuNai'])->name('quanlykhieunai');
-    Route::post('/capnhattrangthaikn/{id}', [AdminController::class, 'capNhatTrangThaiKN'])->name('capnhattrangthaikn');
-    Route::post('/xoakhieunai/{id}', [AdminController::class, 'xoaKhieuNai'])->name('xoakhieunai');
-    Route::post('/xoa/{id}', [AdminController::class, 'xoa'])->name('xoa');
+    Route::post('/capnhattrangthaikn', [AdminController::class, 'capNhatTrangThaiKN'])->name('capnhattrangthaikn');
+    Route::post('/xoakhieunai', [AdminController::class, 'xoaKhieuNai'])->name('xoakhieunai');
 });
 
 // KhieuNai
 Route::prefix('khieunai')->name('khieunai.')->group(function() {
-    Route::get('/taokhieunai/{id}', [KhieuNaiController::class, 'taoKhieuNai'])->name('taokhieunai');
-    Route::post('/taokhieunai/{id}', [KhieuNaiController::class, 'postTaoKhieuNai']);
+    Route::get('/taokhieunai/{id}', [KhieuNaiController::class, 'taoKhieuNai'])->name('tao');
+    Route::post('/taokhieunai', [KhieuNaiController::class, 'postTaoKhieuNai'])->name('taokhieunai');
 });
 
 // LoaiSanPham
 Route::prefix('loaisanpham')->name('loaisanpham.')->group(function() {
-    Route::get('/', [LoaiSanPhamController::class, 'index'])->name('index');
-    Route::get('/create', [LoaiSanPhamController::class, 'create'])->name('create');
-    Route::post('/store', [LoaiSanPhamController::class, 'store'])->name('store');
-    Route::get('/edit/{id}', [LoaiSanPhamController::class, 'edit'])->name('edit');
-    Route::post('/update/{id}', [LoaiSanPhamController::class, 'update'])->name('update');
-    Route::post('/delete/{id}', [LoaiSanPhamController::class, 'delete'])->name('delete');
+    Route::post('/them', [LoaiSanPhamController::class, 'store'])->name('them');
+    Route::post('/sua/{id}', [LoaiSanPhamController::class, 'update'])->name('sua');
+    Route::post('/xoa/{id}', [LoaiSanPhamController::class, 'delete'])->name('xoa');
 });
 
 // TinNhan
 Route::prefix('tinnhan')->name('tinnhan.')->group(function() {
-    Route::get('/{userId?}', [TinNhanController::class, 'index'])->name('index');
-    Route::post('/send', [TinNhanController::class, 'send'])->name('send');
+    Route::get('/index', [TinNhanController::class, 'index'])->name('index');
+    Route::get('/chat', [TinNhanController::class, 'chat'])->name('chat');
+    Route::get('/loadtinnhan', [TinNhanController::class, 'loadTinNhan'])->name('loadtinnhan');
+    Route::post('/guitinnhan', [TinNhanController::class, 'guiTinNhan'])->name('guitinnhan');
+    Route::post('/xoatinnhan', [TinNhanController::class, 'xoaTinNhan'])->name('xoatinnhan');
+    Route::post('/danhdaudadoc', [TinNhanController::class, 'danhDauDaDoc'])->name('danhdaudadoc');
 });

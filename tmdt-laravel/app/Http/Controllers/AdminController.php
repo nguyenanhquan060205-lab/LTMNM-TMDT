@@ -24,18 +24,19 @@ class AdminController extends Controller
     public function index()
     {
         $this->checkAdmin();
-        $tongNguoiDung = NguoiDung::count();
-        $tongSanPham = SanPham::count();
-        $daban = SanPham::where('TrangThai', 'Đã bán')->count();
-        $an = SanPham::where('TrangThai', 'Ẩn')->count();
-        $tinDaDuyet = SanPham::where('TrangThai', 'Đã duyệt')->count();
+        $TongTaiKhoan = NguoiDung::count();
+        $TongSanPham = SanPham::count();
+        $DaBan = SanPham::where('TrangThai', 'Đã bán')->count();
+        $An = SanPham::where('TrangThai', 'Ẩn')->count();
+        $TinDaDuyet = SanPham::where('TrangThai', 'Đã duyệt')->count();
 
-        return view('admin.index', compact('tongNguoiDung', 'tongSanPham', 'daban', 'an', 'tinDaDuyet'));
+        return view('admin.index', compact('TongTaiKhoan', 'TongSanPham', 'DaBan', 'An', 'TinDaDuyet'));
     }
 
-    public function doiTrangThai(Request $request, $id)
+    public function doiTrangThai(Request $request)
     {
         $this->checkAdmin();
+        $id = $request->input('id');
         $sp = SanPham::find($id);
         if (!$sp) abort(404);
 
@@ -48,14 +49,14 @@ class AdminController extends Controller
     public function quanLyNguoiDung()
     {
         $this->checkAdmin();
-        $ds = NguoiDung::orderBy('NgayTao', 'desc')->get();
-        return view('admin.quanlynguoidung', compact('ds'));
+        $dsNguoiDung = NguoiDung::latest()->get();
+        return view('admin.quanlynguoidung', compact('dsNguoiDung'));
     }
 
     public function quanLySanPham()
     {
         $this->checkAdmin();
-        $listSP = SanPham::with('nguoiDung')->orderBy('NgayDang', 'desc')->get(); // NgayTao -> NgayDang in SP
+        $listSP = SanPham::with('nguoiDung')->orderBy('MaSP', 'desc')->get();
         $listLoai = LoaiSanPham::with('sanPhams')->get();
 
         return view('admin.quanlysanpham', compact('listSP', 'listLoai'));
@@ -87,7 +88,7 @@ class AdminController extends Controller
     public function quanLyKhieuNai()
     {
         $this->checkAdmin();
-        $dsKhieuNai = KhieuNai::with(['nguoiDung', 'hoaDon'])->orderBy('NgayTao', 'desc')->get();
+        $dsKhieuNai = KhieuNai::with(['nguoiDung', 'sanPham'])->orderBy('NgayGui', 'desc')->get();
         return view('admin.quanlykhieunai', compact('dsKhieuNai'));
     }
 

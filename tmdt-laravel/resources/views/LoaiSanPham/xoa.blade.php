@@ -1,4 +1,4 @@
-﻿{{-- @model ThuongMaiDienTu_DoAn.Models.LOAISANPHAM --}}
+{{-- @model ThuongMaiDienTu_DoAn.Models.LOAISANPHAM --}}
 
 @extends('shared._layout')
 
@@ -28,3 +28,4 @@
         </div>
     }
 </div>
+

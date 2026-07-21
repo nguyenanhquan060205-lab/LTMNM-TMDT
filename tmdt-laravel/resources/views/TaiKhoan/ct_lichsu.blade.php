@@ -1,12 +1,13 @@
-﻿{{-- @model IEnumerable<ThuongMaiDienTu_DoAn.Models.ChiTietHoaDonViewModel> --}}
+@extends('layouts.app')
 
-@{
-    var hd = $HoaDon as ThuongMaiDienTu_DoAn.Models.HOADON;
+@section('title', 'Chi tiết đơn hàng')
 
-    bool DonHuy = hd.TrangThai != null &&
-                  hd.TrangThai.Trim().Equals("Đã huỷ", StringComparison.OrdinalIgnoreCase);
-}
+@php
+    $hd = $HoaDon;
+    $DonHuy = $hd->TrangThai != null && (strcasecmp(trim($hd->TrangThai), "Đã huỷ") === 0 || strcasecmp(trim($hd->TrangThai), "Đã hủy") === 0);
+@endphp
 
+@section('content')
 <style>
     .order-card {
         background: #fff;
@@ -41,31 +42,26 @@
 <div class="container mt-4">
     <div class="order-card">
 
-        <h2 class="order-title mb-4">Chi tiết đơn hàng #@hd.MaHD</h2>
+        <h2 class="order-title mb-4">Chi tiết đơn hàng #{{ $hd->MaHD }}</h2>
 
         <div class="row mb-3">
             <div class="col-md-6">
-                <p><strong>Ngày đặt:</strong> @(hd.NgayDat?.ToString("dd/MM/yyyy HH:mm") ?? "-")</p>
-                <p><strong>Ngày thanh toán:</strong> @(hd.NgayTT?.ToString("dd/MM/yyyy HH:mm") ?? "-")</p>
+                <p><strong>Ngày đặt:</strong> {{ $hd->NgayDat ? \Carbon\Carbon::parse($hd->NgayDat)->format('d/m/Y HH:mm') : '-' }}</p>
+                <p><strong>Ngày thanh toán:</strong> {{ $hd->NgayTT ? \Carbon\Carbon::parse($hd->NgayTT)->format('d/m/Y HH:mm') : '-' }}</p>
             </div>
 
             <div class="col-md-6">
-                <p><strong>Địa chỉ giao hàng:</strong> @hd.DiaChiGiaoHang</p>
+                <p><strong>Địa chỉ giao hàng:</strong> {{ $hd->DiaChiGiaoHang }}</p>
 
                 <p>
                     <strong>Trạng thái đơn:</strong>
-                    @if (DonHuy)
-                    {
+                    @if ($DonHuy)
                         <span class="badge bg-danger badge-status">Đã huỷ</span>
-                    }
-                    else if (hd.TrangThai == "Đã thanh toán")
-                    {
+                    @elseif ($hd->TrangThai == "Đã thanh toán")
                         <span class="badge bg-success badge-status">Đã thanh toán</span>
-                    }
-                    else
-                    {
+                    @else
                         <span class="badge bg-warning text-dark badge-status">Đang chờ xử lý</span>
-                    }
+                    @endif
                 </p>
             </div>
         </div>
@@ -86,86 +82,74 @@
             </thead>
 
             <tbody>
-                @foreach (var item in Model)
-                {
-                    bool HuyCT = item.TrangThaiCT != null &&
-                                 item.TrangThaiCT.Trim().Equals("Đã huỷ", StringComparison.OrdinalIgnoreCase);
+                @foreach ($chiTietVm as $item)
+                    @php
+                        $HuyCT = $item->TrangThaiCT != null && (strcasecmp(trim($item->TrangThaiCT), "Đã huỷ") === 0 || strcasecmp(trim($item->TrangThaiCT), "Đã hủy") === 0);
+                    @endphp
 
                     <tr>
-                        <td>@item.TenSP</td>
-                        <td>@item.SoLuong</td>
-                        <td class="price-red">@String.Format("{0:N0} đ", item.ThanhTien)</td>
+                        <td>{{ $item->TenSP }}</td>
+                        <td>{{ $item->SoLuong }}</td>
+                        <td class="price-red">{{ number_format($item->ThanhTien, 0, ',', '.') }} đ</td>
 
                         <td>
-                            @if (DonHuy || HuyCT)
-                            {
+                            @if ($DonHuy || $HuyCT)
                                 <span class="badge bg-danger badge-status">Đã huỷ</span>
-                            }
-                            else if (item.TrangThaiCT == "Đã xác nhận")
-                            {
+                            @elseif ($item->TrangThaiCT == "Đã xác nhận")
                                 <span class="badge bg-success badge-status">Đã xác nhận</span>
-                            }
-                            else
-                            {
+                            @else
                                 <span class="badge bg-secondary badge-status">Chờ xác nhận</span>
-                            }
+                            @endif
                         </td>
 
                         <td>
                             <a class="btn btn-primary btn-sm"
-                               href="@Url.Action("ChiTiet", "SanPham", new { id = item.MaSP })">
+                               href="{{ route('sanpham.chitiet', ['id' => $item->MaSP]) }}">
                                 Xem sản phẩm
                             </a>
 
-                            @if (!DonHuy && item.TrangThaiCT == "Đã xác nhận")
-                            {
-                                if (!item.DaDanhGia)
-                                {
+                            @if (!$DonHuy && $item->TrangThaiCT == "Đã xác nhận")
+                                @if (!$item->DaDanhGia)
                                     <a class="btn btn-success btn-sm ms-1"
-                                       href="@Url.Action("DanhGia", "TaiKhoan", new { maHD = item.MaHD, maSP = item.MaSP })">
+                                       href="{{ route('taikhoan.danhgia', ['maHD' => $item->MaHD, 'maSP' => $item->MaSP]) }}">
                                         ⭐ Đánh giá
                                     </a>
-                                }
-                                else
-                                {
+                                @else
                                     <span class="text-muted ms-2">⭐ Đã đánh giá</span>
-                                }
+                                @endif
 
-                                if (!item.DaKhieuNai)
-                                {
-                                    <a href="@Url.Action("TaoKhieuNai", "KhieuNai", new { idSanPham = item.MaSP })"
+                                @if (!$item->DaKhieuNai)
+                                    {{-- Temporary fallback if route doesn't exist, we will fix routes later --}}
+                                    <a href="/khieunai/tao/{{ $item->MaSP }}"
                                        class="btn btn-danger btn-sm ms-1">
                                         Khiếu nại
                                     </a>
-                                }
-                                else
-                                {
+                                @else
                                     <span class="btn btn-outline-danger btn-sm ms-1 disabled">Đã khiếu nại</span>
-                                }
-                            }
-                            else if (DonHuy)
-                            {
+                                @endif
+                            @elseif ($DonHuy)
 
-                            }
+                            @endif
                         </td>
                     </tr>
-                }
+                @endforeach
             </tbody>
         </table>
 
         <div class="d-flex justify-content-between mt-4">
-            <a href="@Url.Action("LichSu", "TaiKhoan")"
+            <a href="{{ route('taikhoan.lichsu') }}"
                class="btn btn-secondary px-4">
                 ⬅ Quay lại
             </a>
-            @if (hd.TrangThai == "Đã thanh toán" && Model.All(x => x.TrangThaiCT == "Đã xác nhận"))
-            {
-                <a href="@Url.Action("InHoaDon", "HoaDon", new { id = hd.MaHD })"
+            @if ($hd->TrangThai == "Đã thanh toán" && $chiTietVm->every(fn($x) => $x->TrangThaiCT == "Đã xác nhận"))
+                <a href="{{ route('hoadon.inhoadon', ['id' => $hd->MaHD]) }}"
                    class="btn btn-success px-4">
                     🧾 In hoá đơn
                 </a>
-            }
+            @endif
         </div>
 
     </div>
 </div>
+@endsection
+

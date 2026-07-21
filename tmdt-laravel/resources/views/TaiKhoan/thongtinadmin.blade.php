@@ -1,4 +1,4 @@
-﻿{{-- @model ThuongMaiDienTu_DoAn.Models.NGUOIDUNG --}}
+{{-- @model ThuongMaiDienTu_DoAn.Models.NGUOIDUNG --}}
 @extends('shared._layoutAdmin')
 
 <div class="container-fluid px-4">
@@ -26,7 +26,7 @@
         <div class="row">
             <div class="col-xl-4">
                 <div class="card mb-4 mb-xl-0 shadow-sm border-0">
-                    <div class="card-header bg-white fw-bold">Ảnh đại diện</div>
+                    <div class="card-header bg-white fw-bold">?nh d?i di?n</div>
                     <div class="card-body text-center">
                         <div class="position-relative d-inline-block">
                             <img id="previewAvatar"
@@ -39,46 +39,46 @@
                             </label>
                         </div>
 
-                        <div class="small font-italic text-muted mb-4 mt-2">JPG hoặc PNG không quá 5MB</div>
+                        <div class="small font-italic text-muted mb-4 mt-2">JPG ho?c PNG kh�ng qu� 5MB</div>
 
                         <input type="file" id="fileUpload" name="fileUpload" class="d-none" accept="image/*" onchange="previewFile(event)" />
 
                         <h5 class="fw-bold text-dark">$Model.HoTen</h5>
-                        <span class="badge bg-info text-dark">Quản trị viên (Admin)</span>
+                        <span class="badge bg-info text-dark">Qu?n tr? vi�n (Admin)</span>
                     </div>
                 </div>
             </div>
 
             <div class="col-xl-8">
                 <div class="card mb-4 shadow-sm border-0">
-                    <div class="card-header bg-white fw-bold">Chi tiết tài khoản</div>
+                    <div class="card-header bg-white fw-bold">Chi ti?t t�i kho?n</div>
                     <div class="card-body">
                         <div class="row gx-3 mb-3">
                             <div class="col-md-6">
-                                <label class="small mb-1 fw-bold">Họ và tên</label>
-                                @Html.TextBoxFor(m => m.HoTen, new { @class = "form-control", placeholder = "Nhập họ tên" })
+                                <label class="small mb-1 fw-bold">H? v� t�n</label>
+                                @Html.TextBoxFor(m => m.HoTen, new { @class = "form-control", placeholder = "Nh?p h? t�n" })
                             </div>
                             <div class="col-md-6">
-                                <label class="small mb-1 fw-bold">Số điện thoại</label>
-                                @Html.TextBoxFor(m => m.SDT, new { @class = "form-control", placeholder = "Nhập số điện thoại" })
+                                <label class="small mb-1 fw-bold">S? di?n tho?i</label>
+                                @Html.TextBoxFor(m => m.SDT, new { @class = "form-control", placeholder = "Nh?p s? di?n tho?i" })
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="small mb-1 fw-bold">Email (Tên đăng nhập)</label>
+                            <label class="small mb-1 fw-bold">Email (T�n dang nh?p)</label>
                             @Html.TextBoxFor(m => m.Email, new { @class = "form-control bg-light", @readonly = "readonly" })
                         </div>
 
                         <div class="row gx-3 mb-3">
                             <div class="col-md-6">
-                                <label class="small mb-1 fw-bold">Giới tính</label>
+                                <label class="small mb-1 fw-bold">Gi?i t�nh</label>
                                 @Html.DropDownListFor(m => m.GioiTinh,
-                                         new SelectList(new[] { "Nam", "Nữ", "Khác" }, Model.GioiTinh),
-                                         "Chọn giới tính", new { @class = "form-select" })
+                                         new SelectList(new[] { "Nam", "N?", "Kh�c" }, Model.GioiTinh),
+                                         "Ch?n gi?i t�nh", new { @class = "form-select" })
                             </div>
                             <div class="col-md-6">
-                                <label class="small mb-1 fw-bold">Địa chỉ</label>
-                                @Html.TextBoxFor(m => m.DiaChi, new { @class = "form-control", placeholder = "Nhập địa chỉ" })
+                                <label class="small mb-1 fw-bold">�?a ch?</label>
+                                @Html.TextBoxFor(m => m.DiaChi, new { @class = "form-control", placeholder = "Nh?p d?a ch?" })
                             </div>
                         </div>
 
@@ -86,11 +86,11 @@
 
                         <div class="d-flex justify-content-between align-items-center">
                             <button type="button" class="btn btn-outline-danger btn-sm">
-                                <i class="fa-solid fa-key me-1"></i> Đổi mật khẩu
+                                <i class="fa-solid fa-key me-1"></i> �?i m?t kh?u
                             </button>
 
                             <button type="submit" class="btn btn-primary px-4">
-                                <i class="fa-solid fa-save me-1"></i> Lưu thay đổi
+                                <i class="fa-solid fa-save me-1"></i> Luu thay d?i
                             </button>
                         </div>
                     </div>
