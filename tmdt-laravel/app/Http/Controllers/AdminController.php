@@ -56,10 +56,10 @@ class AdminController extends Controller
     public function quanLySanPham()
     {
         $this->checkAdmin();
-        $listSP = SanPham::with('nguoiDung')->orderBy('MaSP', 'desc')->get();
-        $listLoai = LoaiSanPham::with('sanPhams')->get();
+        $dsSanPham = SanPham::with('nguoiDung')->orderBy('MaSP', 'desc')->get();
+        $dsLoaiSanPham = LoaiSanPham::with('sanPhams')->get();
 
-        return view('admin.quanlysanpham', compact('listSP', 'listLoai'));
+        return view('admin.quanlysanpham', compact('dsSanPham', 'dsLoaiSanPham'));
     }
 
     public function quanLyDonHang()
