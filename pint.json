@@ -1,0 +1,17 @@
+{
+    "preset": "laravel",
+    "paths": [
+        "app",
+        "bootstrap",
+        "config",
+        "database",
+        "routes",
+        "tests",
+        "tools/quality"
+    ],
+    "exclude": [
+        "bootstrap/cache",
+        "legacy",
+        "tools/legacy-migration"
+    ]
+}

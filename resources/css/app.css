@@ -1,0 +1,13 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+
+:root {
+    color-scheme: light;
+}
+
+body {
+    background: #f8fafc;
+}
+
+.app-shell {
+    min-height: 100vh;
+}
