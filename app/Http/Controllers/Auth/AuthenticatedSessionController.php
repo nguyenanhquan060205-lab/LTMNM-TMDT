@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Contracts\Services\AuthServiceContract;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,14 +16,18 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(LoginRequest $request, AuthServiceContract $authService): RedirectResponse
     {
-        abort(501, 'Login implementation is assigned to the Auth/Profile module.');
+        $authService->attemptLogin($request->validated());
+
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('home'));
     }
 
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request, AuthServiceContract $authService): RedirectResponse
     {
-        auth()->logout();
+        $authService->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

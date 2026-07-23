@@ -12,6 +12,7 @@ erDiagram
     users ||--o{ complaints : files
     users ||--o{ messages : sends
     users ||--o{ messages : receives
+    users ||--o{ notifications : receives
     categories ||--o{ products : contains
     products ||--o{ product_images : has
     products ||--o{ cart_items : selected

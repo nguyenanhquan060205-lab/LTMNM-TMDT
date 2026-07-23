@@ -17,3 +17,16 @@ All routes must have names. State-changing routes must not use GET.
 | Admin | `admin.dashboard`, `admin.users.index`, `admin.users.lock`, `admin.users.unlock`, `admin.products.index`, `admin.products.update-status`, `admin.orders.index`, `admin.complaints.index`, `admin.complaints.update`, `admin.categories.index`, `admin.categories.store`, `admin.categories.update`, `admin.categories.destroy` |
 
 Module route files live in `routes/modules`.
+
+## Broadcast Channels
+
+Broadcast channel definitions live in `routes/channels.php`, loaded from
+`bootstrap/app.php` through Laravel's `withRouting(..., channels: ...)` option.
+
+| Area | Channel | Authorization |
+| --- | --- | --- |
+| User private notifications/messages | `users.{userId}` | Authenticated user can subscribe only when `users.id === userId` |
+
+Message events use `App\Events\MessageSent` with broadcast alias
+`message.sent`. The event broadcasts only public message payload fields and does
+not require Reverb/Echo or a websocket server during tests.

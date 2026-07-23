@@ -26,6 +26,32 @@
 | `reviews` | Review module | Unique order item, rating 1-5 in validation |
 | `complaints` | Complaint/Admin module | Gắn order item |
 | `messages` | Chat module | Sender/receiver and optional product context |
+| `notifications` | Platform/TV5 | Laravel database notification table; morph notifiable columns, data, nullable read timestamp |
+
+## Notifications
+
+`notifications` is in foundation scope and uses Laravel's standard database
+notification table:
+
+- `id` UUID primary key.
+- `type`.
+- `notifiable_type` and `notifiable_id` morph columns.
+- `data`.
+- nullable `read_at`.
+- timestamps.
+
+## Upload Storage Contract
+
+Upload limits are centralized in `config/uploads.php`.
+
+| Type | Disk | Directory | MIME types | Extensions | Max KB |
+| --- | --- | --- | --- | --- | --- |
+| Avatar | `FILESYSTEM_DISK` default `public` | `avatars` | `image/jpeg`, `image/png`, `image/webp` | `jpg`, `jpeg`, `png`, `webp` | 2048 |
+| Product image | `FILESYSTEM_DISK` default `public` | `products` | `image/jpeg`, `image/png`, `image/webp` | `jpg`, `jpeg`, `png`, `webp` | 4096 |
+| Message image | `FILESYSTEM_DISK` default `public` | `messages` | `image/jpeg`, `image/png`, `image/webp` | `jpg`, `jpeg`, `png`, `webp` | 4096 |
+
+Services must store storage-relative paths only. Absolute local paths and
+direct `public/Content` style paths are not part of the active Laravel schema.
 
 ## Safety
 

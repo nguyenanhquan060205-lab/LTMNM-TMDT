@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Contracts\Services\AuthServiceContract;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\RegisterRequest;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class RegisteredUserController extends Controller
 {
@@ -14,8 +15,12 @@ class RegisteredUserController extends Controller
         return view('auth.register');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(RegisterRequest $request, AuthServiceContract $authService): RedirectResponse
     {
-        abort(501, 'Registration implementation is assigned to the Auth/Profile module.');
+        $authService->register($request->validated());
+
+        $request->session()->regenerate();
+
+        return redirect()->route('home');
     }
 }

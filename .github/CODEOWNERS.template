@@ -1,0 +1,70 @@
+# Rename this file to .github/CODEOWNERS only after replacing every placeholder.
+# Do not commit an actual .github/CODEOWNERS file while any @TV*_USERNAME placeholder remains.
+# Multiple owners on one pattern do not guarantee that every listed owner must approve.
+# TV5 pull requests still need TV1 and TV3 review according to the review matrix.
+
+/.github/ @TV5_USERNAME @TV1_USERNAME
+/.github/workflows/ci.yml @TV5_USERNAME @TV1_USERNAME
+/.github/CODEOWNERS @TV1_USERNAME @TV5_USERNAME
+
+/composer.json @TV5_USERNAME @TV1_USERNAME
+/composer.lock @TV5_USERNAME @TV1_USERNAME
+/package.json @TV5_USERNAME @TV1_USERNAME
+/package-lock.json @TV5_USERNAME @TV1_USERNAME
+/vite.config.js @TV5_USERNAME
+
+/bootstrap/app.php @TV1_USERNAME @TV5_USERNAME
+/routes/web.php @TV1_USERNAME @TV5_USERNAME
+/database/migrations/0001_* @TV1_USERNAME @TV5_USERNAME
+/database/migrations/*foundation* @TV1_USERNAME @TV3_USERNAME @TV5_USERNAME
+/database/migrations/*notifications* @TV5_USERNAME @TV1_USERNAME
+/app/Enums/ @TV1_USERNAME @TV2_USERNAME @TV3_USERNAME @TV4_USERNAME @TV5_USERNAME
+
+/app/Contracts/Services/AuthServiceContract.php @TV1_USERNAME @TV4_USERNAME
+/app/Contracts/Services/ProfileServiceContract.php @TV1_USERNAME @TV4_USERNAME
+/app/Contracts/Services/CategoryServiceContract.php @TV2_USERNAME @TV3_USERNAME
+/app/Contracts/Services/ProductServiceContract.php @TV2_USERNAME @TV3_USERNAME
+/app/Contracts/Services/MediaServiceContract.php @TV2_USERNAME @TV5_USERNAME
+/app/Contracts/Services/CartServiceContract.php @TV3_USERNAME @TV2_USERNAME
+/app/Contracts/Services/OrderServiceContract.php @TV3_USERNAME @TV2_USERNAME
+/app/Contracts/Services/SellerOrderServiceContract.php @TV3_USERNAME @TV2_USERNAME
+/app/Contracts/Services/ReviewServiceContract.php @TV4_USERNAME @TV1_USERNAME
+/app/Contracts/Services/ComplaintServiceContract.php @TV4_USERNAME @TV1_USERNAME
+/app/Contracts/Services/AdminDashboardServiceContract.php @TV4_USERNAME @TV1_USERNAME
+/app/Contracts/Services/ChatServiceContract.php @TV5_USERNAME @TV1_USERNAME @TV3_USERNAME
+/app/Contracts/Services/InvoiceServiceContract.php @TV5_USERNAME @TV1_USERNAME @TV3_USERNAME
+
+/app/Http/Controllers/Auth/ @TV1_USERNAME @TV4_USERNAME
+/app/Http/Requests/Auth/ @TV1_USERNAME @TV4_USERNAME
+/app/Http/Middleware/ @TV1_USERNAME @TV5_USERNAME
+/app/Policies/UserPolicy.php @TV1_USERNAME @TV4_USERNAME
+/routes/modules/auth.php @TV1_USERNAME @TV4_USERNAME
+/routes/modules/profile.php @TV1_USERNAME @TV4_USERNAME
+
+/app/Models/Category.php @TV2_USERNAME @TV3_USERNAME
+/app/Models/Product.php @TV2_USERNAME @TV3_USERNAME
+/app/Models/ProductImage.php @TV2_USERNAME @TV5_USERNAME
+/app/Http/Requests/Product/ @TV2_USERNAME @TV3_USERNAME
+/routes/modules/products.php @TV2_USERNAME @TV3_USERNAME
+
+/app/Models/Cart.php @TV3_USERNAME @TV2_USERNAME
+/app/Models/CartItem.php @TV3_USERNAME @TV2_USERNAME
+/app/Models/Order.php @TV3_USERNAME @TV2_USERNAME
+/app/Models/OrderItem.php @TV3_USERNAME @TV2_USERNAME @TV4_USERNAME
+/routes/modules/cart.php @TV3_USERNAME @TV2_USERNAME
+/routes/modules/orders.php @TV3_USERNAME @TV2_USERNAME
+
+/app/Models/Review.php @TV4_USERNAME @TV1_USERNAME
+/app/Models/Complaint.php @TV4_USERNAME @TV1_USERNAME
+/routes/modules/reviews.php @TV4_USERNAME @TV1_USERNAME
+/routes/modules/complaints.php @TV4_USERNAME @TV1_USERNAME
+/routes/modules/admin.php @TV4_USERNAME @TV1_USERNAME
+
+/app/Models/Message.php @TV5_USERNAME @TV1_USERNAME
+/app/Events/ @TV5_USERNAME @TV1_USERNAME
+/routes/channels.php @TV5_USERNAME @TV1_USERNAME
+/routes/modules/messages.php @TV5_USERNAME @TV1_USERNAME
+/resources/views/layouts/ @TV5_USERNAME
+/resources/views/components/ @TV5_USERNAME
+/resources/js/app.js @TV5_USERNAME
+/resources/css/app.css @TV5_USERNAME

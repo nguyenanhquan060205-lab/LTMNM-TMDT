@@ -71,3 +71,47 @@ Do not edit without coordination:
 - Events emitted: `MessageSent`, `InvoiceGenerated`.
 - Data consumed: users, products, orders.
 - Review owner: Shared UI/CI owner.
+
+## Service Contract Registry
+
+Concrete implementations are only listed when a foundation implementation exists.
+`CONTRACT_ONLY` means the module owner can type-hint the interface now, but owns
+the business implementation on their feature branch.
+
+| Contract | Interface | Concrete implementation hien tai | Owner | Methods | Depends on |
+| --- | --- | --- | --- | --- | --- |
+| Auth | `App\Contracts\Services\AuthServiceContract` | `App\Services\AuthService` - IMPLEMENTED_FOUNDATION | TV1 | `register`, `attemptLogin`, `logout`, `currentUser` | `User`, Laravel Auth |
+| Profile | `App\Contracts\Services\ProfileServiceContract` | CONTRACT_ONLY - IMPLEMENTED_BY_MODULE_OWNER_LATER | TV1 | `updateProfile`, `updatePassword`, `updateBankInformation` | `User` |
+| Category | `App\Contracts\Services\CategoryServiceContract` | CONTRACT_ONLY - IMPLEMENTED_BY_MODULE_OWNER_LATER | TV2 | `listForSelection`, `create`, `update`, `delete` | `Category` |
+| Product | `App\Contracts\Services\ProductServiceContract` | CONTRACT_ONLY - IMPLEMENTED_BY_MODULE_OWNER_LATER | TV2 | `publicIndex`, `createForSeller`, `update`, `changeStatus`, `hide` | `User`, `Product`, `ProductStatus` |
+| Media | `App\Contracts\Services\MediaServiceContract` | `App\Services\MediaService` - IMPLEMENTED_FOUNDATION | TV2, TV5 review for chat upload | `storeAvatar`, `storeProductImage`, `storeMessageImage`, `delete` | `User`, `Product`, `UploadedFile`, `Storage` |
+| Cart | `App\Contracts\Services\CartServiceContract` | CONTRACT_ONLY - IMPLEMENTED_BY_MODULE_OWNER_LATER | TV3 | `getOrCreateForUser`, `addProduct`, `updateQuantity`, `removeItem` | `User`, `Product`, `Cart`, `CartItem` |
+| Order | `App\Contracts\Services\OrderServiceContract` | CONTRACT_ONLY - IMPLEMENTED_BY_MODULE_OWNER_LATER | TV3 | `checkout`, `listForBuyer`, `cancelByBuyer` | `User`, `Order`, transaction/inventory contract |
+| Seller order | `App\Contracts\Services\SellerOrderServiceContract` | CONTRACT_ONLY - IMPLEMENTED_BY_MODULE_OWNER_LATER | TV3 | `listForSeller`, `confirmItem`, `cancelItem`, `updateAggregateStatus` | `User`, `Order`, `OrderItem` |
+| Review | `App\Contracts\Services\ReviewServiceContract` | CONTRACT_ONLY - IMPLEMENTED_BY_MODULE_OWNER_LATER | TV4 | `canReview`, `createForOrderItem`, `hasExistingReview` | `User`, `OrderItem`, `Review` |
+| Complaint | `App\Contracts\Services\ComplaintServiceContract` | CONTRACT_ONLY - IMPLEMENTED_BY_MODULE_OWNER_LATER | TV4 | `createForOrderItem`, `listForUser`, `resolve` | `User`, `OrderItem`, `Complaint`, `ComplaintStatus` |
+| Admin dashboard | `App\Contracts\Services\AdminDashboardServiceContract` | CONTRACT_ONLY - IMPLEMENTED_BY_MODULE_OWNER_LATER | TV4 | `statistics` | Aggregated read models; no query builder returned to Blade |
+| Chat | `App\Contracts\Services\ChatServiceContract` | CONTRACT_ONLY - IMPLEMENTED_BY_MODULE_OWNER_LATER | TV5 | `conversation`, `send`, `markAsRead` | `User`, `Message` |
+| Invoice | `App\Contracts\Services\InvoiceServiceContract` | CONTRACT_ONLY - IMPLEMENTED_BY_MODULE_OWNER_LATER | TV5 | `generatePdf` | `Order`, Symfony `Response` |
+
+## Realtime Contract
+
+- Channel file: `routes/channels.php`.
+- Private channel: `users.{userId}`.
+- Authorization: only the authenticated user whose `users.id` equals `{userId}` can subscribe.
+- Event: `App\Events\MessageSent`.
+- Event alias: `message.sent`.
+- Event payload: `message_id`, `sender_id`, `receiver_id`, optional `product_id`, optional `content`, optional `image_path`, `sent_at`.
+- Payload must not include password, email, bank information, or full `User` model.
+
+## Shared File Ownership
+
+- `routes/web.php`: TV1/TV5, import-only.
+- `bootstrap/app.php`: TV1, TV5 review.
+- `routes/channels.php`: TV5, TV1 review.
+- `app/Enums/*`: shared contract PR only.
+- Foundation migrations: frozen; new schema changes use forward migrations.
+- `composer.json`, `composer.lock`, `package.json`, `package-lock.json`: TV5/Platform.
+- Shared models: owner plus dependent reviewer.
+- Layouts/components: TV5.
+- CI workflow: TV5.

@@ -228,20 +228,31 @@ Không chạy lệnh phá hủy database nếu chưa xác minh whitelist.
 
 ## 10. Testing
 
-`phpunit.xml` dùng SQLite in-memory cho test:
+`phpunit.xml` uses MySQL testing database `techsecond_test`:
 
 ```text
-DB_CONNECTION=sqlite
-DB_DATABASE=:memory:
+DB_CONNECTION=mysql
+DB_DATABASE=techsecond_test
+CACHE_STORE=array
+SESSION_DRIVER=array
+QUEUE_CONNECTION=sync
 ```
 
 Chạy:
 
 ```bash
-php artisan test
+bash scripts/verify-parallel-readiness.sh --member-id TV1 --expected-commit <PARALLEL_BASE_COMMIT>
 ```
 
-Không dùng database `TMDT` cho test.
+PowerShell:
+
+```powershell
+.\scripts\verify-parallel-readiness.ps1 -MemberId TV1 -ExpectedCommit <PARALLEL_BASE_COMMIT>
+```
+
+Use your own member id. The scripts read only `DB_CONNECTION` and `DB_DATABASE` from `.env.testing` and refuse `migrate:fresh` unless the database name starts with `techsecond_test`.
+
+Do not use the legacy `TMDT` database for tests.
 
 ## 11. Architecture
 

@@ -2,6 +2,9 @@ name: CI
 
 on:
   pull_request:
+    branches:
+      - main
+      - develop
   push:
     branches:
       - main
@@ -71,8 +74,17 @@ jobs:
           cp .env.example .env
           php artisan key:generate --ansi
 
+      - name: Guard testing database
+        run: |
+          test "$APP_ENV" = "testing"
+          test "$DB_CONNECTION" = "mysql"
+          case "$DB_DATABASE" in
+            techsecond_test*) exit 0 ;;
+            *) echo "Unsafe testing DB: $DB_DATABASE" >&2; exit 1 ;;
+          esac
+
       - name: Run migrations and seeders
-        run: php artisan migrate:fresh --seed --ansi
+        run: php artisan migrate:fresh --seed --env=testing --ansi
 
       - name: Pint
         run: vendor/bin/pint --test

@@ -24,6 +24,7 @@ class MigrationSmokeTest extends TestCase
             'reviews',
             'complaints',
             'messages',
+            'notifications',
             'sessions',
             'cache',
             'jobs',
@@ -39,5 +40,6 @@ class MigrationSmokeTest extends TestCase
         $this->assertTrue(Schema::hasColumns('users', ['id', 'username', 'password', 'is_locked']));
         $this->assertTrue(Schema::hasColumns('products', ['seller_id', 'category_id', 'status', 'deleted_at']));
         $this->assertTrue(Schema::hasColumns('order_items', ['product_name', 'unit_price', 'subtotal']));
+        $this->assertTrue(Schema::hasColumns('notifications', ['id', 'type', 'notifiable_type', 'notifiable_id', 'data', 'read_at']));
     }
 }
