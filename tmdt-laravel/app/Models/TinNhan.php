@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TinNhan extends Model
 {
-    use HasFactory;
-
-    protected $table = "tin_nhans";
-    protected $primaryKey = "MaTN";
+    protected $table = 'TINNHAN';
+    protected $primaryKey = 'MaTN';
+    public $timestamps = false;
     protected $guarded = [];
+    protected $casts = [
+        'DaDoc' => 'boolean',
+    ];
 
-    public function nguoiGui() { return $this->belongsTo(NguoiDung::class, "NguoiGui", "MaKH"); }
-    public function nguoiNhan() { return $this->belongsTo(NguoiDung::class, "NguoiNhan", "MaKH"); }
-    
+
+    public function nguoiGui() { return $this->belongsTo(NguoiDung::class, 'NguoiGui', 'MaKH'); }
+    public function nguoiNhan() { return $this->belongsTo(NguoiDung::class, 'NguoiNhan', 'MaKH'); }
+    public function sanPham() { return $this->belongsTo(SanPham::class, 'MaSP', 'MaSP'); }
+
 }

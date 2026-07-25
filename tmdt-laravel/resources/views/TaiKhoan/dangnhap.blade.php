@@ -1,5 +1,4 @@
-@extends('layouts.app')
-
+@extends('Shared._Layout')
 @section('title', 'Đăng nhập')
 
 @section('content')
@@ -9,14 +8,14 @@
             <div class="card-body">
                 <h4 class="text-center mb-3">Đăng nhập</h4>
 
-                @if (session('error'))
-                    <div class="alert alert-danger">{{ session('error') }}</div>
+                @if (session('Error'))
+                    <div class="alert alert-danger">{{ session('Error') }}</div>
                 @endif
-                @if (session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
+                @if (session('Success'))
+                    <div class="alert alert-success">{{ session('Success') }}</div>
                 @endif
 
-                <form method="post" action="{{ route('taikhoan.dangnhap') }}">
+                <form method="post" action="{{ url('/taikhoan/dangnhap') }}">
                     @csrf
                     <div class="mb-3">
                         <label>Tài khoản</label>
@@ -26,11 +25,11 @@
                         <label>Mật khẩu</label>
                         <input name="matkhau" type="password" class="form-control" required />
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+                    <button type="submit" class="btn btn-warning text-white fw-bold w-100">Đăng nhập</button>
                 </form>
 
                 <p class="text-center mt-3">
-                    Chưa có tài khoản? <a href="{{ route('taikhoan.dangky') }}">Đăng ký ngay</a>
+                    Chưa có tài khoản? <a href="{{ url('/taikhoan/dangky') }}" class="text-warning">Đăng ký ngay</a>
                 </p>
             </div>
         </div>

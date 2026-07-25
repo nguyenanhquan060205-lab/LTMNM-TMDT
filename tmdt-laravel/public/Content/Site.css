@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    TECHSECOND - CSS HOÀN CHỈNH
 ============================================ */
 
@@ -237,10 +237,7 @@ main {
 }
 
 .text-danger {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 700 !important;
+    color: var(--danger-color) !important;
 }
 
 .badge {

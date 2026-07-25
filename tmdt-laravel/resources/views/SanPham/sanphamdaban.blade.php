@@ -88,11 +88,11 @@
                                 <td>{{ $item->NguoiMua }}</td>
 
                                 <td>
-                                    {{ $item->NgayDat ? \Carbon\Carbon::parse($item->NgayDat)->format('dd/MM/yyyy') : '-' }}
+                                    {{ $item->NgayDat ? \Carbon\Carbon::parse($item->NgayDat)->format('d/m/Y H:i') : '-' }}
                                 </td>
 
                                 <td>
-                                    {{ $item->NgayTT ? \Carbon\Carbon::parse($item->NgayTT)->format('dd/MM/yyyy') : '-' }}
+                                    {{ $item->NgayTT ? \Carbon\Carbon::parse($item->NgayTT)->format('d/m/Y H:i') : '-' }}
                                 </td>
 
                                 <td class="text-end fw-bold text-danger text-center">

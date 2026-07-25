@@ -1,4 +1,5 @@
-@extends('layouts.admin')
+@extends('Shared._LayoutAdmin')
+@section('title', 'Quản lý đơn hàng')
 
 @section('content')
 <style>
@@ -11,15 +12,15 @@
         transition: 0.2s;
     }
 
-        .nav-tabs .nav-link.active {
-            color: #0d6efd;
-            border-bottom: 3px solid #0d6efd;
-            background: transparent;
-        }
+    .nav-tabs .nav-link.active {
+        color: #0d6efd;
+        border-bottom: 3px solid #0d6efd;
+        background: transparent;
+    }
 
-        .nav-tabs .nav-link:hover {
-            color: #0a58ca;
-        }
+    .nav-tabs .nav-link:hover {
+        color: #0a58ca;
+    }
 
     .table th {
         background-color: #f8f9fa;
@@ -33,10 +34,10 @@
         vertical-align: middle;
     }
 
-        .table th:hover {
-            background-color: #e9ecef;
-            color: #0d6efd;
-        }
+    .table th:hover {
+        background-color: #e9ecef;
+        color: #0d6efd;
+    }
 
     .table td {
         vertical-align: middle;
@@ -55,9 +56,9 @@
         box-shadow: none;
     }
 
-        .search-box .form-control:focus {
-            border-color: #ced4da;
-        }
+    .search-box .form-control:focus {
+        border-color: #ced4da;
+    }
 </style>
 
 <div class="container-fluid px-4 mt-4 pb-5">
@@ -125,41 +126,41 @@
                                 </tr>
                             </thead>
                             <tbody id="tableBody">
-                                @if (isset($dsDonHang) && count($dsDonHang) > 0)
-                                    @foreach ($dsDonHang as $item)
+                                @if ($donhangs && count($donhangs) > 0)
+                                    @foreach ($donhangs as $item)
                                         @php
-                                            $badgeClass = "bg-secondary";
-                                            if ($item->TrangThai == "Đang chờ xử lý") { $badgeClass = "bg-warning text-dark"; }
-                                            else if ($item->TrangThai == "Đang vận chuyển") { $badgeClass = "bg-info text-white"; }
-                                            else if ($item->TrangThai == "Đã thanh toán") { $badgeClass = "bg-success"; }
-                                            else if ($item->TrangThai == "Đã Huỷ" || $item->TrangThai == "Đã hủy") { $badgeClass = "bg-danger"; }
+                                            $badgeClass = 'bg-secondary';
+                                            if (mb_strtolower(trim($item['TrangThai'])) == 'đang chờ xử lý') { $badgeClass = 'bg-warning text-dark'; }
+                                            elseif (mb_strtolower(trim($item['TrangThai'])) == 'đang vận chuyển') { $badgeClass = 'bg-info text-white'; }
+                                            elseif (mb_strtolower(trim($item['TrangThai'])) == 'đã thanh toán') { $badgeClass = 'bg-success'; }
+                                            elseif (mb_strtolower(trim($item['TrangThai'])) == 'đã huỷ') { $badgeClass = 'bg-danger'; }
                                         @endphp
 
-                                        <tr class="status-row text-center" data-status="{{ $item->TrangThai }}">
+                                        <tr class="status-row text-center" data-status="{{ $item['TrangThai'] }}">
                                             <td class="text-start fw-bold text-dark" style="padding-left: 20px;">
-                                                <i class="fa-solid fa-user-tag text-muted me-2"></i> {{ $item->NguoiMua }}
+                                                <i class="fa-solid fa-user-tag text-muted me-2"></i> {{ $item['NguoiMua'] }}
                                             </td>
 
                                             <td class="text-muted">
-                                                <i class="fa-solid fa-shop me-1"></i> {{ $item->NguoiBan }}
+                                                <i class="fa-solid fa-shop me-1"></i> {{ $item['NguoiBan'] }}
                                             </td>
 
-                                            <td data-date="{{ $item->NgayDat ? \Carbon\Carbon::parse($item->NgayDat)->format('YmdHis') : '0' }}">
-                                                {{ $item->NgayDat ? \Carbon\Carbon::parse($item->NgayDat)->format('dd/MM/yyyy') : '' }}
+                                            <td data-date="{{ $item['NgayDat'] ? \Carbon\Carbon::parse($item['NgayDat'])->format('YmdHis') : '0' }}">
+                                                {{ $item['NgayDat'] ? \Carbon\Carbon::parse($item['NgayDat'])->format('d/m/Y') : '' }}
                                             </td>
 
-                                            <td class="text-danger fw-bold" data-money="{{ $item->TongTien }}">
-                                                {{ number_format($item->TongTien, 0, ',', '.') }} ₫
+                                            <td class="text-danger fw-bold" data-money="{{ $item['TongTien'] }}">
+                                                {{ number_format($item['TongTien'], 0, ',', '.') }} ₫
                                             </td>
 
                                             <td>
                                                 <span class="badge {{ $badgeClass }} rounded-pill fw-bold py-2 px-3" style="min-width: 110px;">
-                                                    {{ $item->TrangThai }}
+                                                    {{ $item['TrangThai'] }}
                                                 </span>
                                             </td>
 
                                             <td>
-                                                <a href="{{ route('taikhoan.ct_lichsu', ['id' => $item->MaHD]) }}"
+                                                <a href="{{ url('/taikhoan/ctlichsu/' . $item['MaHD']) }}"
                                                    class="btn btn-sm btn-outline-primary shadow-sm"
                                                    title="Xem chi tiết đơn hàng">
                                                     <i class="fa-solid fa-eye"></i>
@@ -183,9 +184,7 @@
         </div>
     </div>
 </div>
-@endsection
 
-@section('scripts')
 <script>
     let currentFilter = 'all';
 
@@ -214,12 +213,10 @@
     function filterStatus(status, buttonElement) {
         currentFilter = status;
 
-        // Remove active class from all buttons
         document.querySelectorAll('.btn-outline-primary, .btn-outline-warning, .btn-outline-info, .btn-outline-success, .btn-outline-danger').forEach(btn => {
             btn.classList.remove('active');
         });
 
-        // Add active class to clicked button
         if (buttonElement) {
             buttonElement.classList.add('active');
         }

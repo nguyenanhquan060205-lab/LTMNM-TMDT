@@ -127,8 +127,21 @@
                             <!-- XEM SẢN PHẨM -->
                             <a class="btn btn-primary btn-sm"
                                href="{{ route('sanpham.chitiet', ['id' => $item->MaSP]) }}">
-                                <i class="bi bi-eye-fill"></i> Xem
+                                <i class="bi bi-eye"></i> Xem
                             </a>
+
+                            @if (!$DonHuy && !$HuyCT && $item->TrangThaiCT == "Chờ xác nhận")
+                                <!-- DUYỆT TỪNG SẢN PHẨM -->
+                                <form action="{{ route('hoadon.xacnhansanpham', ['mahd' => $item->MaHD, 'masp' => $item->MaSP]) }}"
+                                      method="post"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Xác nhận sản phẩm này?')">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success btn-sm ms-1">
+                                        <i class="bi bi-check-circle"></i> Duyệt
+                                    </button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                 @empty

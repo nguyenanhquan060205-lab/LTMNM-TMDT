@@ -124,8 +124,8 @@ class SanPhamController extends Controller
     public function taoMoi()
     {
         if (!Session::has('user')) return redirect()->route('taikhoan.dangnhap');
-        $loaiSP = LoaiSanPham::all();
-        return view('sanpham.taomoi', compact('loaiSP'));
+        $maLoai = LoaiSanPham::all();
+        return view('sanpham.taomoi', compact('maLoai'));
     }
 
     public function postTaoMoi(Request $request)
@@ -159,10 +159,6 @@ class SanPhamController extends Controller
                             'URLAnh' => $fileName,
                             'AnhBia' => $firstImage
                         ]);
-                        if($firstImage) {
-                            $sp->AnhBia = $fileName;
-                            $sp->save();
-                        }
                         $firstImage = false;
                     }
                 }
@@ -173,8 +169,6 @@ class SanPhamController extends Controller
                 'URLAnh' => 'noimage.jpg',
                 'AnhBia' => true
             ]);
-            $sp->AnhBia = 'noimage.jpg';
-            $sp->save();
         }
 
         return redirect()->route('sanpham.cuatoi')->with('success', '🎉 Đăng tin thành công! Sản phẩm đã được hiển thị.');
@@ -197,8 +191,8 @@ class SanPhamController extends Controller
             return redirect()->route('sanpham.index');
         }
 
-        $loaiSP = LoaiSanPham::all();
-        return view('sanpham.sua', compact('sanPham', 'loaiSP'));
+        $maLoai = LoaiSanPham::all();
+        return view('sanpham.sua', compact('sanPham', 'maLoai'));
     }
 
     public function postSua(Request $request, $id)
@@ -241,7 +235,6 @@ class SanPhamController extends Controller
                         'URLAnh' => $fileName,
                         'AnhBia' => true
                     ]);
-                    $sp->AnhBia = $fileName;
                 }
             }
         }
@@ -284,7 +277,7 @@ class SanPhamController extends Controller
         $sanPham = SanPham::find($id);
 
         if (!$u || !$sanPham || $sanPham->MaKH != $u->MaKH) {
-            return redirect()->route('home.index')->with('error', 'Bạn không có quyền xóa sản phẩm này.');
+            return redirect()->route('index')->with('error', 'Bạn không có quyền xóa sản phẩm này.');
         }
 
         try {

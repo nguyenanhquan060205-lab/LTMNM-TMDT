@@ -1,5 +1,4 @@
-@extends('layouts.app')
-
+@extends('Shared._Layout')
 @section('title', 'Đăng tin bán hàng')
 
 @section('content')
@@ -70,13 +69,14 @@
     }
 </style>
 
-<div class="container py-4 mb-5">
+
+<div class="container py-4">
 
     <h3 class="fw-bold mb-4">
         <i class="bi bi-megaphone-fill title-icon"></i> Đăng tin bán hàng
     </h3>
 
-    <form method="POST" action="{{ route('sanpham.taomoi') }}" enctype="multipart/form-data">
+    <form action="{{ url('/sanpham/taomoi') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="form-box">
 
@@ -88,15 +88,15 @@
                     <label class="form-label fw-semibold">
                         <i class="bi bi-tag-fill"></i> Tên sản phẩm
                     </label>
-                    <input type="text" name="TenSP" class="form-control mb-3" placeholder="Nhập tên sản phẩm..." required />
+                    <input type="text" name="TenSP" class="form-control mb-3" placeholder="Nhập tên sản phẩm..." required="required" value="{{ old('TenSP') }}" />
 
 
                     <label class="form-label fw-semibold">
                         <i class="bi bi-grid-fill"></i> Danh mục
                     </label>
-                    <select name="MaLoai" class="form-select mb-3" required>
+                    <select name="MaLoai" class="form-select mb-3" required="required">
                         <option value="">Chọn danh mục</option>
-                        @foreach($loaiSP as $loai)
+                        @foreach ($maLoai as $loai)
                             <option value="{{ $loai->MaLoai }}">{{ $loai->TenLoai }}</option>
                         @endforeach
                     </select>
@@ -138,7 +138,7 @@
                     <label class="form-label fw-semibold">
                         <i class="bi bi-journal-text"></i> Mô tả chi tiết
                     </label>
-                    <textarea name="MoTa" class="form-control mb-3" rows="7" placeholder="Mô tả tình trạng sản phẩm, phụ kiện đi kèm..." required></textarea>
+                    <textarea name="MoTa" rows="7" class="form-control mb-3" placeholder="Mô tả tình trạng sản phẩm, phụ kiện đi kèm..." required="required">{{ old('MoTa') }}</textarea>
 
 
                     <label class="form-label fw-semibold">
@@ -159,7 +159,7 @@
 
                 <!-- NÚT ĐĂNG -->
                 <div class="col-12 mt-4 text-end">
-                    <button type="submit" class="btn btn-submit">
+                    <button class="btn btn-submit">
                         <i class="bi bi-cloud-upload-fill"></i> Đăng tin
                     </button>
                 </div>
@@ -168,9 +168,8 @@
         </div>
     </form>
 </div>
-@endsection
 
-@section('scripts')
+
 <script>
     // Preview ảnh bìa
     function previewCover(input) {
@@ -203,3 +202,4 @@
     }
 </script>
 @endsection
+

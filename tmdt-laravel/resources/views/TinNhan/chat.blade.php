@@ -3,15 +3,14 @@
     $viewMode = request()->query('mode');
     $isAdminAccount = ($currentUser && $currentUser->VaiTro == 'Admin');
     $showAdminLayout = $isAdminAccount && ($viewMode != 'user');
-    $layout = $showAdminLayout ? 'layouts.admin' : 'layouts.app';
+    $layout = $showAdminLayout ? 'Shared._LayoutAdmin' : 'Shared._Layout';
+    $title = $showAdminLayout ? 'Dashboard quản trị' : 'Tin nhắn';
 @endphp
 
 @extends($layout)
-
-@section('title', 'Tin nhắn')
+@section('title', $title)
 
 @section('content')
-
 <input type="hidden" id="maSP" value="{{ $MaSP ?? '' }}" />
 <input type="hidden" id="anhSP" value="{{ $AnhSP ?? '' }}" />
 <input type="hidden" id="tenSP" value="{{ $TenSP ?? '' }}" />
@@ -220,9 +219,31 @@
             .options-menu button:hover {
                 background: #f5f5f5;
             }
-    .unread-msg .bubble {
-        border: 2px solid #ff9800;
-        background: #fff8e1;
+    .receipt-label {
+        font-size: 10px;
+        font-style: italic;
+        margin-top: 2px;
+        display: block;
+        text-align: right;
+    }
+    .receipt-label.sent {
+        color: rgba(255,255,255,0.65);
+    }
+    .receipt-label.seen {
+        color: #90caf9;
+        font-weight: 500;
+    }
+    /* Cho bubble bên mình (màu xanh) */
+    .msg.me .receipt-label.sent { color: rgba(255,255,255,0.65); }
+    .msg.me .receipt-label.seen { color: #cce5ff; }
+
+    /* Admin ghim đầu danh sách */
+    .admin-item {
+        border-top: 2px solid #f0b429 !important;
+        background: linear-gradient(90deg, #1d2033, #2a2730) !important;
+    }
+    .admin-item:hover {
+        background: linear-gradient(90deg, #2a2d3d, #352e40) !important;
     }
 </style>
 
@@ -234,8 +255,8 @@
     </div>
 @endif
 
-<input type="hidden" id="NguoiGuiID" value="{{ $NguoiGuiID ?? 0 }}" />
-<input type="hidden" id="NguoiNhanID" value="{{ $NguoiNhanID ?? 0 }}" />
+<input type="hidden" id="NguoiGuiID" value="{{ $NguoiGuiID ?? '' }}" />
+<input type="hidden" id="NguoiNhanID" value="{{ $NguoiNhanID ?? '0' }}" />
 
 <div class="chat-container {{ $showAdminLayout ? 'admin-view' : '' }}">
 
@@ -254,40 +275,52 @@
 
         @php
             $userChuaDoc = $UserChuaDoc ?? [];
-            if (!is_array($userChuaDoc)) {
-                $userChuaDoc = is_object($userChuaDoc) && method_exists($userChuaDoc, 'toArray') ? $userChuaDoc->toArray() : (array)$userChuaDoc;
-            }
+            $nguoiNhanID = $NguoiNhanID ?? 0;
+            $mode = request()->query('mode');
         @endphp
 
-        @foreach ($dsNguoiDung as $u)
-            @php
-                $chuaDoc = in_array($u->MaKH, $userChuaDoc);
-                $avatar = empty($u->AnhDaiDien) ? 'Default.jpg' : $u->AnhDaiDien;
-            @endphp
+        @if(isset($dsNguoiDung) && is_iterable($dsNguoiDung))
+            @foreach ($dsNguoiDung as $u)
+                @php
+                    $chuaDoc = in_array($u->MaKH, $userChuaDoc);
+                @endphp
 
-            <div class="user-item {{ $u->MaKH == ($NguoiNhanID ?? 0) ? 'active' : '' }}"
-                 data-unread="{{ $chuaDoc ? 1 : 0 }}"
-                 onclick="location.href='{{ route('tinnhan.chat', ['idNguoiNhan' => $u->MaKH, 'mode' => request()->query('mode')]) }}'">
+                <div class="user-item {{ $u->MaKH == $nguoiNhanID ? 'active' : '' }} {{ $u->VaiTro == 'Admin' ? 'admin-item' : '' }}"
+                     data-unread="{{ $chuaDoc ? 1 : 0 }}"
+                     onclick="location.href='{{ url('/tinnhan/chat') }}?idNguoiNhan={{ $u->MaKH }}&mode={{ $mode }}'">
 
-                <img src="{{ asset('Content/Avatars/' . $avatar) }}"
-                     style="width:30px;height:30px;border-radius:50%;object-fit:cover;" />
+                    <div style="position:relative; flex-shrink:0;">
+                        <img src="{{ url('Content/avatars/' . (empty($u->AnhDaiDien) ? 'Default.jpg' : $u->AnhDaiDien)) }}"
+                             style="width:36px;height:36px;border-radius:50%;object-fit:cover;" />
+                        @if($u->VaiTro == 'Admin')
+                            <span style="position:absolute;bottom:-2px;right:-4px;font-size:12px;" title="Chăm sóc khách hàng">⭐</span>
+                        @endif
+                    </div>
 
-                <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                    <b>{{ $u->HoTen }}</b>
-
-                    @if ($chuaDoc)
-                        <span class="ms-1 text-warning">●</span>
-                    @endif
+                    <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;">
+                        <div style="display:flex; align-items:center; gap:4px;">
+                            <b>{{ $u->HoTen }}</b>
+                            @if($u->VaiTro == 'Admin')
+                                <span style="font-size:10px; background:#f0b429; color:#000; border-radius:3px; padding:0 4px; font-weight:700;">CSKH</span>
+                            @endif
+                            @if ($chuaDoc)
+                                <span class="ms-1 text-warning">●</span>
+                            @endif
+                        </div>
+                        @if($u->VaiTro == 'Admin')
+                            <small style="color:#8bc4ff; font-size:10px;">📌 Hỗ trợ khách hàng</small>
+                        @endif
+                    </div>
                 </div>
-            </div>
-        @endforeach
+            @endforeach
+        @endif
     </div>
 
     <!-- ======================= CHAT BOX ======================= -->
     <div class="chat-box">
         <div class="chat-header d-flex justify-content-between align-items-center">
             <div>
-                @if (($NguoiNhanID ?? 0) != 0)
+                @if (isset($NguoiNhanID) && $NguoiNhanID != 0)
                     <i class="fa-solid fa-circle-user me-2 text-primary"></i> {{ $NguoiNhanTen ?? '' }}
                 @else
                     <span>Chưa chọn người để trò chuyện</span>
@@ -300,9 +333,8 @@
             </div>
         </div>
 
-
         <div id="messages" class="chat-body">
-            @if (($NguoiNhanID ?? 0) == 0)
+            @if (!isset($NguoiNhanID) || $NguoiNhanID == 0)
                 <div class="text-center text-muted mt-5">
                     <i class="fa-regular fa-comments fa-3x mb-3"></i><br />
                     Vui lòng chọn một người dùng bên trái để bắt đầu
@@ -310,8 +342,7 @@
             @endif
         </div>
 
-        @if (($NguoiNhanID ?? 0) != 0)
-
+        @if (isset($NguoiNhanID) && $NguoiNhanID != 0)
             <div id="imagePreview"
                  style="display:none; padding:10px 15px; border-top:1px solid #ddd; background:#fff;">
                 <div style="position:relative; display:inline-block;">
@@ -329,7 +360,6 @@
             </div>
 
             <div class="chat-input">
-
                 <label for="imgUpload" class="btn btn-outline-secondary mb-0">
                     <i class="fa-regular fa-image"></i>
                 </label>
@@ -341,17 +371,14 @@
                 <button id="btnSend" class="btn btn-primary">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
-
             </div>
-
         @endif
     </div>
 </div>
-@endsection
 
-@section('scripts')
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 <script>
-
     // ======================= TÌM KIẾM USER REALTIME =======================
     $("#searchUser").on("keyup", function () {
         let keyword = $(this).val().toLowerCase();
@@ -363,7 +390,6 @@
         });
     });
 
-
     // ======================= LOAD TIN NHẮN =======================
     let autoScroll = true;
 
@@ -374,10 +400,13 @@
 
         let token = $('#RequestVerificationToken').val();
 
-        $.getJSON('{{ route('tinnhan.loadtinnhan') }}', { idNguoiGui: idGui, idNguoiNhan: idNhan }, function (data) {
+        $.getJSON('/tinnhan/loadtinnhan/' + idGui + '/' + idNhan, function (data) {
 
             let html = "";
             let lastMyIndex = -1;
+
+            // Lấy avatar người nhận (để hiển thị khi tin đã được xem)
+            const idNhan = $('#NguoiNhanID').val();
 
             for (let i = data.length - 1; i >= 0; i--) {
                 if (data[i].NguoiGui == idGui) {
@@ -388,25 +417,29 @@
 
             $.each(data, function (i, m) {
                 let isMe = m.NguoiGui == idGui;
-                let av = m.AvatarGui ? `/Content/Avatars/${m.AvatarGui}` : '/Content/Avatars/Default.jpg';
-                let unreadClass = (!m.DaDoc && m.NguoiGui != idGui) ? "unread-msg" : "";
+                let av = m.AvatarGui ? `/Content/avatars/${m.AvatarGui}` : '/Content/avatars/Default.jpg';
+
+                // --- Receipt (chỉ hiện ở tin cuối cùng của mình) ---
+                let receiptHtml = '';
+                if (isMe) {
+                    if (m.DaDoc) {
+                        receiptHtml = `<span class="receipt-label seen">Đã xem</span>`;
+                    } else {
+                        receiptHtml = `<span class="receipt-label sent">Đã nhận</span>`;
+                    }
+                }
 
                 html += `
-                <div class="msg ${isMe ? 'me' : 'them'} ${unreadClass}" data-dadoc="${m.DaDoc}">
+                <div class="msg ${isMe ? 'me' : 'them'}" data-dadoc="${m.DaDoc}">
                     ${!isMe ? `<img class="avatar" src="${av}">` : ""}
 
                     ${isMe ? `
                     <div class="msg-options">
                         <button class="btn-options">&#x2026;</button>
                         <div class="options-menu" style="display:none;">
-                            <form method="post" action="{{ route('tinnhan.xoatinnhan') }}"
-                                  onsubmit="return confirm('Bạn có chắc muốn xóa tin nhắn này?');">
-                                <input type="hidden" name="_token" value="${token}" />
-                                <input type="hidden" name="idTin" value="${m.MaTN}" />
-                                <button type="submit" class="text-danger">
-                                    <i class="fa-solid fa-trash"></i> Xóa
-                                </button>
-                            </form>
+                            <button type="button" class="text-danger" onclick="xoaTinNhan(${m.MaTN})">
+                                <i class="fa-solid fa-trash"></i> Xóa
+                            </button>
                         </div>
                     </div>
                     ` : ``}
@@ -424,10 +457,7 @@
                         }
 
                         <div class="bubble-time">${m.Gio}</div>
-
-                        ${isMe && i === lastMyIndex && m.DaDoc
-                        ? `<div class="seen-text">Đã xem</div>`
-                        : ``}
+                        ${receiptHtml}
                     </div>
                     ${isMe ? `<img class="avatar" src="${av}">` : ""}
                 </div>`;
@@ -442,7 +472,6 @@
         });
     }
 
-
     $("#messages").on("scroll", function () {
         const el = $(this)[0];
         autoScroll = !(el.scrollTop + el.clientHeight < el.scrollHeight - 50);
@@ -452,7 +481,7 @@
         const idGui = $('#NguoiGuiID').val();
         const idNhan = $('#NguoiNhanID').val();
         const msg = $("#txtMsg").val().trim();
-        const file = $("#imgUpload")[0].files[0];
+        const file = $("#imgUpload")[0] ? $("#imgUpload")[0].files[0] : null;
         let token = $('#RequestVerificationToken').val();
 
         if (!msg && !file) return;
@@ -465,7 +494,7 @@
         if (file) formData.append("anh", file);
 
         $.ajax({
-            url: "{{ route('tinnhan.guitinnhan') }}",
+            url: "/tinnhan/guitinnhan",
             type: "POST",
             data: formData,
             processData: false, // ⛔ bắt buộc
@@ -485,22 +514,36 @@
     });
 
     setInterval(loadTinNhan, 2000);
+    loadTinNhan();
     
-    function danhDauDaDoc() {
+    function sendDanhDauDaDoc() {
         const idGui = $('#NguoiGuiID').val();
         const idNhan = $('#NguoiNhanID').val();
-        let token = $('#RequestVerificationToken').val();
         if (idNhan == 0) return;
+        let token = $('#RequestVerificationToken').val();
 
-        $.post('{{ route('tinnhan.danhdaudadoc') }}', {
-            _token: token,
-            idNguoiGui: idGui,
-            idNguoiNhan: idNhan
+        $.post('/tinnhan/danhdaudadoc/' + idGui + '/' + idNhan, {
+            _token: token
+        }).done(function () {
+            // ...
         });
     }
+    
+    sendDanhDauDaDoc();
 
-    loadTinNhan();
-    danhDauDaDoc();
+    function xoaTinNhan(idTin) {
+        if (!confirm('Bạn có chắc muốn xóa tin nhắn này?')) return;
+        let token = $('#RequestVerificationToken').val();
+        $.ajax({
+            url: '/tinnhan/xoatinnhan/' + idTin,
+            type: 'POST',
+            data: { _token: token },
+            success: function() { loadTinNhan(); },
+            error: function(xhr) {
+                alert('Không thể xóa tin nhắn: ' + (xhr.responseJSON?.error || ''));
+            }
+        });
+    }
 
     // ======================= PREVIEW ẢNH =======================
     $("#imgUpload").on("change", function () {
@@ -558,7 +601,7 @@
         const tenSP = $("#tenSP").val();
 
         if (anhSP) {
-            const imgUrl = `/Content/Images/${anhSP}`;
+            const imgUrl = `/Content/images/${anhSP}`;
 
             // preview ảnh
             $("#previewImg").attr("src", imgUrl);
@@ -614,4 +657,3 @@
     }
 </style>
 @endsection
-

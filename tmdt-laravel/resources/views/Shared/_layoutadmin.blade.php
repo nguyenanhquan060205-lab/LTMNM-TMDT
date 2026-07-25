@@ -1,6 +1,8 @@
 @php
-    $user = session('user');
-    $anh = $user && !empty($user->AnhDaiDien) ? asset('Content/Avatars/' . $user->AnhDaiDien) : asset('Content/Avatars/default.jpg');
+    $user = Session::get('user');
+    $anh = $user && !empty($user->AnhDaiDien)
+        ? url('Content/Avatars/' . $user->AnhDaiDien)
+        : url('content/avatars/default.jpg');
 @endphp
 <!DOCTYPE html>
 <html lang="vi">
@@ -25,43 +27,43 @@
     <div class="d-flex">
         <!-- SIDEBAR -->
         <div class="sidebar d-flex flex-column flex-shrink-0" style="width: 250px;">
-            <a href="{{ route('admin.index') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none p-3 border-bottom border-secondary">
+            <a href="{{ url('/admin/index') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none p-3 border-bottom border-secondary">
                 <i class="fa-solid fa-shield-halved fa-2x text-warning me-2"></i>
                 <span class="fs-5 fw-bold">Admin Panel</span>
             </a>
             <ul class="nav nav-pills flex-column mb-auto mt-3">
                 <li class="nav-item">
-                    <a href="{{ route('admin.index') }}" class="nav-link {{ request()->routeIs('admin.index') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/index') }}" class="nav-link {{ request()->is('Admin/Index') || request()->is('Admin') ? 'active' : '' }}">
                         <i class="fa fa-home me-2"></i> Dashboard
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.quanlysanpham') }}" class="nav-link {{ request()->routeIs('admin.quanlysanpham') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/quanlysanpham') }}" class="nav-link {{ request()->is('Admin/DoiTrangThai') ? 'active' : '' }}">
                         <i class="fa fa-box me-2"></i> Duyệt sản phẩm
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.quanlynguoidung') }}" class="nav-link {{ request()->routeIs('admin.quanlynguoidung') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/quanlysanpham') }}" class="nav-link {{ request()->is('Admin/QuanLySanPham') ? 'active' : '' }}">
+                        <i class="fa fa-boxes-stacked me-2"></i> Quản lý sản phẩm
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url('/admin/quanlynguoidung') }}" class="nav-link {{ request()->is('Admin/QuanLyNguoiDung') ? 'active' : '' }}">
                         <i class="fa fa-users me-2"></i> Quản lý người dùng
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.quanlydonhang') }}" class="nav-link {{ request()->routeIs('admin.quanlydonhang') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/quanlydonhang') }}" class="nav-link {{ request()->is('Admin/QuanLyDonHang') ? 'active' : '' }}">
                         <i class="fa fa-shopping-cart me-2"></i> Đơn hàng hệ thống
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.quanlykhieunai') }}" class="nav-link {{ request()->routeIs('admin.quanlykhieunai') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/quanlykhieunai') }}" class="nav-link {{ request()->is('Admin/QuanLyKhieuNai') ? 'active' : '' }}">
                         <i class="fa fa-exclamation-triangle me-2"></i> Xử lý khiếu nại
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('loaisanpham.index') }}" class="nav-link {{ request()->routeIs('loaisanpham.*') ? 'active' : '' }}">
-                        <i class="fa fa-tags me-2"></i> Danh mục sản phẩm
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('home.index') }}" class="nav-link text-info mt-4 border-top border-secondary pt-3">
+                    <a href="{{ url('/home') }}" class="nav-link text-info mt-4 border-top border-secondary pt-3">
                         <i class="fa fa-globe me-2"></i> Trở về trang chính
                     </a>
                 </li>
@@ -73,7 +75,7 @@
             <!-- TOP NAVBAR -->
             <nav class="navbar navbar-expand-lg navbar-light navbar-admin px-4 py-3">
                 <div class="container-fluid">
-                    <h4 class="mb-0 fw-bold text-dark">{{ $Title ?? 'Quản Trị' }}</h4>
+                    <h4 class="mb-0 fw-bold text-dark">@yield('title', 'Quản Trị')</h4>
                     <div class="d-flex align-items-center ms-auto">
                         <div class="dropdown">
                             <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
@@ -81,9 +83,9 @@
                                 <strong>{{ $user->TaiKhoan ?? 'Admin' }}</strong>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow">
-                                <li><a class="dropdown-item" href="{{ route('taikhoan.thongtin') }}">Thông tin</a></li>
+                                <li><a class="dropdown-item" href="{{ url('/taikhoan/thongtinadmin') }}">Thông tin</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="{{ route('taikhoan.dangxuat') }}">Đăng xuất</a></li>
+                                <li><a class="dropdown-item text-danger" href="{{ url('/taikhoan/dangxuat') }}">Đăng xuất</a></li>
                             </ul>
                         </div>
                     </div>
@@ -98,7 +100,7 @@
                 @if(session('error'))
                     <div class="alert alert-danger shadow-sm"><i class="fa fa-exclamation-triangle me-2"></i>{{ session('error') }}</div>
                 @endif
-                
+
                 @yield('content')
             </div>
         </div>

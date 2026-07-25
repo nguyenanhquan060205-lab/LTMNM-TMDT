@@ -1,10 +1,10 @@
-@extends('layouts.app')
-
+@extends('Shared._Layout')
 @section('title', 'Sửa đơn hàng')
 
 @section('content')
-<div class="container mt-4 mb-5">
+<div class="container my-5">
     <h2>Sửa đơn hàng</h2>
+    
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <ul class="mb-0">
@@ -15,45 +15,46 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('taikhoan.suadonhang', ['id' => $hd->MaHD]) }}">
+    <form action="{{ url('/taikhoan/suadonhang/' . $hd->MaHD) }}" method="POST">
         @csrf
         <input type="hidden" name="MaHD" value="{{ $hd->MaHD }}" />
 
         <div class="mb-3">
-            <label>Phương thức thanh toán: </label>
-            <input type="text" name="PhuongThucTT" class="form-control" style="width:400px;" value="{{ $hd->PhuongThucTT }}" />
+            <label class="form-label fw-bold">Phương thức thanh toán: </label>
+            <input type="text" name="PhuongThucTT" class="form-control" style="max-width:400px;" value="{{ $hd->PhuongThucTT }}" />
             
-            <label class="mt-2">Địa chỉ giao hàng: </label>
-            <input type="text" name="DiaChiGiaoHang" class="form-control" style="width:400px;" value="{{ $hd->DiaChiGiaoHang }}" />
+            <label class="form-label fw-bold mt-3">Địa chỉ giao hàng: </label>
+            <input type="text" name="DiaChiGiaoHang" class="form-control" style="max-width:400px;" value="{{ $hd->DiaChiGiaoHang }}" />
         </div>
 
-        <h4>Chi tiết hóa đơn</h4>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Tên sản phẩm</th>
-                    <th>Số lượng</th>
-                    <th>Thành tiền</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($hd->ctHoaDons as $i => $item)
+        <h4 class="mt-4 fw-bold">Chi tiết hóa đơn</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
                     <tr>
-                        <td>{{ $item->sanPham->TenSP ?? '' }}</td>
-                        <td>
-                            <input type="number" name="CT_HOADON[{{ $i }}][SoLuong]" value="{{ $item->SoLuong }}" class="form-control" />
-                            <input type="hidden" name="CT_HOADON[{{ $i }}][MaSP]" value="{{ $item->MaSP }}" />
-                        </td>
-                        <td>{{ number_format($item->ThanhTien, 0, ',', '.') }} đ</td>
+                        <th>Tên sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Thành tiền</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
-        
-        <!-- Nút lưu thay đổi phải nằm trong form -->
-        <div class="mt-3">
-            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-            <a href="{{ route('taikhoan.lichsu') }}" class="btn btn-secondary">Quay lại</a>
+                </thead>
+                <tbody>
+                    @foreach ($hd->ctHoaDons as $index => $item)
+                        <tr>
+                            <td>{{ $item->sanPham->TenSP ?? '' }}</td>
+                            <td>
+                                <input type="number" name="CT_HOADON[{{ $index }}][SoLuong]" value="{{ $item->SoLuong }}" class="form-control" style="width: 100px;" />
+                                <input type="hidden" name="CT_HOADON[{{ $index }}][MaSP]" value="{{ $item->MaSP }}" />
+                            </td>
+                            <td>{{ number_format($item->ThanhTien, 0, ',', '.') }} đ</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary px-4"><i class="fa-solid fa-save me-1"></i> Lưu thay đổi</button>
+            <a href="{{ url('/taikhoan/lichsu') }}" class="btn btn-secondary px-4">Quay lại</a>
         </div>
     </form>
 </div>

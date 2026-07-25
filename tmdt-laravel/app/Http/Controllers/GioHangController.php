@@ -43,11 +43,11 @@ class GioHangController extends Controller
 
         $gio = GioHang::firstOrCreate(['MaKH' => $user->MaKH]);
 
-        $ds = CtGioHang::with(['sanPham.hinhAnhs'])
+        $model = CtGioHang::with(['sanPham.hinhAnhs'])
             ->where('MaGH', $gio->MaGH)
             ->get();
 
-        return view('giohang.index', compact('ds'));
+        return view('giohang.index', compact('model'));
     }
 
     public function them($id)

@@ -1,22 +1,23 @@
-{{-- @model ThuongMaiDienTu_DoAn.Models.LOAISANPHAM --}}
 
-@extends('shared._layout')
+
+@extends('layouts.app')
+@section('title', '')
 
 <h2>Create</h2>
 
-@using (Html.BeginForm()) 
+
 {
-    @Html.AntiForgeryToken()
+    {{ $Html->AntiForgeryToken }}()
     
     <div class="form-horizontal">
         <h4>LOAISANPHAM</h4>
         <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        {{ $Html->ValidationSummary }}(true, "", new { @class = "text-danger" })
         <div class="form-group">
-            @Html.LabelFor(model => model.TenLoai, htmlAttributes: new { @class = "control-label col-md-2" })
+            {{ $Html->LabelFor }}(model => model.TenLoai, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.TenLoai, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.TenLoai, "", new { @class = "text-danger" })
+                {{ $Html->EditorFor }}(model => model.TenLoai, new { htmlAttributes = new { @class = "form-control" } })
+                {{ $Html->ValidationMessageFor }}(model => model.TenLoai, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -29,6 +30,5 @@
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    {{ $Html->ActionLink }}("Back to List", "Index")
 </div>
-

@@ -19,10 +19,10 @@
 </head>
 
 <body>
-    <!-- 🧭 NAVBAR -->
+    <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-dark shadow-sm sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('home.index') }}">
+            <a class="navbar-brand" href="{{ url('/home') }}">
                 <i class="fa-solid fa-cart-shopping me-2"></i>TechSecond
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
@@ -33,14 +33,14 @@
                 <!-- Menu bên trái -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('home.index') ? 'active' : '' }}" href="{{ route('home.index') }}">Trang chủ</a>
+                        <a class="nav-link {{ request()->is('/') || request()->is('Home*') ? 'active' : '' }}" href="{{ url('/home') }}">Trang chủ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('sanpham.index') ? 'active' : '' }}" href="{{ route('sanpham.index') }}">Sản phẩm</a>
+                        <a class="nav-link {{ request()->is('SanPham*') ? 'active' : '' }}" href="{{ url('/sanpham') }}">Sản phẩm</a>
                     </li>
-                    @if ($user && $user->VaiTro == "Admin")
+                    @if ($user && $user->VaiTro == 'Admin')
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.index') }}">Quản trị</a>
+                            <a class="nav-link {{ request()->is('Admin*') ? 'active' : '' }}" href="{{ url('/admin/index') }}">Quản trị</a>
                         </li>
                     @endif
                 </ul>
@@ -48,12 +48,13 @@
                 <!-- Phần bên phải -->
                 <div class="d-flex align-items-center gap-3">
                     <!-- TÌM KIẾM -->
-                    <form class="d-flex align-items-center flex-shrink-0" method="get" action="{{ route('sanpham.index') }}">
+                    <form class="d-flex align-items-center flex-shrink-0" method="get" action="{{ url('/sanpham') }}">
+                        @php $w = ($user && $user->VaiTro == 'Admin') ? '320px' : '460px'; @endphp
                         <input class="form-control form-control-sm"
                                type="text"
                                name="q"
                                placeholder="Tìm kiếm sản phẩm..."
-                               style="border-radius:20px; width: {{ ($user && $user->VaiTro == 'Admin') ? '320px' : '460px' }};" />
+                               style="border-radius:20px; width: {{ $w }};" />
                         <button class="btn btn-warning btn-sm px-3 ms-2" type="submit">
                             <i class="fa fa-search"></i>
                         </button>
@@ -61,10 +62,8 @@
 
                     <!-- GIỎ HÀNG -->
                     <div class="flex-shrink-0" id="cart-icon-container">
-                        @php
-                            $cartCount = Session::get('CartCount', 0);
-                        @endphp
-                        <a href="{{ route('giohang.index') }}" class="btn btn-outline-light position-relative" style="border: none;">
+                        @php $cartCount = Session::get('CartCount', 0); @endphp
+                        <a href="{{ url('/giohang') }}" class="btn btn-outline-light position-relative" style="border: none;">
                             <i class="fa fa-shopping-cart fa-lg"></i>
                             @if ($user && $cartCount > 0)
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -90,43 +89,43 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('taikhoan.thongtin') }}">
+                                    <a class="dropdown-item" href="{{ url($user->VaiTro == 'Admin' ? '/taikhoan/thongtinadmin' : '/taikhoan/thongtinkhachhang') }}">
                                         <i class="fa fa-user me-2"></i> Thông tin
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('sanpham.taomoi') }}">
+                                    <a class="dropdown-item" href="{{ url('/sanpham/taomoi') }}">
                                         <i class="fa fa-plus-circle me-2"></i> Đăng bán
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('sanpham.cuatoi') }}">
+                                    <a class="dropdown-item" href="{{ url('/sanpham/cuatoi') }}">
                                         <i class="fa fa-box-open me-2"></i> Bài đăng
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('taikhoan.lichsu') }}">
+                                    <a class="dropdown-item" href="{{ url('/taikhoan/lichsu') }}">
                                         <i class="fa fa-history me-2"></i> Lịch sử
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('sanpham.daban') }}">
-                                        <i class="fa fa-bell me-2"></i> Thông báo
+                                    <a class="dropdown-item" href="{{ url('/sanpham/sanphamdaban') }}">
+                                        <i class="fa fa-clipboard-list me-2"></i> Đơn hàng bán
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('tinnhan.index', ['userId' => $user->MaKH, 'mode' => 'user']) }}">
+                                    <a class="dropdown-item" href="{{ url('/tinnhan/chat') }}">
                                         <i class="fa-regular fa-comments me-2"></i> Tin nhắn
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('taikhoan.lichsu') }}{{-- Fallback --}}">
+                                    <a class="dropdown-item" href="{{ url('/taikhoan/lichsu') }}">
                                         <i class="fa-solid fa-flag me-2"></i> Khiếu nại
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item text-danger" href="{{ route('taikhoan.dangxuat') }}">
+                                    <a class="dropdown-item text-danger" href="{{ url('/taikhoan/dangxuat') }}">
                                         <i class="fa fa-sign-out me-2"></i> Đăng xuất
                                     </a>
                                 </li>
@@ -134,7 +133,7 @@
                         </div>
                     @else
                         <a class="btn btn-warning btn-sm px-3 flex-shrink-0"
-                           href="{{ route('taikhoan.dangnhap') }}"
+                           href="{{ url('/taikhoan/dangnhap') }}"
                            style="white-space: nowrap;">
                             Đăng nhập
                         </a>
@@ -143,18 +142,16 @@
             </div>
         </div>
     </nav>
-    <!-- 📦 BODY -->
+
+    <!-- BODY -->
     <main class="container-fluid p-0">
         @yield('content')
     </main>
 
-    <!-- 🦶 FOOTER -->
+    <!-- FOOTER -->
     <footer>
         <div class="container py-5">
-
             <div class="row gy-4">
-
-                <!-- ⭐ Cột 1 -->
                 <div class="col-md-3">
                     <h5 class="fw-bold text-warning mb-3">TechSecond</h5>
                     <p class="small">
@@ -162,26 +159,20 @@
                         Nơi kết nối người mua và người bán toàn quốc.
                     </p>
                 </div>
-
-                <!-- ⭐ Cột 2 -->
                 <div class="col-md-3">
                     <h6 class="fw-bold text-warning mb-3">Liên hệ hỗ trợ</h6>
                     <p class="small mb-1"><i class="fa-solid fa-phone me-2"></i> Hotline: 0123 456 789</p>
-                    <p class="small mb-1"><i class="fa-solid fa-envelope me-2"></i> support@techsecond.vn</p>
+                    <p class="small mb-1"><i class="fa-solid fa-envelope me-2"></i> support@techsecond.com</p>
                     <p class="small"><i class="fa-solid fa-location-dot me-2"></i> Hồ Chí Minh, Việt Nam</p>
                 </div>
-
-                <!-- ⭐ Cột 3 -->
                 <div class="col-md-3">
                     <h6 class="fw-bold text-warning mb-3">Chính sách</h6>
                     <ul class="list-unstyled small">
                         <li><a href="#" class="footer-link">Chính sách bảo mật</a></li>
                         <li><a href="#" class="footer-link">Điều khoản sử dụng</a></li>
-                        <li><a href="#" class="footer-link">Hỗ trợ & FAQ</a></li>
+                        <li><a href="#" class="footer-link">Hỗ trợ &amp; FAQ</a></li>
                     </ul>
                 </div>
-
-                <!-- ⭐ Cột 4 -->
                 <div class="col-md-3">
                     <h6 class="fw-bold text-warning mb-3">Kết nối với chúng tôi</h6>
                     <div class="d-flex gap-3">
@@ -191,19 +182,16 @@
                         <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
                     </div>
                 </div>
-
             </div>
 
             <hr class="border-secondary my-4" />
 
             <div class="text-center small">
-                © 2025 <b class="text-warning">TechSecond</b> – All rights reserved.
+                &copy; 2025 <b class="text-warning">TechSecond</b> &mdash; All rights reserved.
             </div>
-
         </div>
     </footer>
 
     @yield('scripts')
 </body>
 </html>
-

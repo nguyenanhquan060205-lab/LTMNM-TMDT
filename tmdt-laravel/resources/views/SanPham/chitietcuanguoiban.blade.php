@@ -1,16 +1,25 @@
-@extends('layouts.app')
-
-@section('title', 'Chi tiết sản phẩm')
-
 @php
     $trungBinh = $TrungBinhDanhGia ?? 0;
     $tongDanhGia = $TongDanhGia ?? 0;
 
-    $anhBiaObj = collect($sp->hinhAnhs)->firstWhere('AnhBia', true);
-    $anhBia = $anhBiaObj ? $anhBiaObj->URLAnh : ($sp->AnhBia ?? "noimage.jpg");
+    $anhBia = 'no-image.jpg';
+    $anhChiTiet = [];
+    if (isset($sp) && $sp->hinhAnhs) {
+        $anhBiaObj = collect($sp->hinhAnhs)->firstWhere('AnhBia', true);
+        if ($anhBiaObj) {
+            $anhBia = $anhBiaObj->URLAnh;
+        }
+        $anhChiTiet = collect($sp->hinhAnhs)->where('AnhBia', false)->values();
+    }
+    
+    $related = $SPLienQuan ?? [];
 @endphp
 
+@extends('Shared._Layout')
+@section('title', 'Chi tiết sản phẩm')
+
 @section('content')
+
 <div class="container mt-5">
 
     <div class="row">
@@ -23,7 +32,7 @@
             <!-- Hộp ảnh cố định giống CellphoneS -->
             <div class="main-img-box position-relative mx-auto mb-3">
                 <img id="mainImg"
-                     src="{{ asset('Content/Images/' . $anhBia) }}"
+                     src="{{ url('Content/Images/' . $anhBia) }}"
                      class="main-img" 
                      onclick="openLightbox()"
                      style="cursor: zoom-in;" />
@@ -37,13 +46,13 @@
             <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
 
                 <!-- Ảnh bìa -->
-                <img src="{{ asset('Content/Images/' . $anhBia) }}"
+                <img src="{{ url('Content/Images/' . $anhBia) }}"
                      class="thumb thumb-active"
                      onclick="changeImage(0)" />
 
                 <!-- Ảnh phụ -->
-                @foreach ($AnhChiTiet as $i => $anh)
-                    <img src="{{ asset('Content/Images/' . $anh->URLAnh) }}"
+                @foreach ($anhChiTiet as $i => $anh)
+                    <img src="{{ url('Content/Images/' . $anh->URLAnh) }}"
                          class="thumb"
                          onclick="changeImage({{ $i + 1 }})" />
                 @endforeach
@@ -56,23 +65,28 @@
         <!-- ====================== -->
         <div class="col-md-6">
 
-            <h3 class="fw-bold mb-2">{{ $sp->TenSP }}</h3>
-            <p class="text-danger fs-3 fw-bold">{{ number_format($sp->Gia, 0, ',', '.') }} ₫</p>
+            <h3 class="fw-bold mb-2">{{ $sp->TenSP ?? '' }}</h3>
+            <p class="text-danger fs-3 fw-bold">{{ number_format($sp->Gia ?? 0, 0, ',', '.') }} ₫</p>
 
-            <p><b>Mô tả:</b> {{ $sp->MoTa }}</p>
+            <p><b>Mô tả:</b> {{ $sp->MoTa ?? '' }}</p>
 
             <p>
                 <b>Số lượng còn:</b>
-                <span class="fw-bold {{ $sp->SoLuong > 0 ? 'text-success' : 'text-danger' }}">
-                    {{ $sp->SoLuong > 0 ? $sp->SoLuong : 'Hết hàng' }}
+                <span class="fw-bold {{ ($sp->SoLuong ?? 0) > 0 ? 'text-success' : 'text-danger' }}">
+                    {{ ($sp->SoLuong ?? 0) > 0 ? $sp->SoLuong : 'Hết hàng' }}
                 </span>
             </p>
 
             <p>
                 <b>Trạng thái:</b>
-                <span class="badge {{ $sp->TrangThai == 'Đã bán' ? 'bg-danger' :
-                                     ($sp->TrangThai == 'Đã duyệt' ? 'bg-success' : 'bg-secondary') }}">
-                    {{ $sp->TrangThai }}
+                @php
+                    $trangThai = $sp->TrangThai ?? '';
+                    $badgeClass = 'bg-secondary';
+                    if ($trangThai == 'Đã bán') $badgeClass = 'bg-danger';
+                    if ($trangThai == 'Đã duyệt') $badgeClass = 'bg-success';
+                @endphp
+                <span class="badge {{ $badgeClass }}">
+                    {{ $trangThai }}
                 </span>
             </p>
 
@@ -80,8 +94,8 @@
                 <b>Đánh giá:</b>
 
                 @php
-                    $rating = (float)$trungBinh;
-                    $fullStars = (int)floor($rating);
+                    $rating = $trungBinh;
+                    $fullStars = floor($rating);
                     $hasHalfStar = ($rating - $fullStars) >= 0.5;
                 @endphp
 
@@ -109,21 +123,18 @@
             <div class="mt-4 d-flex flex-wrap gap-3">
 
                 <!-- NÚT CHO NGƯỜI BÁN (QUẢN LÝ) -->
-                <a href="{{ route('sanpham.sua', ['id' => $sp->MaSP]) }}"
+                <a href="{{ url('/sanpham/sua/' . ($sp->MaSP ?? '')) }}"
                    class="btn btn-primary fw-bold px-4">
                     <i class="bi bi-pencil-square"></i> Sửa sản phẩm
                 </a>
-                <form action="{{ route('sanpham.xoa', ['id' => $sp->MaSP]) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
-                    @csrf
-                    <!-- Note: Controller accepts simple get/post for xoa, we use form with POST for safety if needed, but original used Url.Action which is GET. Let's use GET as a link since route might be defined as GET in C#. In Laravel, I will use GET link as defined in web.php. -->
-                </form>
-                <a href="{{ route('sanpham.xoa', ['id' => $sp->MaSP]) }}"
+                <a href="{{ url('/sanpham/xoa/' . ($sp->MaSP ?? '')) }}"
                    class="btn btn-danger fw-bold px-4"
                    onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
                     <i class="bi bi-trash"></i> Xóa sản phẩm
                 </a>
 
                 <!-- KHÔNG HIỂN THỊ NÚT THÊM VÀO GIỎ / LIÊN HỆ -->
+                {{-- Nút Khiếu nại (Chủ sở hữu không bao giờ thấy nút khiếu nại) --}}
             </div>
 
         </div>
@@ -133,20 +144,20 @@
     <!-- ========================== -->
     <h4 class="fw-bold mt-4">Đánh giá từ người mua</h4>
 
-    @if ($ListDanhGia && count($ListDanhGia) > 0)
+    @if (isset($ListDanhGia) && collect($ListDanhGia)->isNotEmpty())
         @foreach ($ListDanhGia as $dg)
             <div class="review-box p-3 mt-3 rounded shadow-sm" style="background:#fafafa;">
                 <div class="d-flex align-items-center gap-2">
                     <div class="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center"
                          style="width:38px; height:38px;">
-                        {{ strtoupper(substr($dg->nguoiDung->HoTen ?? 'U', 0, 1)) }}
+                        {{ substr($dg->NGUOIDUNG->HoTen ?? 'U', 0, 1) }}
                     </div>
 
                     <div>
-                        <b>{{ $dg->nguoiDung->HoTen ?? 'Khách hàng' }}</b> <br />
+                        <b>{{ $dg->NGUOIDUNG->HoTen ?? '' }}</b> <br />
                         <span class="text-warning">
                             @for ($i = 1; $i <= 5; $i++)
-                                @if ($i <= $dg->SoSao ?? $dg->DiemDG)
+                                @if ($i <= $dg->SoSao)
                                     <i class="bi bi-star-fill"></i>
                                 @else
                                     <i class="bi bi-star"></i>
@@ -167,52 +178,59 @@
 
         <!-- PHÂN TRANG -->
         @php
-            $current = $PageDG;
-            $total = $TotalPageDG;
+            $current = $PageDG ?? 1;
+            $total = $TotalPageDG ?? 1;
         @endphp
 
         @if ($total > 1)
             <nav class="mt-3 d-flex justify-content-center">
                 <ul class="pagination">
+
                     <li class="page-item {{ $current == 1 ? 'disabled' : '' }}">
-                        <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $current - 1, 'pageSP' => $PageSP]) }}">«</a>
+                        <a class="page-link" href="{{ url('/sanpham/chitiet/' . $sp->MaSP . '?pageDG=' . ($current - 1) . '&pageSP=' . ($PageSP ?? 1)) }}">«</a>
                     </li>
 
                     <li class="page-item {{ $current == 1 ? 'active' : '' }}">
-                        <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => 1, 'pageSP' => $PageSP]) }}">1</a>
+                        <a class="page-link" href="{{ url('/sanpham/chitiet/' . $sp->MaSP . '?pageDG=1&pageSP=' . ($PageSP ?? 1)) }}">1</a>
                     </li>
 
                     @if ($current > 3)
-                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
                     @endif
 
                     @for ($i = $current - 1; $i <= $current + 1; $i++)
                         @if ($i > 1 && $i < $total)
                             <li class="page-item {{ $i == $current ? 'active' : '' }}">
-                                <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $i, 'pageSP' => $PageSP]) }}">{{ $i }}</a>
+                                <a class="page-link" href="{{ url('/sanpham/chitiet/' . $sp->MaSP . '?pageDG=' . $i . '&pageSP=' . ($PageSP ?? 1)) }}">{{ $i }}</a>
                             </li>
                         @endif
                     @endfor
 
                     @if ($current < $total - 2)
-                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
                     @endif
 
                     @if ($total > 1)
                         <li class="page-item {{ $current == $total ? 'active' : '' }}">
-                            <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $total, 'pageSP' => $PageSP]) }}">{{ $total }}</a>
+                            <a class="page-link" href="{{ url('/sanpham/chitiet/' . $sp->MaSP . '?pageDG=' . $total . '&pageSP=' . ($PageSP ?? 1)) }}">{{ $total }}</a>
                         </li>
                     @endif
 
                     <li class="page-item {{ $current == $total ? 'disabled' : '' }}">
-                        <a class="page-link" href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP, 'pageDG' => $current + 1, 'pageSP' => $PageSP]) }}">»</a>
+                        <a class="page-link" href="{{ url('/sanpham/chitiet/' . $sp->MaSP . '?pageDG=' . ($current + 1) . '&pageSP=' . ($PageSP ?? 1)) }}">»</a>
                     </li>
+
                 </ul>
             </nav>
         @endif
     @else
         <p class="text-muted">Chưa có đánh giá nào.</p>
     @endif
+
 </div>
 
 <div id="lightbox" class="lightbox" onclick="closeLightbox()">
@@ -321,19 +339,12 @@
         }
     }
 </style>
-@endsection
 
-@section('scripts')
 <!-- ======================= -->
 <!-- SLIDER JS -->
 <!-- ======================= -->
 <script>
-    let images = [
-        "{{ $anhBia }}",
-        @foreach ($AnhChiTiet as $item)
-            "{!! $item->URLAnh !!}",
-        @endforeach
-    ];
+    let images = @json(collect($anhChiTiet)->pluck('URLAnh')->prepend($anhBia));
 
     let currentIndex = 0;
 

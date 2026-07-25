@@ -1,6 +1,5 @@
-@extends('layouts.app')
-
-@section('title', 'Tin của tôi')
+@extends('Shared._Layout')
+@section('title', 'Tin đăng của tôi')
 
 @section('content')
 <div class="container my-5">
@@ -36,12 +35,12 @@
                         <tr>
                             <td class="text-start ps-4 fw-semibold">{{ $sp->TenSP }}</td>
                             <td>
-                                {{ $sp->NgayTao ? \Carbon\Carbon::parse($sp->NgayTao)->format('dd/MM/yyyy') : '' }}
+                                {{ $sp->NgayTao ? \Carbon\Carbon::parse($sp->NgayTao)->format('d/m/Y') : '' }}
                             </td>
                             <td>
-                                @if ($sp->TrangThai == "Đã duyệt")
+                                @if ($sp->TrangThai == 'Đã duyệt')
                                     <span class="badge bg-success px-3 py-2">Đang hiển thị</span>
-                                @elseif ($sp->TrangThai == "Ẩn")
+                                @elseif ($sp->TrangThai == 'Ẩn')
                                     <span class="badge bg-secondary px-3 py-2">Đã ẩn / Khóa</span>
                                 @else
                                     <span class="badge bg-info text-dark px-3 py-2">{{ $sp->TrangThai }}</span>
@@ -50,13 +49,13 @@
                             <td>{{ $sp->SoLuong }}</td>
                             <td class="text-danger fw-bold">{{ number_format($sp->Gia, 0, ',', '.') }}</td>
                             <td>
-                                <a href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP]) }}" class="btn btn-sm btn-outline-primary me-2">
+                                <a href="{{ url('/sanpham/chitiet/' . $sp->MaSP) }}" class="btn btn-sm btn-outline-primary me-2">
                                     <i class="fa-solid fa-eye"></i> Xem
                                 </a>
-                                <a href="{{ route('sanpham.sua', ['id' => $sp->MaSP]) }}" class="btn btn-sm btn-outline-warning me-2">
+                                <a href="{{ url('/sanpham/sua/' . $sp->MaSP) }}" class="btn btn-sm btn-outline-warning me-2">
                                     <i class="fa-solid fa-pen-to-square"></i> Sửa
                                 </a>
-                                <a href="{{ route('sanpham.xoa', ['id' => $sp->MaSP]) }}" class="btn btn-sm btn-outline-danger"
+                                <a href="{{ url('/sanpham/xoa/' . $sp->MaSP) }}" class="btn btn-sm btn-outline-danger"
                                    onclick="return confirm('Xác nhận xóa sản phẩm này?')">
                                     <i class="fa-solid fa-trash"></i> Xóa
                                 </a>
@@ -68,9 +67,7 @@
         </div>
     </div>
 </div>
-@endsection
 
-@section('scripts')
 <script>
     document.getElementById("searchInput").addEventListener("keyup", function () {
         const keyword = this.value.toLowerCase();

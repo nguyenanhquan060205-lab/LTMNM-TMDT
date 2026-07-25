@@ -1,5 +1,4 @@
-@extends('layouts.admin')
-
+@extends('Shared._LayoutAdmin')
 @section('title', 'Quản lý khiếu nại')
 
 @section('content')
@@ -13,15 +12,15 @@
         transition: 0.2s;
     }
 
-        .nav-tabs .nav-link.active {
-            color: #0d6efd;
-            border-bottom: 3px solid #0d6efd;
-            background: transparent;
-        }
+    .nav-tabs .nav-link.active {
+        color: #0d6efd;
+        border-bottom: 3px solid #0d6efd;
+        background: transparent;
+    }
 
-        .nav-tabs .nav-link:hover {
-            color: #0a58ca;
-        }
+    .nav-tabs .nav-link:hover {
+        color: #0a58ca;
+    }
 
     /* TABLE */
     .table th {
@@ -36,10 +35,10 @@
         vertical-align: middle;
     }
 
-        .table th:hover {
-            background: #e9ecef;
-            color: #0d6efd;
-        }
+    .table th:hover {
+        background: #e9ecef;
+        color: #0d6efd;
+    }
 
     .table td {
         vertical-align: middle;
@@ -70,33 +69,33 @@
         color: #555;
     }
 
-        .ts-filter-btn:hover {
-            background: #f1f4f8;
-        }
+    .ts-filter-btn:hover {
+        background: #f1f4f8;
+    }
 
-        .ts-filter-btn.active {
-            border-color: #0d6efd;
-            background: #e7f0ff;
-            color: #0d6efd;
-        }
+    .ts-filter-btn.active {
+        border-color: #0d6efd;
+        background: #e7f0ff;
+        color: #0d6efd;
+    }
 
     .ts-warning {
         border-color: #e4a11b;
         color: #e4a11b;
     }
 
-        .ts-warning.active {
-            background: #fff3cd;
-        }
+    .ts-warning.active {
+        background: #fff3cd;
+    }
 
     .ts-success {
         border-color: #198754;
         color: #198754;
     }
 
-        .ts-success.active {
-            background: #d1f3e0;
-        }
+    .ts-success.active {
+        background: #d1f3e0;
+    }
 </style>
 
 <div class="container-fluid px-4 mt-4 pb-5">
@@ -110,7 +109,6 @@
                 </button>
             </li>
         </ul>
-
     </div>
 
     <!-- FILTER -->
@@ -168,20 +166,20 @@
                     </thead>
 
                     <tbody id="tableBody">
-                        @if (isset($dsKhieuNai) && count($dsKhieuNai) > 0)
+                        @if ($dsKhieuNai && $dsKhieuNai->count() > 0)
                             @foreach ($dsKhieuNai as $item)
                                 @php
-                                    $badgeClass = $item->TrangThai == "Đã giải quyết" ? "bg-success" : "bg-warning text-dark";
+                                    $badgeClass = $item->TrangThai == 'Đã giải quyết' ? 'bg-success' : 'bg-warning text-dark';
                                 @endphp
 
                                 <tr class="status-row text-center" data-status="{{ $item->TrangThai }}">
                                     <td class="text-start fw-bold text-dark" style="padding-left:20px;">
                                         <i class="fa-solid fa-user me-2 text-muted"></i>
-                                        {{ $item->nguoiDung->HoTen ?? "Ẩn danh" }}
+                                        {{ $item->nguoiDung->HoTen ?? 'Ẩn danh' }}
                                     </td>
 
                                     <td class="text-start text-primary fw-semibold">
-                                        {{ $item->sanPham->TenSP ?? "Sản phẩm đã xóa" }}
+                                        {{ $item->sanPham->TenSP ?? 'Sản phẩm đã xóa' }}
                                     </td>
 
                                     <td class="text-start text-muted small">{{ $item->MoTa }}</td>
@@ -197,8 +195,8 @@
                                     </td>
 
                                     <td>
-                                        @if ($item->TrangThai == "Chưa xử lý" || $item->TrangThai == "Đang chờ xử lý" || $item->TrangThai == "Đang chờ xữ lý")
-                                            <form action="{{ route('admin.capnhattrangthaikn') }}" method="post">
+                                        @if ($item->TrangThai == 'Chưa xử lý')
+                                            <form action="{{ url('/admin/capnhattrangthaikn') }}" method="post">
                                                 @csrf
                                                 <input type="hidden" name="id" value="{{ $item->MaKN }}" />
                                                 <button type="submit" class="btn btn-success btn-sm fw-bold" style="width:100px;">
@@ -206,13 +204,11 @@
                                                 </button>
                                             </form>
                                         @else
-                                            <button type="button" class="btn btn-light btn-sm text-muted border" style="width:100px;" disabled>
-                                                Hoàn tất
-                                            </button>
-                                            <form action="{{ route('admin.xoakhieunai') }}"
+                                            <form action="{{ url('/admin/xoakhieunai') }}"
                                                   method="post"
                                                   onsubmit="return confirm('Bạn có chắc chắn muốn xoá khiếu nại này?');"
                                                   style="display:inline-block">
+
                                                 @csrf
                                                 <input type="hidden" name="id" value="{{ $item->MaKN }}" />
 
@@ -239,9 +235,7 @@
         </div>
     </div>
 </div>
-@endsection
 
-@section('scripts')
 <script>
     // SEARCH
     document.getElementById('searchInput').addEventListener('keyup', function () {
@@ -315,3 +309,4 @@
 
 </script>
 @endsection
+

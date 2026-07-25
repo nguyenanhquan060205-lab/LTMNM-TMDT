@@ -1,16 +1,15 @@
-@extends('layouts.app')
-
+@extends('Shared._Layout')
 @section('title', 'Thông tin người bán')
 
 @section('content')
-<div class="container mt-5 mb-5">
+<div class="container mt-5">
     <div class="row">
 
         <!-- ====================== -->
         <!-- THÔNG TIN NGƯỜI BÁN -->
         <!-- ====================== -->
         <div class="col-md-4 text-center mb-4">
-            <img src="{{ asset('Content/Avatars/' . ($nguoiBan->AnhDaiDien ?? 'no-avatar.jpg')) }}"
+            <img src="{{ url('Content/Avatars/' . ($nguoiBan->AnhDaiDien ?? 'default.jpg')) }}"
                  class="img-fluid rounded-circle mb-3"
                  style="width:150px;height:150px;object-fit:cover;" />
 
@@ -32,19 +31,17 @@
         <div class="col-md-8">
             <h4 class="fw-bold mb-4">Sản phẩm của {{ $nguoiBan->HoTen }}</h4>
 
-            @if ($SanPham && count($SanPham) > 0)
+            @if ($sanPhams && count($sanPhams) > 0)
                 <div class="row g-4 justify-content-center">
-                    @foreach ($SanPham as $sp)
+                    @foreach ($sanPhams as $sp)
                         @php
-                            $anhBiaObj = collect($sp->hinhAnhs)->firstWhere('AnhBia', true);
-                            $anhBia = $anhBiaObj ? $anhBiaObj->URLAnh : ($sp->AnhBia ?? "noimage.jpg");
+                            $anhBia = $sp->hinhAnhSPs->firstWhere('AnhBia', true)?->URLAnh ?? 'no-image.jpg';
                         @endphp
-
                         <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="card product-card border-0 shadow-sm h-100">
-                                <a href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP]) }}">
+                                <a href="{{ url('/sanpham/chitiet/' . $sp->MaSP) }}">
                                     <div class="ratio ratio-1x1 bg-light rounded-top overflow-hidden">
-                                        <img src="{{ asset('Content/Images/' . $anhBia) }}"
+                                        <img src="{{ url('Content/Images/' . $anhBia) }}"
                                              class="card-img-top p-3"
                                              style="object-fit: contain; width:100%; height:100%;" />
                                     </div>
@@ -57,7 +54,7 @@
                                         <p class="small text-muted">{{ $sp->loaiSanPham->TenLoai ?? '' }}</p>
                                     </div>
 
-                                    <a href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP]) }}"
+                                    <a href="{{ url('/sanpham/chitiet/' . $sp->MaSP) }}"
                                        class="btn btn-warning w-100 fw-semibold mt-2 rounded-pill shadow-sm">
                                         Xem chi tiết
                                     </a>
@@ -89,70 +86,30 @@
         </div>
     </div>
 </div>
-@endsection
 
-@section('scripts')
+<!-- ======================= -->
+<!-- SCRIPT AJAX + MODAL BOOTSTRAP 5 -->
+<!-- ======================= -->
 <script>
     $(document).ready(function() {
-        // Danh sách ngân hàng với thông tin màu sắc và logo
         const bankStyles = {
-            'MB Bank': {
-                color: '#0032A0',
-                logo: 'mbbank.png',
-                gradient: 'linear-gradient(135deg, #0032A0 0%, #0052CC 100%)'
-            },
-            'Vietcombank': {
-                color: '#007C3F',
-                logo: 'vietcombank.png',
-                gradient: 'linear-gradient(135deg, #007C3F 0%, #00A854 100%)'
-            },
-            'Techcombank': {
-                color: '#E31E24',
-                logo: 'techcombank.png',
-                gradient: 'linear-gradient(135deg, #E31E24 0%, #FF4444 100%)'
-            },
-            'ACB': {
-                color: '#005BAA',
-                logo: 'acb.png',
-                gradient: 'linear-gradient(135deg, #005BAA 0%, #0077CC 100%)'
-            },
-            'VietinBank': {
-                color: '#ED1C24',
-                logo: 'viettinbank.png',
-                gradient: 'linear-gradient(135deg, #ED1C24 0%, #FF4444 100%)'
-            },
-            'Agribank': {
-                color: '#006838',
-                logo: 'agribank.png',
-                gradient: 'linear-gradient(135deg, #006838 0%, #008A4A 100%)'
-            },
-            'BIDV': {
-                color: '#005BAA',
-                logo: 'bidv.png',
-                gradient: 'linear-gradient(135deg, #005BAA 0%, #0077CC 100%)'
-            },
-            'VPBank': {
-                color: '#1BA05B',
-                logo: 'vpbank.png',
-                gradient: 'linear-gradient(135deg, #1BA05B 0%, #26D07C 100%)'
-            },
-            'TPBank': {
-                color: '#8B3FFD',
-                logo: 'tpbank.png',
-                gradient: 'linear-gradient(135deg, #8B3FFD 0%, #A366FF 100%)'
-            },
-            'Sacombank': {
-                color: '#004B9D',
-                logo: 'sacombank.png',
-                gradient: 'linear-gradient(135deg, #004B9D 0%, #0066CC 100%)'
-            }
+            'MB Bank': { color: '#0032A0', logo: 'mbbank.png', gradient: 'linear-gradient(135deg, #0032A0 0%, #0052CC 100%)' },
+            'Vietcombank': { color: '#007C3F', logo: 'vietcombank.png', gradient: 'linear-gradient(135deg, #007C3F 0%, #00A854 100%)' },
+            'Techcombank': { color: '#E31E24', logo: 'techcombank.png', gradient: 'linear-gradient(135deg, #E31E24 0%, #FF4444 100%)' },
+            'ACB': { color: '#005BAA', logo: 'acb.png', gradient: 'linear-gradient(135deg, #005BAA 0%, #0077CC 100%)' },
+            'VietinBank': { color: '#ED1C24', logo: 'viettinbank.png', gradient: 'linear-gradient(135deg, #ED1C24 0%, #FF4444 100%)' },
+            'Agribank': { color: '#006838', logo: 'agribank.png', gradient: 'linear-gradient(135deg, #006838 0%, #008A4A 100%)' },
+            'BIDV': { color: '#005BAA', logo: 'bidv.png', gradient: 'linear-gradient(135deg, #005BAA 0%, #0077CC 100%)' },
+            'VPBank': { color: '#1BA05B', logo: 'vpbank.png', gradient: 'linear-gradient(135deg, #1BA05B 0%, #26D07C 100%)' },
+            'TPBank': { color: '#8B3FFD', logo: 'tpbank.png', gradient: 'linear-gradient(135deg, #8B3FFD 0%, #A366FF 100%)' },
+            'Sacombank': { color: '#004B9D', logo: 'sacombank.png', gradient: 'linear-gradient(135deg, #004B9D 0%, #0066CC 100%)' }
         };
 
         $(".btn-chuyen-khoan").click(function() {
             var idNguoiBan = $(this).data("id");
 
             $.ajax({
-                url: '{{ route('taikhoan.thongtinchuyenkhoan') }}',
+                url: '{{ url("/TaiKhoan/ThongTinChuyenKhoan") }}',
                 type: 'GET',
                 data: { idNguoiBan: idNguoiBan },
                 success: function(data) {
@@ -165,98 +122,24 @@
 
                         var html = `
                             <style>
-                                .bank-card {
-                                    background: ${bankInfo.gradient};
-                                    border-radius: 20px;
-                                    padding: 25px;
-                                    color: white;
-                                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                                    margin-bottom: 20px;
-                                }
-                                .bank-logo {
-                                    width: 80px;
-                                    height: 80px;
-                                    background: white;
-                                    border-radius: 15px;
-                                    padding: 10px;
-                                    margin-bottom: 15px;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                }
-                                .bank-logo img {
-                                    max-width: 100%;
-                                    max-height: 100%;
-                                    object-fit: contain;
-                                }
-                                .account-info {
-                                    background: rgba(255,255,255,0.15);
-                                    backdrop-filter: blur(10px);
-                                    border-radius: 12px;
-                                    padding: 15px;
-                                    margin-top: 15px;
-                                }
-                                .info-row {
-                                    display: flex;
-                                    justify-content: space-between;
-                                    align-items: center;
-                                    margin-bottom: 12px;
-                                }
-                                .info-row:last-child {
-                                    margin-bottom: 0;
-                                }
-                                .info-label {
-                                    font-size: 13px;
-                                    opacity: 0.9;
-                                    font-weight: 500;
-                                }
-                                .info-value {
-                                    font-size: 16px;
-                                    font-weight: bold;
-                                    text-align: right;
-                                }
-                                .account-number {
-                                    font-size: 24px !important;
-                                    letter-spacing: 2px;
-                                    font-family: 'Courier New', monospace;
-                                }
-                                .copy-btn {
-                                    background: white;
-                                    color: ${bankInfo.color};
-                                    border: none;
-                                    padding: 12px 25px;
-                                    border-radius: 25px;
-                                    font-weight: bold;
-                                    width: 100%;
-                                    margin-top: 15px;
-                                    cursor: pointer;
-                                    transition: all 0.3s;
-                                    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-                                }
-                                .copy-btn:hover {
-                                    transform: translateY(-2px);
-                                    box-shadow: 0 7px 20px rgba(0,0,0,0.3);
-                                }
-                                .qr-section {
-                                    background: white;
-                                    border-radius: 15px;
-                                    padding: 20px;
-                                    text-align: center;
-                                    margin-top: 20px;
-                                }
-                                .qr-title {
-                                    color: #333;
-                                    font-size: 14px;
-                                    margin-bottom: 15px;
-                                    font-weight: 600;
-                                }
+                                .bank-card { background: ${bankInfo.gradient}; border-radius: 20px; padding: 25px; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 20px; }
+                                .bank-logo { width: 80px; height: 80px; background: white; border-radius: 15px; padding: 10px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
+                                .bank-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+                                .account-info { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 12px; padding: 15px; margin-top: 15px; }
+                                .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+                                .info-row:last-child { margin-bottom: 0; }
+                                .info-label { font-size: 13px; opacity: 0.9; font-weight: 500; }
+                                .info-value { font-size: 16px; font-weight: bold; text-align: right; }
+                                .account-number { font-size: 24px !important; letter-spacing: 2px; font-family: 'Courier New', monospace; }
+                                .copy-btn { background: white; color: ${bankInfo.color}; border: none; padding: 12px 25px; border-radius: 25px; font-weight: bold; width: 100%; margin-top: 15px; cursor: pointer; transition: all 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+                                .copy-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(0,0,0,0.3); }
+                                .qr-section { background: white; border-radius: 15px; padding: 20px; text-align: center; margin-top: 20px; }
+                                .qr-title { color: #333; font-size: 14px; margin-bottom: 15px; font-weight: 600; }
                             </style>
 
                             <div class="bank-card">
                                 <div class="bank-logo">
-                                    <img src="/Content/BankLogos/${bankInfo.logo}"
-                                         alt="${data.TenNganHang}"
-                                         onerror="this.src='/Content/BankLogos/default-bank.png'">
+                                    <img src="/Content/BankLogos/${bankInfo.logo}" alt="${data.TenNganHang}" onerror="this.src='/Content/BankLogos/default-bank.png'">
                                 </div>
                                 <h5 class="mb-3" style="font-weight: 600; font-size: 18px;">${data.TenNganHang}</h5>
 
@@ -289,7 +172,6 @@
 
                         $("#chuyenKhoanBody").html(html);
 
-                        // Tạo QR Code (nếu có thư viện QRCode.js)
                         if (typeof QRCode !== 'undefined') {
                             new QRCode(document.getElementById("qrcode-container"), {
                                 text: `${data.TenNganHang}|${data.SoTaiKhoan}|${data.HoTen}`,

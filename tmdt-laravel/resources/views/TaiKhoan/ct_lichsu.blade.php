@@ -58,7 +58,7 @@
                     @if ($DonHuy)
                         <span class="badge bg-danger badge-status">Đã huỷ</span>
                     @elseif ($hd->TrangThai == "Đã thanh toán")
-                        <span class="badge bg-success badge-status">Đã thanh toán</span>
+                        <span class="badge bg-success badge-status">Thành công</span>
                     @else
                         <span class="badge bg-warning text-dark badge-status">Đang chờ xử lý</span>
                     @endif
@@ -96,7 +96,7 @@
                             @if ($DonHuy || $HuyCT)
                                 <span class="badge bg-danger badge-status">Đã huỷ</span>
                             @elseif ($item->TrangThaiCT == "Đã xác nhận")
-                                <span class="badge bg-success badge-status">Đã xác nhận</span>
+                                <span class="badge bg-success badge-status">Thành công</span>
                             @else
                                 <span class="badge bg-secondary badge-status">Chờ xác nhận</span>
                             @endif
@@ -111,7 +111,7 @@
                             @if (!$DonHuy && $item->TrangThaiCT == "Đã xác nhận")
                                 @if (!$item->DaDanhGia)
                                     <a class="btn btn-success btn-sm ms-1"
-                                       href="{{ route('taikhoan.danhgia', ['maHD' => $item->MaHD, 'maSP' => $item->MaSP]) }}">
+                                       href="{{ route('taikhoan.danhgia', ['mahd' => $item->MaHD, 'masp' => $item->MaSP]) }}">
                                         ⭐ Đánh giá
                                     </a>
                                 @else
@@ -120,7 +120,7 @@
 
                                 @if (!$item->DaKhieuNai)
                                     {{-- Temporary fallback if route doesn't exist, we will fix routes later --}}
-                                    <a href="/khieunai/tao/{{ $item->MaSP }}"
+                                    <a href="{{ route('khieunai.taokhieunai', ['idsanpham' => $item->MaSP]) }}"
                                        class="btn btn-danger btn-sm ms-1">
                                         Khiếu nại
                                     </a>

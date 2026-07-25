@@ -1,4 +1,5 @@
-@extends('layouts.admin')
+@extends('Shared._LayoutAdmin')
+@section('title', 'Quản lý người dùng')
 
 @section('content')
 <style>
@@ -11,15 +12,15 @@
         transition: 0.2s;
     }
 
-        .nav-tabs .nav-link.active {
-            color: #0d6efd;
-            border-bottom: 3px solid #0d6efd;
-            background: transparent;
-        }
+    .nav-tabs .nav-link.active {
+        color: #0d6efd;
+        border-bottom: 3px solid #0d6efd;
+        background: transparent;
+    }
 
-        .nav-tabs .nav-link:hover {
-            color: #0a58ca;
-        }
+    .nav-tabs .nav-link:hover {
+        color: #0a58ca;
+    }
 
     /* FILTER BUTTONS */
     .ts-filter-btn {
@@ -33,33 +34,33 @@
         color: #555;
     }
 
-        .ts-filter-btn:hover {
-            background: #f1f4f8;
-        }
+    .ts-filter-btn:hover {
+        background: #f1f4f8;
+    }
 
-        .ts-filter-btn.active {
-            border-color: #0d6efd;
-            background: #e7f0ff;
-            color: #0d6efd;
-        }
+    .ts-filter-btn.active {
+        border-color: #0d6efd;
+        background: #e7f0ff;
+        color: #0d6efd;
+    }
 
     .ts-role-admin {
         border-color: #dc3545;
         color: #dc3545;
     }
 
-        .ts-role-admin.active {
-            background: #ffd9dd;
-        }
+    .ts-role-admin.active {
+        background: #ffd9dd;
+    }
 
     .ts-role-user {
         border-color: #6c757d;
         color: #6c757d;
     }
 
-        .ts-role-user.active {
-            background: #eeeeee;
-        }
+    .ts-role-user.active {
+        background: #eeeeee;
+    }
 
     /* TABLE */
     .table th {
@@ -72,10 +73,10 @@
         user-select: none;
     }
 
-        .table th:hover {
-            background: #e9ecef;
-            color: #0d6efd;
-        }
+    .table th:hover {
+        background: #e9ecef;
+        color: #0d6efd;
+    }
 </style>
 
 <div class="container-fluid px-4 mt-4 pb-5">
@@ -153,16 +154,13 @@
                     <tbody id="tableBody">
                         @foreach ($dsNguoiDung as $nd)
                             @php
-                                $isAdmin = $nd->VaiTro == "Admin";
-                                $roleBadge = $isAdmin ? "bg-danger" : "bg-secondary";
-
-                                // trạng thái khóa
-                                $statusBadge = $nd->Khoa ? "bg-dark text-white" : "bg-success";
-                                $statusText = $nd->Khoa ? "Đang khóa" : "Hoạt động";
+                                $isAdmin = $nd->VaiTro == 'Admin';
+                                $roleBadge = $isAdmin ? 'bg-danger' : 'bg-secondary';
+                                $statusBadge = $nd->Khoa ? 'bg-dark text-white' : 'bg-success';
+                                $statusText = $nd->Khoa ? 'Đang khóa' : 'Hoạt động';
                             @endphp
 
                             <tr class="status-row text-center" data-role="{{ $nd->VaiTro }}">
-
                                 <td class="text-start" style="padding-left:20px;">
                                     <i class="fa-solid fa-circle-user me-2 text-muted"></i>
                                     <span class="fw-bold text-primary">{{ $nd->HoTen }}</span>
@@ -188,7 +186,7 @@
                                             <i class="fa-solid fa-ban"></i> Khóa
                                         </button>
                                     @else
-                                        <form method="post" action="{{ route('admin.doitrangthainguoidung') }}">
+                                        <form method="post" action="{{ url('/admin/doitrangthainguoidung') }}">
                                             @csrf
                                             <input type="hidden" name="id" value="{{ $nd->MaKH }}" />
 
@@ -204,7 +202,6 @@
                                         </form>
                                     @endif
                                 </td>
-
                             </tr>
                         @endforeach
                     </tbody>
@@ -215,9 +212,7 @@
     </div>
 
 </div>
-@endsection
 
-@section('scripts')
 <script>
     /* SEARCH */
     document.getElementById('searchInput').addEventListener('keyup', function () {
@@ -296,3 +291,4 @@
     }
 </script>
 @endsection
+

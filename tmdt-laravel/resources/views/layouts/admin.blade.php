@@ -1,16 +1,16 @@
 @php
-    // 1. Lấy thông tin người dùng
+    // 1. LÃƒÂ¡Ã‚ÂºÃ‚Â¥y thÃƒÆ’Ã‚Â´ng tin ngÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Âi dÃƒÆ’Ã‚Â¹ng
     $user = Session::get('user');
 
-    // 2. Xác định Controller và Action hiện tại qua Route name
+    // 2. XÃƒÆ’Ã‚Â¡c Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹nh Controller vÃƒÆ’Ã‚Â  Action hiÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¡n tÃƒÂ¡Ã‚ÂºÃ‚Â¡i qua Route name
     $routeName = request()->route()->getName();
     
-    // Phân tích route name (ví dụ: 'admin.index', 'tinnhan.chat')
+    // PhÃƒÆ’Ã‚Â¢n tÃƒÆ’Ã‚Â­ch route name (vÃƒÆ’Ã‚Â­ dÃƒÂ¡Ã‚Â»Ã‚Â¥: 'admin.index', 'tinnhan.chat')
     $routeParts = explode('.', $routeName);
     $currentController = $routeParts[0] ?? '';
     $currentAction = $routeParts[1] ?? '';
 
-    // 3. Logic kiểm tra xem có phải đang ở bối cảnh Admin không
+    // 3. Logic kiÃƒÂ¡Ã‚Â»Ã†â€™m tra xem cÃƒÆ’Ã‚Â³ phÃƒÂ¡Ã‚ÂºÃ‚Â£i Ãƒâ€žÃ¢â‚¬Ëœang ÃƒÂ¡Ã‚Â»Ã…Â¸ bÃƒÂ¡Ã‚Â»Ã¢â‚¬Ëœi cÃƒÂ¡Ã‚ÂºÃ‚Â£nh Admin khÃƒÆ’Ã‚Â´ng
     $isAdminContext = false;
 
     if ($currentController == "admin") {
@@ -19,25 +19,25 @@
         $isAdminContext = true;
     }
 
-    // 4. TỰ ĐỘNG ĐẶT TIÊU ĐỀ THEO MENU
-    $pageTitle = "Dashboard quản trị"; // Mặc định
+    // 4. TÃƒÂ¡Ã‚Â»Ã‚Â° Ãƒâ€žÃ‚ÂÃƒÂ¡Ã‚Â»Ã‹Å“NG Ãƒâ€žÃ‚ÂÃƒÂ¡Ã‚ÂºÃ‚Â¶T TIÃƒÆ’Ã…Â U Ãƒâ€žÃ‚ÂÃƒÂ¡Ã‚Â»Ã¢â€šÂ¬ THEO MENU
+    $pageTitle = "Dashboard quÃƒÂ¡Ã‚ÂºÃ‚Â£n trÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹"; // MÃƒÂ¡Ã‚ÂºÃ‚Â·c Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹nh
 
     if ($currentController == "admin") {
         switch ($currentAction) {
             case "index": $pageTitle = "Dashboard"; break;
-            case "quanlysanpham": $pageTitle = "Quản lý sản phẩm"; break;
-            case "quanlydonhang": $pageTitle = "Quản lý đơn hàng"; break;
-            case "quanlynguoidung": $pageTitle = "Quản lý người dùng"; break;
-            case "quanlyloaisp": $pageTitle = "Loại sản phẩm"; break;
-            case "quanlykhieunai": $pageTitle = "Quản lý khiếu nại"; break;
+            case "quanlysanpham": $pageTitle = "QuÃƒÂ¡Ã‚ÂºÃ‚Â£n lÃƒÆ’Ã‚Â½ sÃƒÂ¡Ã‚ÂºÃ‚Â£n phÃƒÂ¡Ã‚ÂºÃ‚Â©m"; break;
+            case "quanlydonhang": $pageTitle = "QuÃƒÂ¡Ã‚ÂºÃ‚Â£n lÃƒÆ’Ã‚Â½ Ãƒâ€žÃ¢â‚¬ËœÃƒâ€ Ã‚Â¡n hÃƒÆ’Ã‚Â ng"; break;
+            case "quanlynguoidung": $pageTitle = "QuÃƒÂ¡Ã‚ÂºÃ‚Â£n lÃƒÆ’Ã‚Â½ ngÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Âi dÃƒÆ’Ã‚Â¹ng"; break;
+            case "quanlyloaisp": $pageTitle = "LoÃƒÂ¡Ã‚ÂºÃ‚Â¡i sÃƒÂ¡Ã‚ÂºÃ‚Â£n phÃƒÂ¡Ã‚ÂºÃ‚Â©m"; break;
+            case "quanlykhieunai": $pageTitle = "QuÃƒÂ¡Ã‚ÂºÃ‚Â£n lÃƒÆ’Ã‚Â½ khiÃƒÂ¡Ã‚ÂºÃ‚Â¿u nÃƒÂ¡Ã‚ÂºÃ‚Â¡i"; break;
         }
     } else if ($currentController == "tinnhan") {
-        $pageTitle = "Tin nhắn / Hỗ trợ";
+        $pageTitle = "Tin nhÃƒÂ¡Ã‚ÂºÃ‚Â¯n / HÃƒÂ¡Ã‚Â»Ã¢â‚¬â€ trÃƒÂ¡Ã‚Â»Ã‚Â£";
     } else if ($currentController == "taikhoan") {
-        $pageTitle = "Thông tin quản trị viên";
+        $pageTitle = "ThÃƒÆ’Ã‚Â´ng tin quÃƒÂ¡Ã‚ÂºÃ‚Â£n trÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ viÃƒÆ’Ã‚Âªn";
     }
 
-    // Hàm Active Menu
+    // HÃƒÆ’Ã‚Â m Active Menu
     $getActive = function($ctrl, $act) use ($currentController, $currentAction) {
         return ($currentController == $ctrl && $currentAction == $act) ? "active" : "";
     };
@@ -50,7 +50,7 @@
     <title>{{ $pageTitle }} - Admin Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
     <style>
@@ -84,7 +84,7 @@
                 margin: 20px 0 0;
                 border-left: 3px solid transparent;
                 transition: all 0.25s ease;
-                border-radius: 8px; /* Đã bo cong */
+                border-radius: 8px; /* Ãƒâ€žÃ‚ÂÃƒÆ’Ã‚Â£ bo cong */
             }
 
                 .sidebar .panel-title h2 {
@@ -276,15 +276,15 @@
 
         @if ($isAdminContext)
             <a href="{{ route('admin.index') }}" class="{{ $getActive('admin', 'index') }}"><i class="fa-solid fa-chart-column"></i>Dashboard</a>
-            <a href="{{ route('admin.quanlysanpham') }}" class="{{ $getActive('admin', 'quanlysanpham') }}"><i class="fa-solid fa-box"></i>Quản lý sản phẩm</a>
-            <a href="{{ route('admin.quanlydonhang') }}" class="{{ $getActive('admin', 'quanlydonhang') }}"><i class="fa-solid fa-file-invoice"></i>Quản lý đơn hàng</a>
-            <a href="{{ route('admin.quanlynguoidung') }}" class="{{ $getActive('admin', 'quanlynguoidung') }}"><i class="fa-solid fa-users"></i>Quản lý người dùng</a>
-            <a href="{{ route('admin.quanlykhieunai') }}" class="{{ $getActive('admin', 'quanlykhieunai') }}"><i class="fa-solid fa-triangle-exclamation"></i>Quản lý khiếu nại</a>
-            <a href="{{ route('tinnhan.chat') }}" class="{{ $getActive('tinnhan', 'chat') }}"><i class="fa-solid fa-comments"></i>Tin nhắn / Hỗ trợ</a>
+            <a href="{{ route('admin.quanlysanpham') }}" class="{{ $getActive('admin', 'quanlysanpham') }}"><i class="fa-solid fa-box"></i>QuÃƒÂ¡Ã‚ÂºÃ‚Â£n lÃƒÆ’Ã‚Â½ sÃƒÂ¡Ã‚ÂºÃ‚Â£n phÃƒÂ¡Ã‚ÂºÃ‚Â©m</a>
+            <a href="{{ route('admin.quanlydonhang') }}" class="{{ $getActive('admin', 'quanlydonhang') }}"><i class="fa-solid fa-file-invoice"></i>QuÃƒÂ¡Ã‚ÂºÃ‚Â£n lÃƒÆ’Ã‚Â½ Ãƒâ€žÃ¢â‚¬ËœÃƒâ€ Ã‚Â¡n hÃƒÆ’Ã‚Â ng</a>
+            <a href="{{ route('admin.quanlynguoidung') }}" class="{{ $getActive('admin', 'quanlynguoidung') }}"><i class="fa-solid fa-users"></i>QuÃƒÂ¡Ã‚ÂºÃ‚Â£n lÃƒÆ’Ã‚Â½ ngÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã‚Âi dÃƒÆ’Ã‚Â¹ng</a>
+            <a href="{{ route('admin.quanlykhieunai') }}" class="{{ $getActive('admin', 'quanlykhieunai') }}"><i class="fa-solid fa-triangle-exclamation"></i>QuÃƒÂ¡Ã‚ÂºÃ‚Â£n lÃƒÆ’Ã‚Â½ khiÃƒÂ¡Ã‚ÂºÃ‚Â¿u nÃƒÂ¡Ã‚ÂºÃ‚Â¡i</a>
+            <a href="{{ route('tinnhan.chat') }}" class="{{ $getActive('tinnhan', 'chat') }}"><i class="fa-solid fa-comments"></i>Tin nhÃƒÂ¡Ã‚ÂºÃ‚Â¯n / HÃƒÂ¡Ã‚Â»Ã¢â‚¬â€ trÃƒÂ¡Ã‚Â»Ã‚Â£</a>
         @endif
 
         <a href="{{ route('taikhoan.dangxuat') }}" class="logout">
-            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+            <i class="fa-solid fa-right-from-bracket"></i> Ãƒâ€žÃ‚ÂÃƒâ€žÃ†â€™ng xuÃƒÂ¡Ã‚ÂºÃ‚Â¥t
         </a>
     </div>
 
@@ -298,9 +298,9 @@
                 @endphp
 
                 @if ($user)
-                    <a href="{{ route('taikhoan.thongtin') }}"
+                    <a href="{{ route('taikhoan.thongtinadmin') }}"
                        class="d-flex align-items-center gap-2 text-decoration-none text-dark"
-                       title="Xem thông tin cá nhân">
+                       title="Xem thÃƒÆ’Ã‚Â´ng tin cÃƒÆ’Ã‚Â¡ nhÃƒÆ’Ã‚Â¢n">
 
                         <img src="{{ asset('Content/Avatars/' . $avatar) }}"
                              style="width:40px;height:40px;border-radius:50%;object-fit:cover; border: 2px solid #00d9ff;" />
@@ -317,10 +317,10 @@
 
         @yield('content')
 
-        <footer>© 2025 - TechSecond Admin Dashboard</footer>
+        <footer>Ãƒâ€šÃ‚Â© 2025 - TechSecond Admin Dashboard</footer>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     @yield('scripts')
 </body>

@@ -1,19 +1,18 @@
-@extends('layouts.app')
-
+@extends('Shared._Layout')
 @section('title', 'Thông tin khách hàng')
 
 @section('content')
 <section class="container my-5">
     <h3 class="fw-bold mb-4">Thông tin khách hàng</h3>
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    @if (session('Success'))
+        <div class="alert alert-success">{{ session('Success') }}</div>
     @endif
-    @if (session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
+    @if (session('Error'))
+        <div class="alert alert-danger">{{ session('Error') }}</div>
     @endif
 
-    <form method="POST" action="{{ route('taikhoan.capnhatthongtin') }}" enctype="multipart/form-data">
+    <form action="{{ url('/taikhoan/capnhatthongtin') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="MaKH" value="{{ $targetUser->MaKH }}" />
 
@@ -22,7 +21,7 @@
             <div class="col-md-3 text-center">
                 <div class="avatar-upload position-relative mb-3">
                     <img id="previewAvatar"
-                         src="{{ asset('Content/Avatars/' . ($targetUser->AnhDaiDien ?: 'default.jpg')) }}"
+                         src="{{ url('Content/Avatars/' . ($targetUser->AnhDaiDien ?? 'default.jpg')) }}"
                          class="rounded-circle shadow-sm avatar-img"
                          style="width: 130px; height: 130px; object-fit: cover; border: 3px solid #f1f1f1;" />
 
@@ -32,10 +31,8 @@
                 </div>
 
                 <!-- Nút chọn file -->
-                <input type="file" id="fileUpload" name="fileUpload"
-                       class="d-none" accept="image/*" onchange="previewFile(event)" />
-                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3"
-                        onclick="document.getElementById('fileUpload').click()">
+                <input type="file" id="fileUpload" name="fileUpload" class="d-none" accept="image/*" onchange="previewFile(event)" />
+                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="document.getElementById('fileUpload').click()">
                     <i class="fa fa-camera me-1"></i> Đổi ảnh đại diện
                 </button>
             </div>
@@ -43,23 +40,23 @@
             <!-- Thông tin -->
             <div class="col-md-9">
                 <div class="mb-3">
-                    <label>Họ tên</label>
+                    <label class="form-label">Họ tên</label>
                     <input type="text" name="HoTen" class="form-control" value="{{ $targetUser->HoTen }}" />
                 </div>
                 <div class="mb-3">
-                    <label>Email</label>
+                    <label class="form-label">Email</label>
                     <input type="email" name="Email" class="form-control" value="{{ $targetUser->Email }}" />
                 </div>
                 <div class="mb-3">
-                    <label>Số điện thoại</label>
+                    <label class="form-label">Số điện thoại</label>
                     <input type="text" name="SDT" class="form-control" value="{{ $targetUser->SDT }}" />
                 </div>
                 <div class="mb-3">
-                    <label>Địa chỉ</label>
+                    <label class="form-label">Địa chỉ</label>
                     <input type="text" name="DiaChi" class="form-control" value="{{ $targetUser->DiaChi }}" />
                 </div>
                 <div class="mb-3">
-                    <label>Giới tính</label>
+                    <label class="form-label">Giới tính</label>
                     <select name="GioiTinh" class="form-control">
                         <option value="">Chọn giới tính</option>
                         <option value="Nam" {{ $targetUser->GioiTinh == 'Nam' ? 'selected' : '' }}>Nam</option>
@@ -68,7 +65,6 @@
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-                <!-- Nút mở modal -->
                 <button type="button" class="btn btn-warning me-2" data-bs-toggle="modal" data-bs-target="#modalDoiMatKhau">
                     Cập nhật mật khẩu
                 </button>
@@ -89,21 +85,21 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form method="POST" action="{{ route('taikhoan.doimatkhau') }}">
+                <form action="{{ url('/taikhoan/capnhatmatkhau') }}" method="POST">
                     @csrf
                     <input type="hidden" name="MaKH" value="{{ $targetUser->MaKH }}" />
 
                     <div class="mb-3">
-                        <label>Mật khẩu hiện tại</label>
-                        <input type="password" name="MatKhauHienTai" class="form-control" required />
+                        <label class="form-label">Mật khẩu hiện tại</label>
+                        <input type="password" name="MatKhauHienTai" class="form-control" />
                     </div>
                     <div class="mb-3">
-                        <label>Mật khẩu mới</label>
-                        <input type="password" name="MatKhauMoi" class="form-control" required />
+                        <label class="form-label">Mật khẩu mới</label>
+                        <input type="password" name="MatKhauMoi" class="form-control" />
                     </div>
                     <div class="mb-3">
-                        <label>Xác nhận mật khẩu mới</label>
-                        <input type="password" name="XacNhanMatKhauMoi" class="form-control" required />
+                        <label class="form-label">Xác nhận mật khẩu mới</label>
+                        <input type="password" name="XacNhanMatKhauMoi" class="form-control" />
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Cập nhật</button>
                 </form>
@@ -121,7 +117,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <form method="POST" action="/taikhoan/capnhatchuyenkhoan">
+            <form action="{{ url('/taikhoan/capnhatchuyenkhoan') }}" method="POST">
                 @csrf
                 <input type="hidden" name="MaKH" value="{{ $targetUser->MaKH }}" />
 
@@ -134,8 +130,11 @@
                         <label for="TenNganHang" class="form-label">Ngân hàng</label>
                         <select name="TenNganHang" class="form-control">
                             <option value="">Chọn ngân hàng</option>
-                            @foreach (["MB Bank", "Vietcombank", "Techcombank", "ACB", "VietinBank", "Agribank", "BIDV", "VPBank", "TPBank", "Sacombank"] as $bank)
-                                <option value="{{ $bank }}" {{ $targetUser->TenNganHang == $bank ? 'selected' : '' }}>{{ $bank }}</option>
+                            @php
+                                $nganHangs = ["MB Bank", "Vietcombank", "Techcombank", "ACB", "VietinBank", "Agribank", "BIDV", "VPBank", "TPBank", "Sacombank"];
+                            @endphp
+                            @foreach ($nganHangs as $nh)
+                                <option value="{{ $nh }}" {{ $targetUser->TenNganHang == $nh ? 'selected' : '' }}>{{ $nh }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -149,18 +148,12 @@
         </div>
     </div>
 </div>
-@endsection
 
-@section('scripts')
-    <script>
-        function previewFile(event) {
-            const img = document.getElementById("previewAvatar");
-            const file = event.target.files[0];
-            if (file) img.src = URL.createObjectURL(file);
-        }
-        $("#btnCapNhatChuyenKhoan").click(function () {
-            $("#modalChuyenKhoan").modal("show");
-        });
-    </script>
+<script>
+    function previewFile(event) {
+        const img = document.getElementById("previewAvatar");
+        const file = event.target.files[0];
+        if (file) img.src = URL.createObjectURL(file);
+    }
+</script>
 @endsection
-

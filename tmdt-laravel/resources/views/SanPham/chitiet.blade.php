@@ -133,7 +133,7 @@
 
                 <!-- Nút khiếu nại: chỉ hiện nếu user KHÔNG PHẢI người bán -->
                 @if ($currentUser && $currentUser->MaKH != $sp->nguoiDung->MaKH)
-                    <a href="{{ route('khieunai.taokhieunai', ['idSanPham' => $sp->MaSP]) }}"
+                    <a href="{{ route('khieunai.taokhieunai', ['idsanpham' => $sp->MaSP]) }}"
                        class="btn btn-outline-danger fw-bold px-4">
                         <i class="bi bi-exclamation-triangle"></i> Khiếu nại
                     </a>

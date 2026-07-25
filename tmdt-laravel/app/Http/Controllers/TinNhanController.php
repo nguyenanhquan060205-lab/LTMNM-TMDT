@@ -19,10 +19,9 @@ class TinNhanController extends Controller
         $currentUser = Session::get('user');
         if (!$currentUser) return redirect()->route('taikhoan.dangnhap');
 
-        $dsNguoiDung = NguoiDung::where('MaKH', '!=', $currentUser->MaKH)->get();
         $idNguoiNhan = $request->query('idNguoiNhan');
         $mode = $request->query('mode');
-        
+
         $activeUser = null;
         $NguoiNhanID = 0;
         $NguoiNhanTen = '';
@@ -34,6 +33,37 @@ class TinNhanController extends Controller
             }
         }
 
+        $admin = NguoiDung::where('VaiTro', 'Admin')->first();
+
+        if ($currentUser->VaiTro == 'Admin') {
+            // Admin thấy toàn bộ user (trừ chính mình)
+            $dsNguoiDung = NguoiDung::where('MaKH', '!=', $currentUser->MaKH)->get();
+        } else {
+            // User thường: chỉ thấy những ai đã từng nhắn tin 2 chiều
+            $daChatIds = TinNhan::where('NguoiGui', $currentUser->MaKH)
+                ->pluck('NguoiNhan')
+                ->merge(
+                    TinNhan::where('NguoiNhan', $currentUser->MaKH)->pluck('NguoiGui')
+                )
+                ->unique()
+                ->values();
+
+            // Nếu bấm "Liên hệ" từ trang sản phẩm/khiếu nại -> thêm người đó vào list
+            if ($idNguoiNhan && !$daChatIds->contains($idNguoiNhan)) {
+                $daChatIds->push((int)$idNguoiNhan);
+            }
+
+            // Luôn ghim Admin ở đầu (dù chưa từng chat)
+            if ($admin && !$daChatIds->contains($admin->MaKH)) {
+                $daChatIds->prepend($admin->MaKH);
+            }
+
+            $dsNguoiDung = NguoiDung::whereIn('MaKH', $daChatIds)->get()
+                // Sắp xếp: Admin lên đầu
+                ->sortBy(fn($u) => $u->VaiTro == 'Admin' ? 0 : 1)
+                ->values();
+        }
+
         $UserChuaDoc = TinNhan::where('NguoiNhan', $currentUser->MaKH)
             ->where('DaDoc', false)
             ->pluck('NguoiGui')
@@ -41,19 +71,16 @@ class TinNhanController extends Controller
             
         $NguoiGuiID = $currentUser->MaKH;
 
-        return view('tinnhan.chat', compact('dsNguoiDung', 'activeUser', 'mode', 'NguoiNhanID', 'NguoiNhanTen', 'NguoiGuiID', 'UserChuaDoc'));
+        return view('tinnhan.chat', compact('dsNguoiDung', 'admin', 'activeUser', 'mode', 'NguoiNhanID', 'NguoiNhanTen', 'NguoiGuiID', 'UserChuaDoc'));
     }
 
-    public function loadTinNhan(Request $request)
+    public function loadTinNhan($idNguoiGui, $idNguoiNhan)
     {
-        $idNguoiGui = $request->query('idNguoiGui');
-        $idNguoiNhan = $request->query('idNguoiNhan');
-
         if (!$idNguoiGui || !$idNguoiNhan) {
             return response()->json([]);
         }
 
-        $messages = TinNhan::with(['nguoiGui', 'nguoiNhan'])
+        $messages = TinNhan::with(['nguoiGui'])
             ->where(function ($q) use ($idNguoiGui, $idNguoiNhan) {
                 $q->where('NguoiGui', $idNguoiGui)
                   ->where('NguoiNhan', $idNguoiNhan);
@@ -73,7 +100,7 @@ class TinNhanController extends Controller
                     'NguoiNhan' => $tn->NguoiNhan,
                     'NoiDung' => $tn->NoiDung,
                     'Anh' => $tn->Anh,
-                    'Gio' => $tn->NgayGui ? \Carbon\Carbon::parse($tn->NgayGui)->format('H:i d/m') : '',
+                    'Gio' => $tn->NgayGui ? \Carbon\Carbon::parse($tn->NgayGui)->setTimezone('Asia/Ho_Chi_Minh')->format('H:i d/m') : '',
                     'AvatarGui' => $avatar,
                     'DaDoc' => $tn->DaDoc ? true : false,
                 ];
@@ -116,24 +143,29 @@ class TinNhanController extends Controller
         return response()->json(['success' => false]);
     }
 
-    public function xoaTinNhan(Request $request)
+    public function xoaTinNhan($idTin)
     {
-        $id = $request->input('MaTN');
-        if (!$id) return back()->with('error', 'Không tìm thấy tin nhắn');
+        $currentUser = Session::get('user');
+        if (!$currentUser) return response()->json(['error' => 'Unauthorized'], 401);
         
-        $tn = TinNhan::find($id);
-        if ($tn) {
-            $tn->delete();
+        $tn = TinNhan::find($idTin);
+        if (!$tn) return response()->json(['error' => 'Not found'], 404);
+
+        // Chỉ người gửi hoặc admin mới được xoá
+        if ($tn->NguoiGui != $currentUser->MaKH && $currentUser->VaiTro != 'Admin') {
+            return response()->json(['error' => 'Forbidden'], 403);
         }
-        
-        return back()->with('success', 'Đã xoá tin nhắn');
+
+        // Soft-delete: thay nội dung
+        $tn->NoiDung = 'Tin nhắn này đã được xóa';
+        $tn->Anh = null;
+        $tn->save();
+
+        return response()->json(['success' => true]);
     }
 
-    public function danhDauDaDoc(Request $request)
+    public function danhDauDaDoc($idNguoiGui, $idNguoiNhan)
     {
-        $idNguoiGui = $request->input('idNguoiGui');
-        $idNguoiNhan = $request->input('idNguoiNhan');
-
         TinNhan::where('NguoiGui', $idNguoiNhan)
                ->where('NguoiNhan', $idNguoiGui)
                ->update(['DaDoc' => true]);

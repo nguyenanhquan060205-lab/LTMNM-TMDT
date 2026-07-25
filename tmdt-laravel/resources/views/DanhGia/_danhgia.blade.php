@@ -1,12 +1,10 @@
-{{-- @model IEnumerable<ThuongMaiDienTu_DoAn.Models.DANHGIA> --}}
 
-@foreach (var dg in Model)
-{
+
+@foreach ($Model as $dg)
     <div class="border-bottom mb-3">
-        <strong>@dg.NGUOIDUNG.HoTen</strong>
-        <span class="text-warning">@new string('?', dg.SoSao)</span>
-        <p>@dg.NoiDung</p>
-        <small>@dg.NgayDG.ToString("dd/MM/yyyy HH:mm")</small>
+        <strong>{{ $dg->nguoiDung->HoTen ?? 'Người dùng' }}</strong>
+        <span class="text-warning">{{ str_repeat('⭐', $dg->SoSao) }}</span>
+        <p>{{ $dg->NoiDung }}</p>
+        <small>{{ $dg->NgayDG ? \Carbon\Carbon::parse($dg->NgayDG)->format('d/m/Y H:i') : '' }}</small>
     </div>
-}
-
+@endforeach

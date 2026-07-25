@@ -38,9 +38,8 @@
             return;
         }
 
-        $.post("{{ route('khieunai.taokhieunai') }}", {
+        $.post("{{ route('khieunai.taokhieunai', ['idsanpham' => $sp->MaSP]) }}", {
             _token: "{{ csrf_token() }}",
-            idSanPham: {{ $sp->MaSP }},
             MoTa: moTa
         }, function () {
             alert("Gửi khiếu nại thành công! Vui lòng chờ Admin xử lý.");

@@ -51,7 +51,7 @@
                             @if ($huy)
                                 <span class="badge bg-danger">Đã hủy</span>
                             @elseif ($daTT)
-                                <span class="badge bg-success">Đã thanh toán</span>
+                                <span class="badge bg-success">Thành công</span>
                             @elseif ($item->TrangThai == "Đang chờ xử lý")
                                 <span class="badge bg-warning text-dark">Đang chờ xử lý</span>
                                 <div><small class="text-muted">Chờ người bán xác nhận đủ</small></div>

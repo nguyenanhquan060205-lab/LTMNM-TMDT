@@ -1,25 +1,22 @@
-@extends('layouts.admin')
+@extends('Shared._LayoutAdmin')
+@section('title', 'Tổng quan hệ thống')
 
 @section('content')
 <style>
-    /* Hiệu ứng hover cho card */
     .card-hover {
         transition: all 0.3s ease;
         border: 1px solid #e0e0e0;
     }
-
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            cursor: pointer;
-            border-color: #00d9ff; /* Viền sáng lên khi hover */
-        }
-
-    /* Style cho tiêu đề từng mục */
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        cursor: pointer;
+        border-color: #00d9ff;
+    }
     .section-title {
         font-size: 1.1rem;
         font-weight: 700;
-        color: #1e1e3b; /* Màu tối giống sidebar */
+        color: #1e1e3b;
         border-bottom: 2px solid #f0f0f0;
         padding-bottom: 10px;
         margin-bottom: 20px;
@@ -28,34 +25,28 @@
         align-items: center;
         gap: 10px;
     }
-
-        .section-title i {
-            color: #00d9ff; /* Icon màu xanh chủ đạo */
-        }
+    .section-title i { color: #00d9ff; }
 </style>
 
-<div class="container-fluid px-4 pb-5">
+<div class="container-fluid px-2 pb-5">
 
-    <h2 class="fw-bold text-primary mt-4 mb-2">
-        Tổng quan hệ thống
-    </h2>
+    <h2 class="fw-bold text-primary mt-2 mb-1">Tổng quan hệ thống</h2>
     <p class="text-muted">Chào mừng quay trở lại, đây là bảng điều khiển trung tâm.</p>
 
+    <!-- QUẢN LÝ SẢN PHẨM -->
     <div class="section-title">
         <i class="fa-solid fa-box"></i> Quản lý sản phẩm
     </div>
     <div class="row g-3">
         <div class="col-md-4 col-xl-3">
-            <a href="{{ route('admin.quanlysanpham') }}" class="text-decoration-none text-reset">
+            <a href="{{ url('/admin/quanlysanpham') }}" class="text-decoration-none text-reset">
                 <div class="card card-hover h-100 border-0 shadow-sm">
                     <div class="card-body d-flex align-items-center">
-                        <div class="rounded-circle p-3 me-3"
-                             style="background-color: rgba(111, 66, 193, 0.15);">
-                            <i class="fa-solid fa-tag fs-3"
-                               style="color:#6f42c1;"></i>
+                        <div class="rounded-circle p-3 me-3" style="background-color: rgba(111,66,193,0.15);">
+                            <i class="fa-solid fa-tag fs-3" style="color:#6f42c1;"></i>
                         </div>
                         <div>
-                            <h3 class="fw-bold mb-0">{{ $DaBan ?? 0 }}</h3>
+                            <h3 class="fw-bold mb-0">{{ $daban ?? 0 }}</h3>
                             <span class="text-muted small">Đã bán</span>
                         </div>
                     </div>
@@ -63,16 +54,15 @@
             </a>
         </div>
 
-
         <div class="col-md-4 col-xl-3">
-            <a href="{{ route('admin.quanlysanpham') }}" class="text-decoration-none text-reset">
+            <a href="{{ url('/admin/quanlysanpham') }}" class="text-decoration-none text-reset">
                 <div class="card card-hover h-100 border-0 shadow-sm">
                     <div class="card-body d-flex align-items-center">
                         <div class="rounded-circle bg-secondary bg-opacity-10 p-3 me-3">
                             <i class="fa-solid fa-lock text-secondary fs-3"></i>
                         </div>
                         <div>
-                            <h3 class="fw-bold mb-0">{{ $An ?? 0 }}</h3>
+                            <h3 class="fw-bold mb-0">{{ $an ?? 0 }}</h3>
                             <span class="text-muted small">Ẩn</span>
                         </div>
                     </div>
@@ -80,16 +70,15 @@
             </a>
         </div>
 
-
         <div class="col-md-4 col-xl-3">
-            <a href="{{ route('admin.quanlysanpham') }}" class="text-decoration-none text-reset">
+            <a href="{{ url('/admin/quanlysanpham') }}" class="text-decoration-none text-reset">
                 <div class="card card-hover h-100 border-0 shadow-sm">
                     <div class="card-body d-flex align-items-center">
                         <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
                             <i class="fa-solid fa-check-circle text-success fs-3"></i>
                         </div>
                         <div>
-                            <h3 class="fw-bold mb-0">{{ $TinDaDuyet ?? 0 }}</h3>
+                            <h3 class="fw-bold mb-0">{{ $tinDaDuyet ?? 0 }}</h3>
                             <span class="text-muted small">Tin đang hiển thị</span>
                         </div>
                     </div>
@@ -98,14 +87,14 @@
         </div>
 
         <div class="col-md-4 col-xl-3">
-            <a href="{{ route('admin.quanlysanpham') }}" class="text-decoration-none text-reset">
+            <a href="{{ url('/admin/quanlysanpham') }}" class="text-decoration-none text-reset">
                 <div class="card card-hover h-100 border-0 shadow-sm">
                     <div class="card-body d-flex align-items-center">
                         <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
                             <i class="fa-solid fa-boxes-stacked text-primary fs-3"></i>
                         </div>
                         <div>
-                            <h3 class="fw-bold mb-0">{{ $TongSanPham ?? 0 }}</h3>
+                            <h3 class="fw-bold mb-0">{{ $tongSanPham ?? 0 }}</h3>
                             <span class="text-muted small">Tổng sản phẩm</span>
                         </div>
                     </div>
@@ -114,16 +103,15 @@
         </div>
 
         <div class="col-md-4 col-xl-3">
-            <a href="{{ route('admin.quanlysanpham', ['tab' => 'category']) }}"
-               class="text-decoration-none text-reset">
+            <a href="{{ url('/admin/quanlysanpham') }}" class="text-decoration-none text-reset">
                 <div class="card card-hover h-100 border-0 shadow-sm">
                     <div class="card-body d-flex align-items-center">
                         <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
                             <i class="fa-solid fa-layer-group text-info fs-3"></i>
                         </div>
                         <div>
-                            <h5 class="fw-bold mb-0">Danh mục</h5>
-                            <span class="text-muted small">Quản lý danh mục</span>
+                            <h5 class="fw-bold mb-0">Duyệt tin</h5>
+                            <span class="text-muted small">Duyệt sản phẩm mới</span>
                         </div>
                     </div>
                 </div>
@@ -131,12 +119,13 @@
         </div>
     </div>
 
+    <!-- QUẢN LÝ ĐƠN HÀNG -->
     <div class="section-title">
         <i class="fa-solid fa-file-invoice"></i> Quản lý đơn hàng
     </div>
     <div class="row g-3">
         <div class="col-md-6 col-xl-4">
-            <a href="{{ route('admin.quanlydonhang') }}" class="text-decoration-none text-reset">
+            <a href="{{ url('/admin/quanlydonhang') }}" class="text-decoration-none text-reset">
                 <div class="card card-hover h-100 border-0 shadow-sm">
                     <div class="card-body d-flex align-items-center">
                         <div class="rounded-circle bg-danger bg-opacity-10 p-3 me-3">
@@ -155,19 +144,20 @@
         </div>
     </div>
 
+    <!-- QUẢN LÝ NGƯỜI DÙNG -->
     <div class="section-title">
         <i class="fa-solid fa-users"></i> Quản lý người dùng
     </div>
     <div class="row g-3">
         <div class="col-md-4 col-xl-3">
-            <a href="{{ route('admin.quanlynguoidung') }}" class="text-decoration-none text-reset">
+            <a href="{{ url('/admin/quanlynguoidung') }}" class="text-decoration-none text-reset">
                 <div class="card card-hover h-100 border-0 shadow-sm">
                     <div class="card-body d-flex align-items-center">
                         <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
                             <i class="fa-solid fa-user-group text-info fs-3"></i>
                         </div>
                         <div>
-                            <h3 class="fw-bold mb-0">{{ $TongNguoiDung ?? 0 }}</h3>
+                            <h3 class="fw-bold mb-0">{{ $tongNguoiDung ?? 0 }}</h3>
                             <span class="text-muted small">Tài khoản đăng ký</span>
                         </div>
                     </div>
@@ -176,12 +166,13 @@
         </div>
     </div>
 
+    <!-- HỖ TRỢ & KHIẾU NẠI -->
     <div class="section-title">
-        <i class="fa-solid fa-headset"></i> Hỗ trợ & Khiếu nại
+        <i class="fa-solid fa-headset"></i> Hỗ trợ &amp; Khiếu nại
     </div>
     <div class="row g-3">
         <div class="col-md-6 col-xl-4">
-            <a href="{{ route('admin.quanlykhieunai') }}" class="text-decoration-none text-reset">
+            <a href="{{ url('/admin/quanlykhieunai') }}" class="text-decoration-none text-reset">
                 <div class="card card-hover h-100 border-0 shadow-sm">
                     <div class="card-body d-flex align-items-center">
                         <div class="rounded-circle bg-secondary bg-opacity-10 p-3 me-3">
@@ -197,7 +188,7 @@
         </div>
 
         <div class="col-md-6 col-xl-4">
-            <a href="{{ route('tinnhan.chat') }}" class="text-decoration-none text-reset">
+            <a href="{{ url('/tinnhan/chat') }}" class="text-decoration-none text-reset">
                 <div class="card card-hover h-100 border-0 shadow-sm">
                     <div class="card-body d-flex align-items-center">
                         <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
