@@ -1,0 +1,326 @@
+{
+  "repository_foundation_verdict": "REPOSITORY_FOUNDATION_NOT_READY",
+  "five_member_operational_verdict": "NOT_READY_FOR_5_PERSON_PARALLEL_WORK",
+  "branch": "chore/pre-parallel-foundation",
+  "head": "1e9f5f04e977ef0843a42fffae2ed9e35be30e92",
+  "previous_audited_head": "5c9ed90c5899c4c6549dd2743154c59c0b6d0240",
+  "working_tree_clean": true,
+  "gates": [
+    {
+      "name": "composer_validate",
+      "command": "composer validate --strict",
+      "result": "PASS",
+      "exit_code": 0,
+      "evidence": "composer.json is valid"
+    },
+    {
+      "name": "composer_install",
+      "command": "composer install --no-interaction --prefer-dist",
+      "result": "FAIL",
+      "exit_code": 1,
+      "evidence": "Fails in php artisan package:discover; cannot open storage/logs/laravel.log and reports bootstrap/cache not writable/present"
+    },
+    {
+      "name": "composer_platform",
+      "command": "composer check-platform-reqs",
+      "result": "PASS",
+      "exit_code": 0,
+      "evidence": "All platform requirements success"
+    },
+    {
+      "name": "composer_audit",
+      "command": "composer audit --format=plain",
+      "result": "FAIL",
+      "exit_code": 1,
+      "evidence": "6 advisories affecting dompdf/dompdf v3.1.5; affected versions <3.1.6"
+    },
+    {
+      "name": "laravel_boot",
+      "command": "php artisan about && php artisan route:list",
+      "result": "PASS",
+      "exit_code": 0,
+      "evidence": "Laravel 13.20.0 boots and lists 61 routes"
+    },
+    {
+      "name": "package_discover",
+      "command": "php artisan package:discover --ansi",
+      "result": "FAIL",
+      "exit_code": 1,
+      "evidence": "Same log/cache write exception as composer install"
+    },
+    {
+      "name": "migration_testing",
+      "command": "php artisan migrate:fresh --seed --env=testing",
+      "result": "PASS",
+      "exit_code": 0,
+      "evidence": "Ran on whitelisted techsecond_test"
+    },
+    {
+      "name": "migration_local",
+      "command": "php artisan migrate:fresh --seed",
+      "result": "PASS",
+      "exit_code": 0,
+      "evidence": "Ran on whitelisted techsecond"
+    },
+    {
+      "name": "quality_scanner",
+      "command": "php tools/quality/check-forbidden-patterns.php",
+      "result": "PASS",
+      "exit_code": 0,
+      "evidence": "Forbidden pattern scan passed"
+    },
+    {
+      "name": "pint",
+      "command": "vendor/bin/pint --test",
+      "result": "PASS",
+      "exit_code": 0,
+      "evidence": "Pint result passed"
+    },
+    {
+      "name": "php_lint",
+      "command": "php -l active PHP source",
+      "result": "PASS",
+      "exit_code": 0,
+      "evidence": "No syntax errors in app/config/database/routes/tests"
+    },
+    {
+      "name": "phpunit",
+      "command": "php artisan test",
+      "result": "FAIL",
+      "exit_code": 1,
+      "evidence": "39 tests total, 38 passed, 1 failed, 234 assertions; UploadContractTest fails because MediaService::storeManagedFile returns false"
+    },
+    {
+      "name": "npm_ci",
+      "command": "npm ci",
+      "result": "PASS",
+      "exit_code": 0,
+      "evidence": "45 packages installed from package-lock.json"
+    },
+    {
+      "name": "npm_build",
+      "command": "npm run build",
+      "result": "FAIL",
+      "exit_code": 1,
+      "evidence": "Vite EPERM while deleting public/build/assets"
+    },
+    {
+      "name": "composer_verify",
+      "command": "composer run verify",
+      "result": "FAIL",
+      "exit_code": 1,
+      "evidence": "Fails at php artisan test before npm build"
+    }
+  ],
+  "contracts": [
+    {
+      "name": "Database schema",
+      "status": "PRESENT_AND_MATCHES_CODE",
+      "evidence": "Migrations create canonical tables with English FK columns, enum defaults, soft deletes, unique cart/user and review/order_item constraints",
+      "drift": "None blocking"
+    },
+    {
+      "name": "Enums",
+      "status": "PRESENT_AND_MATCHES_CODE",
+      "evidence": "PHP backed enums match docs/architecture/status-enums.md and model casts",
+      "drift": "None"
+    },
+    {
+      "name": "Routes",
+      "status": "PRESENT_AND_MATCHES_CODE",
+      "evidence": "routes/web.php requires module files; route:list shows contract names",
+      "drift": "No blocking drift"
+    },
+    {
+      "name": "Services",
+      "status": "PRESENT_AND_MATCHES_CODE",
+      "evidence": "Service interfaces exist for all modules; AuthService and MediaService concrete bindings exist",
+      "drift": "MediaService matches signature but runtime upload test fails"
+    },
+    {
+      "name": "Storage",
+      "status": "PRESENT_BUT_DRIFTED",
+      "evidence": "config/uploads.php and MediaService exist",
+      "drift": "Upload storage test fails because storeAs returns false"
+    },
+    {
+      "name": "CI",
+      "status": "PRESENT_BUT_DRIFTED",
+      "evidence": ".github/workflows/ci.yml runs core gate-0 workflow",
+      "drift": "Does not run composer audit; branch protection unverified"
+    },
+    {
+      "name": "Git workflow",
+      "status": "PRESENT_BUT_DRIFTED",
+      "evidence": "PR template, CODEOWNERS.template, branch guide exist",
+      "drift": "No real CODEOWNERS; no issue template; GitHub settings unverified"
+    },
+    {
+      "name": "Team machine evidence",
+      "status": "MISSING",
+      "evidence": "docs/readiness/five-machine-verification-results.json lists TV1-TV5 as PENDING",
+      "drift": "Operational readiness not established"
+    }
+  ],
+  "modules": [
+    {
+      "member": "TV1",
+      "module": "Foundation, Authentication, Profile",
+      "status": "BLOCKED",
+      "dependencies": ["User", "AuthServiceContract", "ProfileServiceContract"],
+      "blocking_issues": ["Global composer/test/build gates fail"]
+    },
+    {
+      "member": "TV2",
+      "module": "Category, Product, Search, Images",
+      "status": "BLOCKED",
+      "dependencies": ["User", "ProductStatus", "MediaServiceContract"],
+      "blocking_issues": ["Upload storage test fails", "Global gates fail"]
+    },
+    {
+      "member": "TV3",
+      "module": "Cart, Checkout, Orders, Inventory",
+      "status": "BLOCKED",
+      "dependencies": ["User", "Product", "OrderStatus", "OrderItemStatus"],
+      "blocking_issues": ["Global gates fail before split"]
+    },
+    {
+      "member": "TV4",
+      "module": "Review, Complaint, Admin",
+      "status": "BLOCKED",
+      "dependencies": ["User", "OrderItem", "ComplaintStatus"],
+      "blocking_issues": ["Global gates fail", "Review enforcement missing"]
+    },
+    {
+      "member": "TV5",
+      "module": "Chat, Realtime, PDF, Shared UI, CI",
+      "status": "BLOCKED",
+      "dependencies": ["User", "Product", "Order", "Message", "DomPDF", "Vite"],
+      "blocking_issues": ["Composer audit fails on DomPDF", "npm build fails", "five-machine evidence missing"]
+    }
+  ],
+  "shared_file_conflicts": [
+    {
+      "path": "composer.json",
+      "primary_owner": "TV1/TV5",
+      "secondary_consumers": ["All"],
+      "expected_writers": ["TV1", "TV5"],
+      "conflict_level": "HIGH",
+      "reason": "Dependency and script changes affect every member",
+      "required_coordination": "Platform review and audit pass"
+    },
+    {
+      "path": "composer.lock",
+      "primary_owner": "TV1/TV5",
+      "secondary_consumers": ["All"],
+      "expected_writers": ["TV1", "TV5"],
+      "conflict_level": "HIGH",
+      "reason": "DomPDF remediation requires lock change",
+      "required_coordination": "Serialized dependency PR"
+    },
+    {
+      "path": "routes/web.php",
+      "primary_owner": "TV1/TV5",
+      "secondary_consumers": ["All modules"],
+      "expected_writers": ["TV1", "TV5"],
+      "conflict_level": "LOW",
+      "reason": "Import-only module loader",
+      "required_coordination": "Only coordinate new module includes"
+    },
+    {
+      "path": "database/seeders/DatabaseSeeder.php",
+      "primary_owner": "TV2",
+      "secondary_consumers": ["TV1", "TV3", "TV4"],
+      "expected_writers": ["TV2"],
+      "conflict_level": "MEDIUM",
+      "reason": "Demo data shared by tests/modules",
+      "required_coordination": "Prefer module seeders or reviewed blocks"
+    },
+    {
+      "path": "resources/views/layouts/app.blade.php",
+      "primary_owner": "TV5",
+      "secondary_consumers": ["All UI modules"],
+      "expected_writers": ["TV5"],
+      "conflict_level": "HIGH",
+      "reason": "Shared layout consumed by all views",
+      "required_coordination": "TV5 owner review"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "primary_owner": "TV5",
+      "secondary_consumers": ["All"],
+      "expected_writers": ["TV5"],
+      "conflict_level": "HIGH",
+      "reason": "Controls release gates",
+      "required_coordination": "TV1 review for foundation gates"
+    }
+  ],
+  "team_machine_evidence": [
+    {"member": "TV1", "evidence": null, "commit": null, "gate_result": "PENDING"},
+    {"member": "TV2", "evidence": null, "commit": null, "gate_result": "PENDING"},
+    {"member": "TV3", "evidence": null, "commit": null, "gate_result": "PENDING"},
+    {"member": "TV4", "evidence": null, "commit": null, "gate_result": "PENDING"},
+    {"member": "TV5", "evidence": null, "commit": null, "gate_result": "PENDING"}
+  ],
+  "blockers": [
+    {
+      "severity": "P0 BLOCKER",
+      "title": "composer install fails package discovery",
+      "evidence": "php artisan package:discover cannot open storage/logs/laravel.log and reports bootstrap/cache not writable/present"
+    },
+    {
+      "severity": "P0 BLOCKER",
+      "title": "composer audit fails",
+      "evidence": "6 advisories affect dompdf/dompdf v3.1.5; affected versions <3.1.6"
+    },
+    {
+      "severity": "P0 BLOCKER",
+      "title": "php artisan test fails",
+      "evidence": "UploadContractTest fails because MediaService::storeManagedFile returns false"
+    },
+    {
+      "severity": "P0 BLOCKER",
+      "title": "npm run build fails",
+      "evidence": "Vite EPERM deleting public/build/assets"
+    },
+    {
+      "severity": "P0 BLOCKER",
+      "title": "Five-machine verification missing",
+      "evidence": "TV1-TV5 all PENDING in five-machine-verification-results.json"
+    },
+    {
+      "severity": "P1 HIGH",
+      "title": "CI lacks composer audit",
+      "evidence": ".github/workflows/ci.yml does not run composer audit"
+    },
+    {
+      "severity": "P1 HIGH",
+      "title": "CODEOWNERS not active",
+      "evidence": "Only .github/CODEOWNERS.template exists"
+    },
+    {
+      "severity": "P1 HIGH",
+      "title": "Branch protection unverified",
+      "evidence": "gh command not found; GitHub settings manual verification required"
+    },
+    {
+      "severity": "P2 MEDIUM",
+      "title": ".env.testing APP_ENV drift",
+      "evidence": ".env.testing has APP_ENV=local while docs require testing"
+    },
+    {
+      "severity": "P2 MEDIUM",
+      "title": "Issue template missing",
+      "evidence": ".github/ISSUE_TEMPLATE does not exist"
+    }
+  ],
+  "required_actions": [
+    "Fix package discovery/log/cache writability so composer install exits 0",
+    "Remediate dompdf/dompdf advisories and commit updated lock through controlled dependency change",
+    "Fix MediaService upload storage behavior so php artisan test passes",
+    "Fix frontend build reproducibility so npm run build passes",
+    "Add composer audit to CI or otherwise enforce advisory checks",
+    "Create real CODEOWNERS and configure branch protection/review requirements",
+    "Collect passing five-machine verification reports for TV1-TV5 against the agreed baseline commit"
+  ]
+}

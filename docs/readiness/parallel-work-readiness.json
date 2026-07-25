@@ -1,0 +1,478 @@
+{
+  "blockers": [
+    {
+      "affected_members": [
+        "TV1",
+        "TV2",
+        "TV3",
+        "TV4",
+        "TV5"
+      ],
+      "evidence": "docs/architecture/module-contracts.md:24-71 lists services; app/Services contains only .gitkeep",
+      "id": "READY-P0-001",
+      "owner": "TV1+TV5 with module owners",
+      "priority": "P0",
+      "resolved_when": "Service interfaces/classes exist with stable method signatures and ownership",
+      "summary": "Service layer contracts are documented by name but not implemented"
+    },
+    {
+      "affected_members": [
+        "TV1",
+        "TV3",
+        "TV4",
+        "TV5"
+      ],
+      "evidence": "app/Http/Controllers/Auth/AuthenticatedSessionController.php:19; app/Http/Controllers/Auth/RegisteredUserController.php:19",
+      "id": "READY-P0-002",
+      "owner": "TV1",
+      "priority": "P0",
+      "resolved_when": "Login/register/current-user flow works through Laravel Auth and has tests",
+      "summary": "Auth executable baseline is incomplete because login/register POST handlers abort 501"
+    },
+    {
+      "affected_members": [
+        "TV5",
+        "TV1"
+      ],
+      "evidence": "routes/channels.php missing; app/Events missing; bootstrap/app.php wires only web/console/health",
+      "id": "READY-P0-003",
+      "owner": "TV5 with TV1 review",
+      "priority": "P0",
+      "resolved_when": "Channel file, MessageSent event, channel names and auth rules exist, or realtime is explicitly out of scope",
+      "summary": "Chat/realtime contract is not present"
+    },
+    {
+      "affected_members": [
+        "TV5"
+      ],
+      "evidence": "No Schema::create('notifications') match; MigrationSmokeTest.php:11-29 does not assert notifications",
+      "id": "READY-P0-004",
+      "owner": "TV5/Platform",
+      "priority": "P0",
+      "resolved_when": "Notification migration/test exists or notifications are explicitly out of scope",
+      "summary": "Gate 0 migration skeleton is incomplete for notifications"
+    },
+    {
+      "affected_members": [
+        "all"
+      ],
+      "evidence": "tests/Feature contains only Foundation",
+      "id": "READY-P1-001",
+      "owner": "all module owners",
+      "priority": "P1",
+      "resolved_when": "Module feature test directories and smoke tests exist",
+      "summary": "Module test skeletons are missing"
+    },
+    {
+      "affected_members": [
+        "TV2",
+        "TV5"
+      ],
+      "evidence": "StoreProductRequest.php:22; StoreMessageRequest.php:20; UpdateProfileRequest.php:20",
+      "id": "READY-P1-002",
+      "owner": "TV2/TV5",
+      "priority": "P1",
+      "resolved_when": "Upload requests and MediaService define MIME, extension, size and Storage behavior",
+      "summary": "Upload validation and storage contract are partial"
+    }
+  ],
+  "commands": [
+    {
+      "command": "git rev-parse --show-toplevel",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Confirmed Git root at Laravel root after initial parent-cwd failure"
+    },
+    {
+      "command": "git status --short",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Clean before audit"
+    },
+    {
+      "command": "git branch --show-current",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "chore/pre-parallel-foundation"
+    },
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "424c5dbd87ea505c92a73ff68a91e92734a296b4"
+    },
+    {
+      "command": "git remote -v",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "origin points to GitHub repository"
+    },
+    {
+      "command": "php -v",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "PHP 8.4.12"
+    },
+    {
+      "command": "composer --version",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Composer 2.9.4"
+    },
+    {
+      "command": "node -v",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Node v24.15.0"
+    },
+    {
+      "command": "npm -v",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "npm 11.12.1"
+    },
+    {
+      "command": "php artisan --version",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Laravel Framework 13.20.0 after rerun with longer timeout"
+    },
+    {
+      "command": "composer validate --strict",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "composer.json is valid"
+    },
+    {
+      "command": "composer check-platform-reqs",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Platform requirements satisfied"
+    },
+    {
+      "command": "composer install --dry-run --no-interaction --prefer-dist",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Lock installable; nothing to install/update/remove"
+    },
+    {
+      "command": "npm ci",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Installed 45 packages from lock"
+    },
+    {
+      "command": "php artisan route:list --json",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Route list generated"
+    },
+    {
+      "command": "php artisan optimize:clear",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Caches cleared"
+    },
+    {
+      "command": "php artisan migrate:fresh --seed --env=testing",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "MySQL test database reset, migrated and seeded"
+    },
+    {
+      "command": "php artisan migrate:status --env=testing",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "All four migrations ran"
+    },
+    {
+      "command": "vendor/bin/pint --test",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Pint passed"
+    },
+    {
+      "command": "composer run check:quality",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Forbidden pattern scan passed"
+    },
+    {
+      "command": "php artisan test",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "15 passed, 118 assertions after sandbox permission rerun"
+    },
+    {
+      "command": "npm run build",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Vite build passed after sandbox permission rerun"
+    },
+    {
+      "command": "gh --version",
+      "exit_code": 1,
+      "result": "MANUAL_ACTION_REQUIRED",
+      "summary": "gh is not installed; branch protection not verified"
+    }
+  ],
+  "commit": "424c5dbd87ea505c92a73ff68a91e92734a296b4",
+  "gates": [
+    {
+      "blocker": false,
+      "evidence": "README.md:5; AGENTS.md:15-20; docs/database/schema-contract.md:5",
+      "gate": "H1",
+      "status": "PASS",
+      "summary": "Laravel codebase and schema source of truth are clear"
+    },
+    {
+      "blocker": true,
+      "evidence": "app/Services only .gitkeep; app/Events missing",
+      "gate": "H2",
+      "status": "FAIL",
+      "summary": "Foundation contracts and ownership are not fully locked"
+    },
+    {
+      "blocker": false,
+      "evidence": "migrate:fresh --seed --env=testing exit 0",
+      "gate": "H3",
+      "status": "PASS",
+      "summary": "Migrations and seeders run on empty MySQL test database"
+    },
+    {
+      "blocker": false,
+      "evidence": "route:list --json exit 0",
+      "gate": "H4",
+      "status": "PASS",
+      "summary": "No route/controller/view mismatch detected at foundation level"
+    },
+    {
+      "blocker": false,
+      "evidence": "Razor/mojibake scans and quality scanner pass",
+      "gate": "H5",
+      "status": "PASS",
+      "summary": "No active Razor or mojibake business logic detected"
+    },
+    {
+      "blocker": true,
+      "evidence": "Auth store handlers abort 501",
+      "gate": "H6",
+      "status": "FAIL",
+      "summary": "Auth executable baseline is incomplete"
+    },
+    {
+      "blocker": false,
+      "evidence": "composer validate, Pint, tests, build pass",
+      "gate": "H7",
+      "status": "PASS",
+      "summary": "Local technical gates pass"
+    },
+    {
+      "blocker": false,
+      "evidence": ".github/workflows/ci.yml exists; remote run not checked",
+      "gate": "H8",
+      "status": "PARTIAL",
+      "summary": "CI workflow exists and matches baseline"
+    },
+    {
+      "blocker": true,
+      "evidence": "services/events/channels missing",
+      "gate": "H9",
+      "status": "FAIL",
+      "summary": "Critical ownership collisions remain"
+    },
+    {
+      "blocker": true,
+      "evidence": "TV3/TV4/TV5 lack stable service/channel/auth contracts",
+      "gate": "H10",
+      "status": "FAIL",
+      "summary": "Downstream members are blocked by shared contracts"
+    }
+  ],
+  "hard_blocker_count": 4,
+  "laravel_root": "D:/Study/Code/PHP/LaptrinhMaNguonMo/DoAn2/LTMNM-TMDT",
+  "legacy_issues": [
+    {
+      "current": false,
+      "evidence": "route:list --json exit 0; route calls use defined auth/products/cart/orders/admin names",
+      "issue": "route missing parameter or called but undefined",
+      "severity": "LOW"
+    },
+    {
+      "current": false,
+      "evidence": "Razor marker scan returned no active matches",
+      "issue": "Razor in Blade",
+      "severity": "LOW"
+    },
+    {
+      "current": false,
+      "evidence": "Mojibake scan matched docs/handover only, not active runtime",
+      "issue": "encoding/mojibake",
+      "severity": "LOW"
+    },
+    {
+      "current": false,
+      "evidence": "Canonical reviews/product_images/messages fields align across migration/model/request/factory",
+      "issue": "schema mismatch",
+      "severity": "LOW"
+    },
+    {
+      "current": false,
+      "evidence": "User password cast is hashed; seeder/factory use Hash::make; tests pass",
+      "issue": "password plain text",
+      "severity": "LOW"
+    },
+    {
+      "current": false,
+      "evidence": "No active guarded=[] matches",
+      "issue": "$guarded = []",
+      "severity": "LOW"
+    },
+    {
+      "current": true,
+      "evidence": "Upload requests use image|max but no explicit mime/extension contract",
+      "issue": "upload validation weak",
+      "severity": "MEDIUM"
+    },
+    {
+      "current": true,
+      "evidence": "No ExampleTest remains, but only Foundation test directory exists",
+      "issue": "tests not module-split",
+      "severity": "MEDIUM"
+    },
+    {
+      "current": false,
+      "evidence": "Active views are lowercase; quality scanner checks uppercase view dirs",
+      "issue": "view path case",
+      "severity": "LOW"
+    },
+    {
+      "current": false,
+      "evidence": "Vite imports installed packages and build passes",
+      "issue": "Vite import package missing",
+      "severity": "LOW"
+    }
+  ],
+  "manual_check_count": 2,
+  "member_startability": [
+    {
+      "can_start": "Implement auth/profile contract and tests",
+      "conclusion": "CAN_START_SKELETON_ONLY",
+      "member": "TV1",
+      "missing_dependencies": "AuthService/ProfileService and executable login/register flow",
+      "module": "Platform/Auth/Profile"
+    },
+    {
+      "can_start": "Create product/media service contracts and product UI skeleton",
+      "conclusion": "CAN_START_SKELETON_ONLY",
+      "member": "TV2",
+      "missing_dependencies": "ProductService/MediaService/CategoryService",
+      "module": "Category/Product/Search/Images"
+    },
+    {
+      "can_start": "Write tests and draft order service contracts",
+      "conclusion": "BLOCKED_BY_SHARED_CONTRACT",
+      "member": "TV3",
+      "missing_dependencies": "Executable auth/current-user and product/order services",
+      "module": "Cart/Checkout/Orders"
+    },
+    {
+      "can_start": "Prepare policy/request/test skeletons",
+      "conclusion": "BLOCKED_BY_SHARED_CONTRACT",
+      "member": "TV4",
+      "missing_dependencies": "OrderItem review eligibility and AdminDashboardService",
+      "module": "Review/Complaint/Admin"
+    },
+    {
+      "can_start": "Improve CI/docs/shared layouts only",
+      "conclusion": "BLOCKED_BY_SHARED_CONTRACT",
+      "member": "TV5",
+      "missing_dependencies": "routes/channels.php, app/Events, ChatService, InvoiceService, notifications scope",
+      "module": "Chat/Realtime/PDF/Shared UI/CI"
+    }
+  ],
+  "ownership_collisions": [
+    {
+      "conflict_level": "HIGH",
+      "dependents": "all",
+      "owner": "TV5/Platform",
+      "required_lock": "Dependency approval rule and single lockfile owner",
+      "shared_area": "composer/package lock files"
+    },
+    {
+      "conflict_level": "LOW",
+      "dependents": "all",
+      "owner": "TV1/TV5",
+      "required_lock": "Keep web.php import-only",
+      "shared_area": "routes/web.php"
+    },
+    {
+      "conflict_level": "HIGH",
+      "dependents": "neighboring modules",
+      "owner": "module owners",
+      "required_lock": "One route module file per owner",
+      "shared_area": "routes/modules/*"
+    },
+    {
+      "conflict_level": "CRITICAL",
+      "dependents": "TV5/TV1",
+      "owner": "TV5",
+      "required_lock": "Create channel contract",
+      "shared_area": "routes/channels.php"
+    },
+    {
+      "conflict_level": "HIGH",
+      "dependents": "all",
+      "owner": "Platform DB owner",
+      "required_lock": "Freeze foundation migrations or add forward migrations",
+      "shared_area": "database/migrations/*"
+    },
+    {
+      "conflict_level": "HIGH",
+      "dependents": "TV3/TV4/TV5",
+      "owner": "TV1/TV2/TV3",
+      "required_lock": "Review relationship/cast/fillable changes",
+      "shared_area": "shared models"
+    },
+    {
+      "conflict_level": "HIGH",
+      "dependents": "all",
+      "owner": "Platform",
+      "required_lock": "Freeze enum machine values",
+      "shared_area": "app/Enums/*"
+    },
+    {
+      "conflict_level": "CRITICAL",
+      "dependents": "all",
+      "owner": "module owners",
+      "required_lock": "Add service interfaces and signatures",
+      "shared_area": "app/Services/*"
+    },
+    {
+      "conflict_level": "HIGH",
+      "dependents": "all UI",
+      "owner": "TV5",
+      "required_lock": "Shared layout/component naming contract",
+      "shared_area": "resources/views/layouts and components"
+    },
+    {
+      "conflict_level": "MEDIUM",
+      "dependents": "all PRs",
+      "owner": "TV5",
+      "required_lock": "CI command sequence frozen",
+      "shared_area": ".github/workflows/ci.yml"
+    }
+  ],
+  "recommended_order": [
+    "Confirm Laravel migrations remain source of truth and fix stale README testing notes",
+    "Decide notifications scope and add migration/test or mark out of scope",
+    "Implement auth login/register/current-user foundation",
+    "Lock service interfaces and method signatures",
+    "Create realtime channel/event contract or remove realtime from release scope",
+    "Add module feature test skeletons",
+    "Rerun composer validate, platform reqs, migrate fresh seed, Pint, quality, tests, npm ci and build",
+    "Verify GitHub branch protection and required status checks"
+  ],
+  "score": 76,
+  "verdict": "NOT_READY"
+}
