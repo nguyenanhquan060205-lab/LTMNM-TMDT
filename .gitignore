@@ -433,6 +433,8 @@ obj/
 /storage/*.key
 /storage/app/*
 !/storage/app/.gitignore
+!/storage/app/private/
+!/storage/app/private/.gitkeep
 !/storage/app/public/
 /storage/app/public/*
 !/storage/app/public/.gitignore

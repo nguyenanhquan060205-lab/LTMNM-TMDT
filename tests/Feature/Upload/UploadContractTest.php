@@ -86,4 +86,31 @@ class UploadContractTest extends TestCase
         $this->assertTrue($media->delete($avatarPath));
         Storage::disk('public')->assertMissing($avatarPath);
     }
+
+    public function test_media_service_generates_normalized_unique_managed_paths(): void
+    {
+        Storage::fake('public');
+
+        /** @var MediaServiceContract $media */
+        $media = app(MediaServiceContract::class);
+        $user = User::factory()->create();
+
+        $firstPath = $media->storeAvatar($user, UploadedFile::fake()->image('avatar.jpg'));
+        $secondPath = $media->storeAvatar($user, UploadedFile::fake()->image('avatar.jpg'));
+
+        $this->assertNotSame($firstPath, $secondPath);
+        $this->assertStringStartsWith('avatars/', $firstPath);
+        $this->assertStringNotContainsString('\\', $firstPath);
+        Storage::disk('public')->assertExists($firstPath);
+        Storage::disk('public')->assertExists($secondPath);
+    }
+
+    public function test_media_service_refuses_managed_path_traversal(): void
+    {
+        /** @var MediaServiceContract $media */
+        $media = app(MediaServiceContract::class);
+
+        $this->assertFalse($media->delete('/avatars/avatar.jpg'));
+        $this->assertFalse($media->delete('avatars/../../outside.jpg'));
+    }
 }

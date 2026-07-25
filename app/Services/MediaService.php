@@ -10,6 +10,8 @@ use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
+use League\Flysystem\UnableToWriteFile;
 
 class MediaService implements MediaServiceContract
 {
@@ -40,24 +42,44 @@ class MediaService implements MediaServiceContract
     private function storeManagedFile(string $type, UploadedFile $file, string $prefix): string
     {
         $config = $this->uploadConfig($type);
-        $extension = $file->extension() ?: $file->getClientOriginalExtension();
+        $extension = $this->extensionFor($file, $config['extensions']);
         $filename = $prefix.'-'.Str::uuid()->toString().'.'.$extension;
 
-        return $file->storeAs($config['directory'], $filename, [
+        $path = Storage::disk($config['disk'])->putFileAs($config['directory'], $file, $filename, [
             'disk' => $config['disk'],
             'visibility' => $config['visibility'],
         ]);
+
+        if ($path === false) {
+            throw UnableToWriteFile::atLocation($filename);
+        }
+
+        return str_replace('\\', '/', ltrim($path, '/'));
     }
 
     /**
-     * @return array{disk:string,directory:string,visibility:string}
+     * @return array{disk:string,directory:string,extensions:list<string>,visibility:string}
      */
     private function uploadConfig(string $type): array
     {
-        /** @var array{disk:string,directory:string,visibility:string} $config */
+        /** @var array{disk:string,directory:string,extensions:list<string>,visibility:string} $config */
         $config = config("uploads.types.{$type}");
 
         return $config;
+    }
+
+    /**
+     * @param  list<string>  $allowedExtensions
+     */
+    private function extensionFor(UploadedFile $file, array $allowedExtensions): string
+    {
+        $extension = Str::lower((string) $file->extension());
+
+        if ($extension === '' || ! in_array($extension, $allowedExtensions, true)) {
+            throw new InvalidArgumentException('The uploaded file does not have an allowed extension.');
+        }
+
+        return $extension;
     }
 
     private function defaultDisk(): string
