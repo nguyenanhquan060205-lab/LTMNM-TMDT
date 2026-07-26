@@ -1,63 +1,109 @@
-@extends('layouts.admin')
+@extends('Shared._LayoutAdmin')
+@section('title', 'Quản lý đơn hàng')
 
 @section('content')
 <style>
-    /* CSS ĐỒNG BỘ */
+    /* Tabs hiện đại */
+    .nav-tabs {
+        border-bottom: 2px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+    }
     .nav-tabs .nav-link {
-        color: #6c757d;
+        color: #718096;
         font-weight: 600;
         border: none;
-        padding: 12px 20px;
-        transition: 0.2s;
+        padding: 12px 24px;
+        transition: all 0.3s ease;
+        border-radius: 10px 10px 0 0;
+        position: relative;
+    }
+    .nav-tabs .nav-link:hover {
+        color: #4a5568;
+        background: #edf2f7;
+    }
+    .nav-tabs .nav-link.active {
+        color: #667eea;
+        background: transparent;
+    }
+    .nav-tabs .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 3px 3px 0 0;
     }
 
-        .nav-tabs .nav-link.active {
-            color: #0d6efd;
-            border-bottom: 3px solid #0d6efd;
-            background: transparent;
-        }
-
-        .nav-tabs .nav-link:hover {
-            color: #0a58ca;
-        }
-
+    /* Bảng sang trọng */
+    .card {
+        border: 1px solid rgba(0,0,0,0.05);
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+        overflow: hidden;
+    }
     .table th {
-        background-color: #f8f9fa;
-        color: #495057;
+        background: #f8f9fa;
+        color: #4a5568;
         font-weight: 700;
         text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
+        font-size: .85rem;
         cursor: pointer;
         user-select: none;
-        vertical-align: middle;
+        padding: 16px;
+        border-bottom: 2px solid #edf2f7;
     }
-
-        .table th:hover {
-            background-color: #e9ecef;
-            color: #0d6efd;
-        }
-
+    .table th:hover {
+        background: #edf2f7;
+        color: #667eea;
+    }
     .table td {
+        padding: 16px;
         vertical-align: middle;
+        border-bottom: 1px solid #edf2f7;
         font-size: 0.95rem;
-        color: #333;
     }
 
-    .search-box .input-group-text {
-        background-color: #fff;
-        border-right: none;
-        color: #aaa;
+    .badge {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
     }
 
-    .search-box .form-control {
-        border-left: none;
-        box-shadow: none;
+    /* Lọc trạng thái */
+    .filter-section {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 24px;
+        border: 1px solid #edf2f7;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
     }
-
-        .search-box .form-control:focus {
-            border-color: #ced4da;
-        }
+    .btn-filter {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #4a5568;
+    }
+    .btn-filter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border-color: #cbd5e0;
+    }
+    .btn-filter.active {
+        border-color: #667eea;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        color: #5a67d8;
+    }
 </style>
 
 <div class="container-fluid px-4 mt-4 pb-5">
@@ -72,19 +118,19 @@
         </ul>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
+    <div class="filter-section d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
         <div class="d-flex align-items-center gap-2 flex-wrap">
-            <span class="text-muted fw-semibold"><i class="fa-solid fa-filter me-1"></i> Lọc theo trạng thái:</span>
-            <button class="btn btn-sm btn-outline-primary active" onclick="filterStatus('all', this)">
+            <span class="text-muted fw-bold me-2"><i class="fa-solid fa-filter me-1"></i> Lọc trạng thái:</span>
+            <button class="btn-filter active" onclick="filterStatus('all', this)">
                 <i class="fa-solid fa-list me-1"></i> Tất cả
             </button>
-            <button class="btn btn-sm btn-outline-warning" onclick="filterStatus('Đang chờ xử lý', this)">
+            <button class="btn-filter text-warning" onclick="filterStatus('Đang chờ xử lý', this)" style="border-color:#f6ad55">
                 <i class="fa-solid fa-clock me-1"></i> Đang chờ xử lý
             </button>
-            <button class="btn btn-sm btn-outline-success" onclick="filterStatus('Đã thanh toán', this)">
+            <button class="btn-filter text-success" onclick="filterStatus('Đã thanh toán', this)" style="border-color:#68d391">
                 <i class="fa-solid fa-check-circle me-1"></i> Đã thanh toán
             </button>
-            <button class="btn btn-sm btn-outline-danger" onclick="filterStatus('Đã Huỷ', this)">
+            <button class="btn-filter text-danger" onclick="filterStatus('Đã Huỷ', this)" style="border-color:#fc8181">
                 <i class="fa-solid fa-times-circle me-1"></i> Đã Huỷ
             </button>
         </div>
@@ -125,41 +171,41 @@
                                 </tr>
                             </thead>
                             <tbody id="tableBody">
-                                @if (isset($dsDonHang) && count($dsDonHang) > 0)
-                                    @foreach ($dsDonHang as $item)
+                                @if ($donhangs && count($donhangs) > 0)
+                                    @foreach ($donhangs as $item)
                                         @php
-                                            $badgeClass = "bg-secondary";
-                                            if ($item->TrangThai == "Đang chờ xử lý") { $badgeClass = "bg-warning text-dark"; }
-                                            else if ($item->TrangThai == "Đang vận chuyển") { $badgeClass = "bg-info text-white"; }
-                                            else if ($item->TrangThai == "Đã thanh toán") { $badgeClass = "bg-success"; }
-                                            else if ($item->TrangThai == "Đã Huỷ" || $item->TrangThai == "Đã hủy") { $badgeClass = "bg-danger"; }
+                                            $badgeClass = 'bg-secondary';
+                                            if (mb_strtolower(trim($item['TrangThai'])) == 'đang chờ xử lý') { $badgeClass = 'bg-warning text-dark'; }
+                                            elseif (mb_strtolower(trim($item['TrangThai'])) == 'đang vận chuyển') { $badgeClass = 'bg-info text-white'; }
+                                            elseif (mb_strtolower(trim($item['TrangThai'])) == 'đã thanh toán') { $badgeClass = 'bg-success'; }
+                                            elseif (mb_strtolower(trim($item['TrangThai'])) == 'đã huỷ') { $badgeClass = 'bg-danger'; }
                                         @endphp
 
-                                        <tr class="status-row text-center" data-status="{{ $item->TrangThai }}">
+                                        <tr class="status-row text-center" data-status="{{ $item['TrangThai'] }}">
                                             <td class="text-start fw-bold text-dark" style="padding-left: 20px;">
-                                                <i class="fa-solid fa-user-tag text-muted me-2"></i> {{ $item->NguoiMua }}
+                                                <i class="fa-solid fa-user-tag text-muted me-2"></i> {{ $item['NguoiMua'] }}
                                             </td>
 
                                             <td class="text-muted">
-                                                <i class="fa-solid fa-shop me-1"></i> {{ $item->NguoiBan }}
+                                                <i class="fa-solid fa-shop me-1"></i> {{ $item['NguoiBan'] }}
                                             </td>
 
-                                            <td data-date="{{ $item->NgayDat ? \Carbon\Carbon::parse($item->NgayDat)->format('YmdHis') : '0' }}">
-                                                {{ $item->NgayDat ? \Carbon\Carbon::parse($item->NgayDat)->format('dd/MM/yyyy') : '' }}
+                                            <td data-date="{{ $item['NgayDat'] ? \Carbon\Carbon::parse($item['NgayDat'])->format('YmdHis') : '0' }}">
+                                                {{ $item['NgayDat'] ? \Carbon\Carbon::parse($item['NgayDat'])->format('d/m/Y') : '' }}
                                             </td>
 
-                                            <td class="text-danger fw-bold" data-money="{{ $item->TongTien }}">
-                                                {{ number_format($item->TongTien, 0, ',', '.') }} ₫
+                                            <td class="text-danger fw-bold" data-money="{{ $item['TongTien'] }}">
+                                                {{ number_format($item['TongTien'], 0, ',', '.') }} ₫
                                             </td>
 
                                             <td>
                                                 <span class="badge {{ $badgeClass }} rounded-pill fw-bold py-2 px-3" style="min-width: 110px;">
-                                                    {{ $item->TrangThai }}
+                                                    {{ $item['TrangThai'] }}
                                                 </span>
                                             </td>
 
                                             <td>
-                                                <a href="{{ route('taikhoan.ct_lichsu', ['id' => $item->MaHD]) }}"
+                                                <a href="{{ url('/taikhoan/ctlichsu/' . $item['MaHD']) }}"
                                                    class="btn btn-sm btn-outline-primary shadow-sm"
                                                    title="Xem chi tiết đơn hàng">
                                                     <i class="fa-solid fa-eye"></i>
@@ -183,9 +229,7 @@
         </div>
     </div>
 </div>
-@endsection
 
-@section('scripts')
 <script>
     let currentFilter = 'all';
 
@@ -214,12 +258,10 @@
     function filterStatus(status, buttonElement) {
         currentFilter = status;
 
-        // Remove active class from all buttons
         document.querySelectorAll('.btn-outline-primary, .btn-outline-warning, .btn-outline-info, .btn-outline-success, .btn-outline-danger').forEach(btn => {
             btn.classList.remove('active');
         });
 
-        // Add active class to clicked button
         if (buttonElement) {
             buttonElement.classList.add('active');
         }

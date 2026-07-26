@@ -2,8 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\NguoiDung;
+use App\Models\LoaiSanPham;
+use App\Models\SanPham;
+use App\Models\HinhAnhSP;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
@@ -13,229 +17,114 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Users (NguoiDung)
-        DB::table('nguoi_dungs')->insert([
-            [
-                'MaKH' => 1,
-                'HoTen' => 'Admin System',
-                'GioiTinh' => 'Nam',
-                'NgaySinh' => '1990-01-01',
-                'VaiTro' => 'Admin',
-                'MatKhau' => '123456',
-                'TaiKhoan' => 'admin',
-                'Email' => 'admin@techsecond.com',
-                'SDT' => '0987654321',
-                'DiaChi' => 'TP.HCM',
-                'AnhDaiDien' => 'default.jpg',
-                'NgayTao' => Carbon::now(),
-                'Khoa' => 0,
-                'SoTaiKhoan' => '1234567890',
-                'TenNganHang' => 'Vietcombank'
-            ],
-            [
-                'MaKH' => 2,
-                'HoTen' => 'Nguyễn Anh Quân',
-                'GioiTinh' => 'Nam',
-                'NgaySinh' => '2000-05-15',
-                'VaiTro' => 'User',
-                'MatKhau' => '123456',
-                'TaiKhoan' => 'anhquan',
-                'Email' => 'quan@example.com',
-                'SDT' => '0912345678',
-                'DiaChi' => 'Hà Nội',
-                'AnhDaiDien' => 'default.jpg',
-                'NgayTao' => Carbon::now(),
-                'Khoa' => 0,
-                'SoTaiKhoan' => '0987654321',
-                'TenNganHang' => 'Agribank'
-            ],
-            [
-                'MaKH' => 3,
-                'HoTen' => 'Trần Thị B',
-                'GioiTinh' => 'Nữ',
-                'NgaySinh' => '1995-10-20',
-                'VaiTro' => 'User',
-                'MatKhau' => '123456',
-                'TaiKhoan' => 'userb',
-                'Email' => 'userb@example.com',
-                'SDT' => '0922334455',
-                'DiaChi' => 'Đà Nẵng',
-                'AnhDaiDien' => 'default.jpg',
-                'NgayTao' => Carbon::now(),
-                'Khoa' => 0,
-                'SoTaiKhoan' => '1122334455',
-                'TenNganHang' => 'Techcombank'
-            ]
+        // 1. Tạo người dùng (Admin)
+        NguoiDung::create([
+            'TaiKhoan' => 'admin',
+            'MatKhau' => '123', // C# used plain text for now, but keeping the same for test
+            'HoTen' => 'Quản trị viên',
+            'Email' => 'admin@gmail.com',
+            'SDT' => '0123456789',
+            'NgayTao' => Carbon::now(),
+            'VaiTro' => 'Admin',
+            'Khoa' => false,
         ]);
 
-        // 2. Categories (LoaiSanPham)
-        DB::table('loai_san_phams')->insert([
-            ['MaLoai' => 1, 'TenLoai' => 'Điện thoại'],
-            ['MaLoai' => 2, 'TenLoai' => 'Laptop'],
-            ['MaLoai' => 3, 'TenLoai' => 'Phụ kiện'],
-            ['MaLoai' => 4, 'TenLoai' => 'Đồng hồ thông minh']
+        // 2. Tạo người dùng (User)
+        $user1 = NguoiDung::create([
+            'TaiKhoan' => 'user1',
+            'MatKhau' => '123',
+            'HoTen' => 'Người Dùng 1',
+            'Email' => 'user1@gmail.com',
+            'SDT' => '0987654321',
+            'NgayTao' => Carbon::now(),
+            'VaiTro' => 'User',
+            'Khoa' => false,
         ]);
 
-        // 3. Products (SanPham)
-        DB::table('san_phams')->insert([
-            [
-                'MaSP' => 1,
-                'MaKH' => 2,
-                'MaLoai' => 1,
-                'TenSP' => 'iPhone 13 Pro Max 256GB Cũ',
-                'MoTa' => 'Máy xài lướt, ngoại hình đẹp 99%, pin còn 90%.',
-                'Gia' => 15000000,
-                'SoLuong' => 2,
-                'DanhGiaTB' => 4.5,
-                'TongDanhGia' => 2,
-                'TrangThai' => 'Đã duyệt',
-                'NgayTao' => Carbon::now()->subDays(10)
-            ],
-            [
-                'MaSP' => 2,
-                'MaKH' => 3,
-                'MaLoai' => 2,
-                'TenSP' => 'MacBook Pro M1 2020',
-                'MoTa' => 'RAM 16GB, SSD 512GB. Bàn phím không liệt phím nào, màn hình không ám.',
-                'Gia' => 22000000,
-                'SoLuong' => 1,
-                'DanhGiaTB' => 5.0,
-                'TongDanhGia' => 1,
-                'TrangThai' => 'Đã duyệt',
-                'NgayTao' => Carbon::now()->subDays(5)
-            ],
-            [
-                'MaSP' => 3,
-                'MaKH' => 2,
-                'MaLoai' => 3,
-                'TenSP' => 'Tai nghe AirPods Pro',
-                'MoTa' => 'Mất hộp sạc, chỉ còn 2 tai nghe.',
-                'Gia' => 1500000,
-                'SoLuong' => 5,
-                'DanhGiaTB' => 0,
-                'TongDanhGia' => 0,
-                'TrangThai' => 'Đã duyệt',
-                'NgayTao' => Carbon::now()->subDays(2)
-            ],
-            [
-                'MaSP' => 4,
-                'MaKH' => 2,
-                'MaLoai' => 4,
-                'TenSP' => 'Apple Watch Series 7',
-                'MoTa' => 'Mới 100% nguyên seal chưa kích hoạt.',
-                'Gia' => 7500000,
-                'SoLuong' => 3,
-                'DanhGiaTB' => 0,
-                'TongDanhGia' => 0,
-                'TrangThai' => 'Đã duyệt',
-                'NgayTao' => Carbon::now()->subDays(1)
-            ],
-            [
-                'MaSP' => 5,
-                'MaKH' => 3,
-                'MaLoai' => 1,
-                'TenSP' => 'Samsung Galaxy S22 Ultra',
-                'MoTa' => 'Màu đen, bản Hàn Quốc, dùng giữ gìn.',
-                'Gia' => 14000000,
-                'SoLuong' => 1,
-                'DanhGiaTB' => 0,
-                'TongDanhGia' => 0,
-                'TrangThai' => 'Chưa duyệt', // Chưa duyệt để Admin có thể test tính năng duyệt
-                'NgayTao' => Carbon::now()
-            ]
+        $user2 = NguoiDung::create([
+            'TaiKhoan' => 'user2',
+            'MatKhau' => '123',
+            'HoTen' => 'Người Dùng 2',
+            'Email' => 'user2@gmail.com',
+            'SDT' => '0987111222',
+            'NgayTao' => Carbon::now(),
+            'VaiTro' => 'User',
+            'Khoa' => false,
         ]);
 
-        // 4. Product Images (HinhAnhSP)
-        DB::table('hinh_anh_s_p_s')->insert([
-            ['MaAnh' => 1, 'Masp' => 1, 'URLAnh' => 'default_product.jpg', 'AnhBia' => 1],
-            ['MaAnh' => 2, 'Masp' => 2, 'URLAnh' => 'default_product.jpg', 'AnhBia' => 1],
-            ['MaAnh' => 3, 'Masp' => 3, 'URLAnh' => 'default_product.jpg', 'AnhBia' => 1],
-            ['MaAnh' => 4, 'Masp' => 4, 'URLAnh' => 'default_product.jpg', 'AnhBia' => 1],
-            ['MaAnh' => 5, 'Masp' => 5, 'URLAnh' => 'default_product.jpg', 'AnhBia' => 1]
+        // 3. Tạo Loại Sản Phẩm
+        $loai1 = LoaiSanPham::create(['TenLoai' => 'Điện thoại']);
+        $loai2 = LoaiSanPham::create(['TenLoai' => 'Laptop']);
+        $loai3 = LoaiSanPham::create(['TenLoai' => 'Đồ điện tử']);
+        $loai4 = LoaiSanPham::create(['TenLoai' => 'Đồ gia dụng']);
+        $loai5 = LoaiSanPham::create(['TenLoai' => 'Xe cộ']);
+        $loai6 = LoaiSanPham::create(['TenLoai' => 'Khác']);
+
+        // 4. Tạo Sản phẩm
+        $sp1 = SanPham::create([
+            'MaKH' => $user1->MaKH,
+            'MaLoai' => $loai1->MaLoai,
+            'TenSP' => 'iPhone 13 Pro Max 256GB Cũ',
+            'Gia' => 18000000,
+            'MoTa' => 'Máy hình thức đẹp 99%, pin 90%. Chưa qua sửa chữa. Kèm hộp và cáp sạc.',
+            'NgayTao' => Carbon::now(),
+            'TrangThai' => 'Đã duyệt'
         ]);
 
-        // 5. Carts (GioHang)
-        DB::table('gio_hangs')->insert([
-            ['MaGH' => 1, 'MaKH' => 2, 'TongSoLuong' => 1]
+        HinhAnhSP::create([
+            'MaSP' => $sp1->MaSP,
+            'URLAnh' => 'noimage.jpg',
+            'AnhBia' => true
         ]);
 
-        DB::table('ct_gio_hangs')->insert([
-            ['MaGH' => 1, 'MaSP' => 2, 'SoLuong' => 1, 'ThanhTien' => 22000000]
+        $sp2 = SanPham::create([
+            'MaKH' => $user2->MaKH,
+            'MaLoai' => $loai2->MaLoai,
+            'TenSP' => 'Laptop Dell XPS 13 9310',
+            'Gia' => 22000000,
+            'MoTa' => 'Core i7, RAM 16GB, SSD 512GB. Bàn phím êm, màn hình đẹp xước nhẹ góc dưới.',
+            'NgayTao' => Carbon::now(),
+            'TrangThai' => 'Đã duyệt'
         ]);
 
-        // 6. Orders (HoaDon)
-        DB::table('hoa_dons')->insert([
-            [
-                'MaHD' => 1,
-                'MaKH' => 3,
-                'TongTien' => 15000000,
-                'PhuongThucTT' => 'Chuyển khoản',
-                'DiaChiGiaoHang' => 'Đà Nẵng City',
-                'NgayTT' => Carbon::now()->subDays(3),
-                'NgayDat' => Carbon::now()->subDays(4),
-                'TrangThai' => 'Đã giao'
-            ]
+        HinhAnhSP::create([
+            'MaSP' => $sp2->MaSP,
+            'URLAnh' => 'noimage.jpg',
+            'AnhBia' => true
         ]);
 
-        DB::table('ct_hoa_dons')->insert([
-            [
-                'MaHD' => 1,
-                'MaSP' => 1,
-                'SoLuong' => 1,
-                'ThanhTien' => 15000000,
-                'TrangThaiCT' => 'Đã giao',
-                'DaDanhGia' => 1
-            ]
+        $sp3 = SanPham::create([
+            'MaKH' => $user1->MaKH,
+            'MaLoai' => $loai4->MaLoai,
+            'TenSP' => 'Nồi chiên không dầu Philips',
+            'Gia' => 1500000,
+            'MoTa' => 'Dùng lướt, mới 95%. Bán rẻ do không có nhu cầu.',
+            'NgayTao' => Carbon::now(),
+            'TrangThai' => 'Đã duyệt'
         ]);
 
-        // 7. Reviews (DanhGia)
-        DB::table('danh_gias')->insert([
-            [
-                'MaDG' => 1,
-                'MaKH' => 3,
-                'MaSP' => 1,
-                'MaHD' => 1,
-                'SoSao' => 4,
-                'NoiDung' => 'Máy xài ổn, có trầy xước nhẹ hơn mình nghĩ xíu',
-                'NgayDG' => Carbon::now()->subDays(1)
-            ]
+        HinhAnhSP::create([
+            'MaSP' => $sp3->MaSP,
+            'URLAnh' => 'noimage.jpg',
+            'AnhBia' => true
         ]);
 
-        // 8. Complaints (KhieuNai)
-        DB::table('khieu_nais')->insert([
-            [
-                'MaKN' => 1,
-                'MaKH' => 3,
-                'MaSP' => 1,
-                'MoTa' => 'Dây cáp sạc đi kèm bị đứt ngầm.',
-                'PhanHoi' => null,
-                'NgayGui' => Carbon::now(),
-                'TrangThai' => 'Đang chờ xử lý'
-            ]
+        $sp4 = SanPham::create([
+            'MaKH' => $user2->MaKH,
+            'MaLoai' => $loai1->MaLoai,
+            'TenSP' => 'Samsung S23 Ultra',
+            'Gia' => 21000000,
+            'MoTa' => 'Mới nguyên seal, được tặng dư không xài.',
+            'NgayTao' => Carbon::now(),
+            'TrangThai' => 'Chờ duyệt'
         ]);
 
-        // 9. Messages (TinNhan)
-        DB::table('tin_nhans')->insert([
-            [
-                'MaTN' => 1,
-                'NguoiGui' => 3, // B hỏi A
-                'NguoiNhan' => 2,
-                'NgayGui' => Carbon::now()->subHours(5),
-                'NoiDung' => 'Bạn ơi, MacBook Pro còn bớt được không?',
-                'MaSP' => 2,
-                'DaDoc' => 1,
-                'Anh' => null
-            ],
-            [
-                'MaTN' => 2,
-                'NguoiGui' => 2, // A trả lời B
-                'NguoiNhan' => 3,
-                'NgayGui' => Carbon::now()->subHours(4),
-                'NoiDung' => 'Máy đẹp không bớt được nha bạn ơi.',
-                'MaSP' => 2,
-                'DaDoc' => 0, // B chưa đọc
-                'Anh' => null
-            ]
+        HinhAnhSP::create([
+            'MaSP' => $sp4->MaSP,
+            'URLAnh' => 'noimage.jpg',
+            'AnhBia' => true
         ]);
+        
+        echo "Database seeded successfully!";
     }
 }

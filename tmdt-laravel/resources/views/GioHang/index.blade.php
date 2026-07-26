@@ -1,5 +1,4 @@
-@extends('layouts.app')
-
+@extends('Shared._Layout')
 @section('title', 'Giỏ hàng của bạn')
 
 @section('content')
@@ -11,28 +10,32 @@
     </h2>
 
     <!-- 🔔 THÔNG BÁO -->
-    @foreach (['CartOK' => 'success', 'CartError' => 'danger', 'CartWarning' => 'warning'] as $msg => $alertClass)
-        @if (Session::has($msg))
-            <div id="alertBox" class="alert alert-{{ $alertClass }} text-center fw-bold shadow-sm">
-                {{ Session::get($msg) }}
+    @foreach (['CartOK', 'CartError', 'CartWarning'] as $key)
+        @if (session()->has($key))
+            @php
+                $alertClass = $key == 'CartOK' ? 'alert-success' :
+                             ($key == 'CartError' ? 'alert-danger' : 'alert-warning');
+            @endphp
+            <div id="alertBox" class="alert {{ $alertClass }} text-center fw-bold shadow-sm">
+                {{ session($key) }}
             </div>
-            @php Session::forget($msg); @endphp
+            {{ session()->forget($key) }}
         @endif
     @endforeach
 
     <!-- 🛒 GIỎ HÀNG RỖNG -->
-    @if (!$ds || count($ds) == 0)
+    @if (!$model || $model->isEmpty())
         <div class="empty-cart-wrapper">
             <div class="empty-cart-icon">🛒</div>
             <h4 class="empty-cart-title">Giỏ hàng của bạn đang trống</h4>
             <p class="empty-cart-subtitle">Hãy thêm sản phẩm yêu thích để bắt đầu mua sắm</p>
-            <a href="{{ route('sanpham.index') }}" class="btn btn-primary btn-lg rounded-pill px-5">
+            <a href="{{ url('/sanpham') }}" class="btn btn-primary btn-lg rounded-pill px-5">
                 <i class="bi bi-shop me-2"></i> Khám phá sản phẩm
             </a>
         </div>
     @else
         @php
-            $tongTien = collect($ds)->sum('ThanhTien');
+            $tongTien = $model->sum('ThanhTien');
         @endphp
 
         <!-- 📦 BẢNG GIỎ HÀNG -->
@@ -49,10 +52,10 @@
                 </thead>
 
                 <tbody>
-                    @foreach ($ds as $item)
+                    @foreach ($model as $item)
                         @php
-                            $anhBiaObj = collect($item->sanPham->hinhAnhs)->firstWhere('AnhBia', true);
-                            $url = $anhBiaObj ? asset('Content/Images/' . $anhBiaObj->URLAnh) : asset('Content/Images/default.jpg');
+                            $anh = $item->sanPham && $item->sanPham->hinhAnhSPs ? $item->sanPham->hinhAnhSPs->where('AnhBia', true)->first() : null;
+                            $url = $anh ? url('Content/Images/' . $anh->URLAnh) : url('content/images/default.jpg');
                         @endphp
 
                         <tr class="cart-row">
@@ -69,11 +72,11 @@
 
                             <td>
                                 <div class="quantity-control">
-                                    <a href="{{ route('giohang.giam', ['id' => $item->MaSP]) }}" class="qty-btn qty-minus">
+                                    <a href="{{ url('/giohang/giam/' . $item->MaSP) }}" class="qty-btn qty-minus">
                                         <i class="bi bi-dash"></i>
                                     </a>
                                     <span class="qty-value">{{ $item->SoLuong }}</span>
-                                    <a href="{{ route('giohang.tang', ['id' => $item->MaSP]) }}" class="qty-btn qty-plus">
+                                    <a href="{{ url('/giohang/tang/' . $item->MaSP) }}" class="qty-btn qty-plus">
                                         <i class="bi bi-plus"></i>
                                     </a>
                                 </div>
@@ -84,7 +87,7 @@
                             </td>
 
                             <td class="text-center">
-                                <a href="{{ route('giohang.xoa', ['id' => $item->MaSP]) }}"
+                                <a href="{{ url('/giohang/xoa/' . $item->MaSP) }}"
                                    class="btn-delete"
                                    onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?');"
                                    title="Xóa sản phẩm">
@@ -107,7 +110,7 @@
 
                 <div class="summary-body">
                     <div class="summary-row">
-                        <span class="summary-label">Tạm tính ({{ count($ds) }} sản phẩm):</span>
+                        <span class="summary-label">Tạm tính ({{ collect($model)->count() }} sản phẩm):</span>
                         <span class="summary-value">{{ number_format($tongTien, 0, ',', '.') }} ₫</span>
                     </div>
 
@@ -126,7 +129,7 @@
                     </div>
                 </div>
 
-                <form action="{{ route('hoadon.dathang') }}" method="post" class="mt-3">
+                <form action="{{ url('/hoadon/dathang') }}" method="post" class="mt-3">
                     @csrf
                     <button type="submit" class="btn-checkout">
                         <i class="bi bi-credit-card me-2"></i>
@@ -134,7 +137,7 @@
                     </button>
                 </form>
 
-                <a href="{{ route('sanpham.index') }}" class="btn-continue">
+                <a href="{{ url('/sanpham/index') }}" class="btn-continue">
                     <i class="bi bi-arrow-left me-2"></i>
                     Tiếp tục mua sắm
                 </a>
@@ -142,9 +145,7 @@
         </div>
     @endif
 </div>
-@endsection
 
-@section('scripts')
 <script>
     setTimeout(() => {
         var alertBox = document.getElementById("alertBox");
@@ -169,9 +170,7 @@
     .cart-title {
         font-weight: 800;
         font-size: 2.2rem;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #2d3748; /* Đen nhám hiện đại */
         margin-bottom: 2rem;
     }
 
@@ -216,16 +215,14 @@
         margin-bottom: 0;
     }
 
-    .cart-table thead {
-        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-    }
-
     .cart-table thead th {
-        color: white !important;
-        font-weight: 600;
+        background-color: #f8fafc !important; /* Xám nhạt thay vì gradient đen */
+        color: #4a5568 !important; /* Chữ xám đậm dễ đọc */
+        font-weight: 700;
         padding: 1.2rem 1rem;
         border: none;
-        font-size: 0.9rem;
+        border-bottom: 2px solid #e2e8f0;
+        font-size: 0.85rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
@@ -280,7 +277,7 @@
     }
 
     .product-price-unit {
-        color: #667eea;
+        color: #6c757d;
         font-size: 0.85rem;
         font-weight: 500;
     }
@@ -302,18 +299,18 @@
         align-items: center;
         justify-content: center;
         background: transparent;
-        color: #667eea;
+        color: #0d6efd;
         border: none;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.2s;
         text-decoration: none;
         font-size: 1.1rem;
         font-weight: 600;
     }
 
     .qty-btn:hover {
-        background: #667eea;
-        color: white;
+        background: #f1f5f9;
+        color: #0b5ed7;
     }
 
     .qty-value {
@@ -329,9 +326,7 @@
     .cart-price {
         font-weight: 700;
         font-size: 1.2rem;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #0d6efd; /* Xanh dương đậm */
     }
 
     /* ===== DELETE BUTTON ===== */
@@ -426,22 +421,20 @@
     .total-amount {
         font-size: 1.8rem;
         font-weight: 700;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #0d6efd;
     }
 
     /* ===== BUTTONS ===== */
     .btn-checkout {
         width: 100%;
         padding: 1rem 1.5rem;
-        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        color: #2d3748;
+        background-color: #0d6efd;
+        color: white;
         border: none;
         border-radius: 15px;
         font-weight: 700;
         font-size: 1rem;
-        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
         transition: all 0.3s;
         cursor: pointer;
         display: flex;
@@ -450,16 +443,17 @@
     }
 
     .btn-checkout:hover {
+        background-color: #0b5ed7;
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(255, 193, 7, 0.6);
+        box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
     }
 
     .btn-continue {
         width: 100%;
         padding: 0.9rem 1.5rem;
         background: white;
-        color: #667eea;
-        border: 2px solid #667eea;
+        color: #4a5568;
+        border: 2px solid #e2e8f0;
         border-radius: 15px;
         font-weight: 600;
         text-align: center;
@@ -472,8 +466,9 @@
     }
 
     .btn-continue:hover {
-        background: #667eea;
-        color: white;
+        background: #f8fafc;
+        color: #2d3748;
+        border-color: #cbd5e1;
         text-decoration: none;
     }
 

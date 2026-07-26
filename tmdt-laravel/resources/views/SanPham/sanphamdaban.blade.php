@@ -5,44 +5,58 @@
 @section('content')
 <style>
     .page-title {
-        font-size: 28px;
+        color: #2a2a40;
+        margin-top: 20px;
+    }
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .table th {
+        background: #f8f9fa !important;
+        color: #4a5568 !important;
         font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: linear-gradient(90deg, #0d6efd, #00b4d8);
-        -webkit-background-clip: text;
-        color: transparent;
-        margin-bottom: 20px;
+        text-transform: uppercase;
+        font-size: .85rem;
+        padding: 16px;
+        border-bottom: 2px solid #edf2f7;
     }
-
-    .table thead th {
-        background: #1e1e1e !important;
-        color: #fff;
+    .table td {
+        padding: 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid #edf2f7;
+        font-size: 0.95rem;
+    }
+    .badge-status {
+        padding: 6px 12px;
+        border-radius: 8px;
         font-weight: 600;
+        letter-spacing: 0.3px;
     }
-
-    .table-hover tbody tr:hover {
-        background-color: #f4f8ff;
+    .btn-action {
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        border: 1px solid transparent;
     }
-
-    .badge {
-        padding: 6px 10px;
-        font-size: 13px;
-        border-radius: 6px;
-    }
-
-    .btn-soft:hover {
-        transform: scale(1.05);
-        transition: 0.2s;
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 </style>
 
 <div class="container py-4 mb-5">
 
-    <h2 class="page-title">
-        <i class="bi bi-receipt-cutoff text-primary"></i> Hóa đơn bạn đã bán
-    </h2>
+    <h3 class="fw-bold mb-4 page-title text-center">
+        <i class="fa-solid fa-receipt text-primary me-2"></i> Hóa đơn bạn đã bán
+    </h3>
 
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show">
@@ -58,16 +72,16 @@
         </div>
     @endif
 
-    <div class="row mb-3">
-        <div class="col-md-5">
+    <div class="row mb-4">
+        <div class="col-md-6 mx-auto">
             <input type="text"
                    id="searchInput"
-                   class="form-control shadow-sm"
+                   class="form-control rounded-pill shadow-sm py-2 px-4"
                    placeholder="🔍 Tìm theo người mua, trạng thái, ngày, tổng tiền..." />
         </div>
     </div>
 
-    <div class="card shadow-sm border-0 rounded-4">
+    <div class="table-container">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0" id="hoaDonTable">
@@ -88,11 +102,11 @@
                                 <td>{{ $item->NguoiMua }}</td>
 
                                 <td>
-                                    {{ $item->NgayDat ? \Carbon\Carbon::parse($item->NgayDat)->format('dd/MM/yyyy') : '-' }}
+                                    {{ $item->NgayDat ? \Carbon\Carbon::parse($item->NgayDat)->format('d/m/Y H:i') : '-' }}
                                 </td>
 
                                 <td>
-                                    {{ $item->NgayTT ? \Carbon\Carbon::parse($item->NgayTT)->format('dd/MM/yyyy') : '-' }}
+                                    {{ $item->NgayTT ? \Carbon\Carbon::parse($item->NgayTT)->format('d/m/Y H:i') : '-' }}
                                 </td>
 
                                 <td class="text-end fw-bold text-danger text-center">
@@ -110,44 +124,42 @@
                                             $badge = "bg-danger";
                                         }
                                     @endphp
-                                    <span class="badge {{ $badge }}">{{ $item->TrangThai }}</span>
+                                    <span class="badge-status {{ $badge }}">{{ $item->TrangThai }}</span>
                                 </td>
 
                                 <td class="text-center text-nowrap">
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <!-- XEM CHI TIẾT -->
+                                        <a class="btn btn-outline-primary btn-action"
+                                           href="{{ route('sanpham.ctsanphamdaban', ['id' => $item->MaHD]) }}" title="Xem chi tiết">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
 
-                                    <!-- XEM CHI TIẾT -->
-                                    <a class="btn btn-primary btn-sm btn-soft"
-                                       href="{{ route('sanpham.ctsanphamdaban', ['id' => $item->MaHD]) }}">
-                                        <i class="bi bi-eye-fill"></i>
-                                    </a>
+                                        @if ($item->TrangThai == "Đang chờ xử lý")
+                                            <!-- HOÀN THÀNH -->
+                                            <form action="{{ route('sanpham.hoanthanhhoadon', ['id' => $item->MaHD]) }}"
+                                                  method="post"
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Xác nhận hoàn thành toàn bộ sản phẩm trong hóa đơn này?')">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="btn btn-outline-success btn-action" title="Xác nhận hoàn thành">
+                                                    <i class="fa-solid fa-check"></i>
+                                                </button>
+                                            </form>
 
-                                    @if ($item->TrangThai == "Đang chờ xử lý")
-                                        <!-- HOÀN THÀNH -->
-                                        <form action="{{ route('sanpham.hoanthanhhoadon', ['id' => $item->MaHD]) }}"
-                                              method="post"
-                                              class="d-inline"
-                                              onsubmit="return confirm('Xác nhận hoàn thành toàn bộ sản phẩm trong hóa đơn này?')">
-                                            @csrf
-                                            <button type="submit"
-                                                    class="btn btn-success btn-sm btn-soft">
-                                                <i class="bi bi-check-circle-fill"></i>
-                                            </button>
-                                        </form>
-
-                                        <!-- HUỶ -->
-                                        <form action="{{ route('sanpham.huyhoadonban', ['id' => $item->MaHD]) }}"
-                                              method="post"
-                                              class="d-inline"
-                                              onsubmit="return confirm('Bạn có chắc muốn hủy hóa đơn này?')">
-                                            @csrf
-                                            <button type="submit" class="btn btn-danger btn-sm btn-soft">
-                                                <i class="bi bi-x-circle-fill"></i>
-                                            </button>
-                                        </form>
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-
+                                            <!-- HUỶ -->
+                                            <form action="{{ route('sanpham.huyhoadonban', ['id' => $item->MaHD]) }}"
+                                                  method="post"
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Bạn có chắc muốn hủy hóa đơn này?')">
+                                                @csrf
+                                                <button type="submit" class="btn btn-outline-danger btn-action" title="Hủy đơn hàng">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty

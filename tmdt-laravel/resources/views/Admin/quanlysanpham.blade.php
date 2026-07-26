@@ -1,10 +1,9 @@
-@extends('layouts.admin')
-
+@extends('Shared._LayoutAdmin')
 @section('title', 'Quản lý sản phẩm')
 
 @section('content')
 @php
-    $activeTab = session('ActiveTab') ?? request()->query('tab') ?? 'product';
+    $activeTab = request()->query('tab', session('ActiveTab', 'product'));
     $tabProductNav = $activeTab == 'product' ? 'active' : '';
     $tabCategoryNav = $activeTab == 'category' ? 'active' : '';
     $tabProductPane = $activeTab == 'product' ? 'show active' : '';
@@ -12,127 +11,143 @@
 @endphp
 
 <style>
+    /* Tabs hiện đại */
+    .nav-tabs {
+        border-bottom: 2px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+    }
     .nav-tabs .nav-link {
-        color: #6c757d;
+        color: #718096;
         font-weight: 600;
         border: none;
-        padding: 12px 20px;
-        transition: 0.2s;
+        padding: 12px 24px;
+        transition: all 0.3s ease;
+        border-radius: 10px 10px 0 0;
+        position: relative;
+    }
+    .nav-tabs .nav-link:hover {
+        color: #4a5568;
+        background: #edf2f7;
+    }
+    .nav-tabs .nav-link.active {
+        color: #667eea;
+        background: transparent;
+    }
+    .nav-tabs .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 3px 3px 0 0;
     }
 
-        .nav-tabs .nav-link.active {
-            color: #0d6efd;
-            border-bottom: 3px solid #0d6efd;
-            background: transparent;
-        }
-
-        .nav-tabs .nav-link:hover {
-            color: #0a58ca;
-        }
-
+    /* Table sang trọng */
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .table { margin-bottom: 0; }
     .table th {
-        background-color: #f8f9fa;
-        color: #495057;
+        background: #f8f9fa;
+        color: #4a5568;
         font-weight: 700;
-        cursor: pointer;
-        user-select: none;
-        vertical-align: middle;
+        padding: 16px;
+        border-bottom: 2px solid #edf2f7;
     }
-
-        .table th:hover {
-            background-color: #e9ecef;
-            color: #0d6efd;
-        }
-
     .table td {
+        padding: 16px;
         vertical-align: middle;
+        border-bottom: 1px solid #edf2f7;
         font-size: 0.95rem;
     }
-
-    .btn-category-toggle {
-        background-color: #fff;
-        color: #444;
-        border: 1px solid #ced4da;
-        font-weight: 500;
-        padding: 8px 12px;
-        border-radius: 6px;
+    
+    /* Badges */
+    .badge {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
-
-        .btn-category-toggle[aria-expanded="true"] {
-            background-color: #e7f1ff;
-            border-color: #0d6efd;
-            color: #0d6efd;
-        }
 
     /* Filter Section */
     .filter-section {
-        background: #f8f9fa;
-        border-radius: 8px;
+        background: white;
+        border-radius: 12px;
         padding: 16px;
-        margin-bottom: 20px;
-        border: 1px solid #dee2e6;
+        margin-bottom: 24px;
+        border: 1px solid #edf2f7;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
     }
 
     .filter-badge {
         display: inline-flex;
         align-items: center;
-        padding: 6px 12px;
+        padding: 8px 16px;
         border-radius: 20px;
         font-size: 0.875rem;
-        font-weight: 500;
+        font-weight: 600;
         cursor: pointer;
-        transition: all 0.2s;
-        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
         background: white;
+        color: #4a5568;
     }
 
-        .filter-badge:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
+    .filter-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border-color: #cbd5e0;
+    }
 
-        .filter-badge.active {
-            border-color: #0d6efd;
-            background: #e7f1ff;
-            color: #0d6efd;
-        }
+    .filter-badge.active {
+        border-color: #667eea;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        color: #5a67d8;
+    }
 
     .filter-badge-all {
-        border-color: #6c757d;
+        border-color: #cbd5e0;
     }
 
-        .filter-badge-all.active {
-            border-color: #0d6efd;
-            background: #e7f1ff;
-            color: #0d6efd;
-        }
+    .filter-badge-all.active {
+        border-color: #0d6efd;
+        background: #e7f1ff;
+        color: #0d6efd;
+    }
 
     .filter-badge-approved {
         color: #198754;
     }
 
-        .filter-badge-approved.active {
-            border-color: #198754;
-            background: #d1e7dd;
-        }
+    .filter-badge-approved.active {
+        border-color: #198754;
+        background: #d1e7dd;
+    }
 
     .filter-badge-hidden {
         color: #495057;
     }
 
-        .filter-badge-hidden.active {
-            border-color: #495057;
-            background: #e9ecef;
-        }
+    .filter-badge-hidden.active {
+        border-color: #495057;
+        background: #e9ecef;
+    }
 
     .filter-badge-sold {
         color: #0dcaf0;
     }
 
-        .filter-badge-sold.active {
-            border-color: #0dcaf0;
-            background: #cff4fc;
-        }
+    .filter-badge-sold.active {
+        border-color: #0dcaf0;
+        background: #cff4fc;
+    }
 
     .status-count {
         display: inline-block;
@@ -160,14 +175,12 @@
                 </button>
             </li>
         </ul>
-
     </div>
 
     <div class="tab-content" id="myTabContent">
 
         <div class="tab-pane fade {{ $tabProductPane }}" id="product-pane" role="tabpanel">
 
-            <!-- Filter Section - Tách riêng -->
             <div class="filter-section">
                 <div class="d-flex align-items-center flex-wrap gap-3">
                     <div class="me-2">
@@ -208,11 +221,11 @@
 
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    @if (session('success'))
-                        <div class="alert alert-success mb-3 py-2 small"><i class="fa-solid fa-check-circle me-2"></i>{{ session('success') }}</div>
+                    @if (session('Success'))
+                        <div class="alert alert-success mb-3 py-2 small"><i class="fa-solid fa-check-circle me-2"></i>{{ session('Success') }}</div>
                     @endif
-                    @if (session('error'))
-                        <div class="alert alert-danger mb-3 py-2 small"><i class="fa-solid fa-triangle-exclamation me-2"></i>{{ session('error') }}</div>
+                    @if (session('Error'))
+                        <div class="alert alert-danger mb-3 py-2 small"><i class="fa-solid fa-triangle-exclamation me-2"></i>{{ session('Error') }}</div>
                     @endif
 
                     <div class="table-responsive">
@@ -234,18 +247,18 @@
                             </thead>
 
                             <tbody id="tableBody">
-                                @if (isset($dsSanPham))
-                                    @foreach ($dsSanPham as $sp)
+                                @if (isset($SanPhams))
+                                    @foreach ($SanPhams as $sp)
                                         @php
-                                            $badgeClass = "bg-secondary";
-                                            if ($sp->TrangThai == "Đã duyệt") { $badgeClass = "bg-success"; }
-                                            else if ($sp->TrangThai == "Ẩn") { $badgeClass = "bg-dark text-white"; }
-                                            else if ($sp->TrangThai == "Đã bán") { $badgeClass = "bg-info text-dark"; }
+                                            $badgeClass = 'bg-secondary';
+                                            if ($sp->TrangThai == 'Đã duyệt') { $badgeClass = 'bg-success'; }
+                                            elseif ($sp->TrangThai == 'Ẩn') { $badgeClass = 'bg-dark text-white'; }
+                                            elseif ($sp->TrangThai == 'Đã bán') { $badgeClass = 'bg-info text-dark'; }
                                         @endphp
 
                                         <tr class="status-row text-center" data-status="{{ $sp->TrangThai }}">
                                             <td class="fw-bold text-start">
-                                                <a href="{{ route('sanpham.chitiet', ['id' => $sp->MaSP]) }}"
+                                                <a href="{{ url('/sanpham/chitiet/' . $sp->MaSP) }}"
                                                    target="_blank"
                                                    class="text-primary text-decoration-none"
                                                    title="Xem chi tiết sản phẩm ngoài trang chủ">
@@ -271,20 +284,16 @@
 
                                             <td>
                                                 <div class="d-flex justify-content-center gap-2">
-                                                    <form action="{{ route('admin.doitrangthaisanpham') }}" method="post">
+                                                    <form action="{{ url('/admin/doitrangthai') }}" method="post">
                                                         @csrf
                                                         <input type="hidden" name="id" value="{{ $sp->MaSP }}" />
-                                                        @if ($sp->TrangThai == "Đã duyệt")
+                                                        @if ($sp->TrangThai == 'Đã duyệt')
                                                             <button type="submit" name="tt" value="Ẩn" class="btn btn-dark btn-sm fw-bold shadow-sm" style="width: 80px;">
                                                                 <i class="fa-solid fa-lock me-1"></i> Khóa
                                                             </button>
-                                                        @elseif ($sp->TrangThai == "Ẩn")
+                                                        @elseif ($sp->TrangThai == 'Ẩn')
                                                             <button type="submit" name="tt" value="Đã duyệt" class="btn btn-success btn-sm fw-bold shadow-sm" style="width: 80px;">
                                                                 <i class="fa-solid fa-unlock me-1"></i> Mở
-                                                            </button>
-                                                        @elseif ($sp->TrangThai == "Chưa duyệt" || $sp->TrangThai == "Chờ duyệt")
-                                                            <button type="submit" name="tt" value="Đã duyệt" class="btn btn-primary btn-sm fw-bold shadow-sm" style="width: 80px;">
-                                                                <i class="fa-solid fa-check me-1"></i> Duyệt
                                                             </button>
                                                         @else
                                                             <button type="button" class="btn btn-light btn-sm border" style="width: 80px;" disabled>
@@ -293,7 +302,7 @@
                                                         @endif
                                                     </form>
 
-                                                    <form action="{{ route('admin.xoasanpham') }}" method="post" onsubmit="return confirm('CẢNH BÁO: Xóa vĩnh viễn sản phẩm này?');">
+                                                    <form action="{{ url('/admin/xoa') }}" method="post" onsubmit="return confirm('CẢNH BÁO: Xóa vĩnh viễn sản phẩm này?');">
                                                         @csrf
                                                         <input type="hidden" name="id" value="{{ $sp->MaSP }}" />
                                                         <button type="submit" class="btn btn-outline-danger btn-sm shadow-sm px-2" title="Xóa vĩnh viễn">
@@ -320,7 +329,7 @@
         <div class="tab-pane fade {{ $tabCategoryPane }}" id="category-pane" role="tabpanel">
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
-                    <form action="{{ route('loaisanpham.them') }}" method="post" class="row g-2 mb-4 align-items-center bg-light p-3 rounded border">
+                    <form action="{{ url('/admin/loaisanpham/them') }}" method="post" class="row g-2 mb-4 align-items-center bg-light p-3 rounded border">
                         @csrf
                         <div class="col-auto"><label class="fw-bold text-secondary">Thêm mới:</label></div>
                         <div class="col-md-4"><input type="text" name="TenLoai" class="form-control form-control-sm" placeholder="Tên danh mục..." required /></div>
@@ -336,18 +345,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (isset($dsLoaiSanPham))
-                                @foreach ($dsLoaiSanPham as $loai)
+                            @if (isset($LoaiSanPhams))
+                                @foreach ($LoaiSanPhams as $loai)
                                     @php
-                                        $spDaDuyet = [];
-                                        if (isset($loai->sanPhams) && count($loai->sanPhams) > 0) {
-                                            foreach($loai->sanPhams as $sp_con) {
-                                                if ($sp_con->TrangThai == 'Đã duyệt') {
-                                                    $spDaDuyet[] = $sp_con;
-                                                }
-                                            }
-                                        }
-                                        $soLuong = count($spDaDuyet);
+                                        $spDaDuyet = $loai->sanPhams ? $loai->sanPhams->where('TrangThai', 'Đã duyệt') : collect();
+                                        $soLuong = $spDaDuyet->count();
                                     @endphp
                                     <tr>
                                         <td class="fw-bold text-dark bg-light"><i class="fa-regular fa-folder-open text-primary me-2"></i> {{ $loai->TenLoai }}</td>
@@ -372,7 +374,7 @@
                                         </td>
                                         <td class="text-center">
                                             <button class="btn btn-sm btn-outline-primary border-0" data-bs-toggle="modal" data-bs-target="#modalEdit-{{ $loai->MaLoai }}"><i class="fa-solid fa-pen-to-square"></i></button>
-                                            <form action="{{ route('loaisanpham.xoa') }}" method="post" class="d-inline" onsubmit="return confirm('Xóa {{ $loai->TenLoai }}?');">
+                                            <form action="{{ url('/loaisanpham/xoa') }}" method="post" class="d-inline" onsubmit="return confirm('Xóa {{ $loai->TenLoai }}?');">
                                                 @csrf
                                                 <input type="hidden" name="id" value="{{ $loai->MaLoai }}" />
                                                 <button class="btn btn-sm btn-outline-danger border-0"><i class="fa-solid fa-trash"></i></button>
@@ -389,8 +391,8 @@
     </div>
 </div>
 
-@if (isset($dsLoaiSanPham))
-    @foreach ($dsLoaiSanPham as $loai)
+@if (isset($LoaiSanPhams))
+    @foreach ($LoaiSanPhams as $loai)
         <div class="modal fade" id="modalEdit-{{ $loai->MaLoai }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-sm">
                 <div class="modal-content">
@@ -398,7 +400,7 @@
                         <h6 class="modal-title">Cập nhật tên</h6>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-                    <form action="{{ route('loaisanpham.sua') }}" method="post">
+                    <form action="{{ url('/loaisanpham/sua') }}" method="post">
                         @csrf
                         <div class="modal-body">
                             <input type="hidden" name="id" value="{{ $loai->MaLoai }}" />
@@ -414,9 +416,6 @@
     @endforeach
 @endif
 
-@endsection
-
-@section('scripts')
 <script>
     let currentFilter = 'all';
 

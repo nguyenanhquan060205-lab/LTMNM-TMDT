@@ -54,7 +54,7 @@ class TaiKhoanController extends Controller
         if ($user->VaiTro == 'Admin') {
             return redirect()->route('admin.index');
         } else {
-            return redirect()->route('home.index');
+            return redirect()->route('index');
         }
     }
 
@@ -215,7 +215,7 @@ class TaiKhoanController extends Controller
     {
         Session::forget('user');
         Session::forget('CartCount');
-        return redirect()->route('home.index');
+        return redirect()->route('index');
     }
 
     public function lichSu()
@@ -362,7 +362,7 @@ class TaiKhoanController extends Controller
             'MaHD' => $ct->MaHD,
             'MaSP' => $ct->MaSP,
             'TenSP' => $ct->sanPham->TenSP ?? '',
-            'Hinh' => HinhAnhSP::where('MaSP', $maSP)->value('DuongDan'), // simplified
+            'Hinh' => HinhAnhSP::where('MaSP', $maSP)->value('URLAnh'), // simplified
             'DaDanhGia' => $ct->DaDanhGia
         ];
 
@@ -409,7 +409,12 @@ class TaiKhoanController extends Controller
             })
             ->orderBy('NgayGui', 'desc')
             ->get();
+            
+        $dsKhieuNaiCuaToi = KhieuNai::with(['sanPham', 'nguoiDung'])
+            ->where('MaKH', $kh->MaKH)
+            ->orderBy('NgayGui', 'desc')
+            ->get();
 
-        return view('taikhoan.khieunai', compact('dsKhieuNai'));
+        return view('taikhoan.khieunai', compact('dsKhieuNai', 'dsKhieuNaiCuaToi'));
     }
 }

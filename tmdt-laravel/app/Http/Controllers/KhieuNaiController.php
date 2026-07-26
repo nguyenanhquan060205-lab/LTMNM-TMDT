@@ -14,10 +14,10 @@ class KhieuNaiController extends Controller
         $currentUser = Session::get('user');
         if (!$currentUser) return redirect()->route('taikhoan.dangnhap');
 
-        $sanPham = SanPham::find($idSanPham);
-        if (!$sanPham) abort(404);
+        $sp = SanPham::find($idSanPham);
+        if (!$sp) abort(404);
 
-        return view('khieunai.taokhieunai', compact('sanPham'));
+        return view('khieunai.taokhieunai', compact('sp'));
     }
 
     public function postTaoKhieuNai(Request $request, $idSanPham)

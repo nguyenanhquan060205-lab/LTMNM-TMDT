@@ -24,13 +24,13 @@ class AdminController extends Controller
     public function index()
     {
         $this->checkAdmin();
-        $TongTaiKhoan = NguoiDung::count();
-        $TongSanPham = SanPham::count();
-        $DaBan = SanPham::where('TrangThai', 'Đã bán')->count();
-        $An = SanPham::where('TrangThai', 'Ẩn')->count();
-        $TinDaDuyet = SanPham::where('TrangThai', 'Đã duyệt')->count();
+        $tongNguoiDung = NguoiDung::count();
+        $tongSanPham = SanPham::count();
+        $daban = SanPham::where('TrangThai', 'Đã bán')->count();
+        $an = SanPham::where('TrangThai', 'Ẩn')->count();
+        $tinDaDuyet = SanPham::where('TrangThai', 'Đã duyệt')->count();
 
-        return view('admin.index', compact('TongTaiKhoan', 'TongSanPham', 'DaBan', 'An', 'TinDaDuyet'));
+        return view('admin.index', compact('tongNguoiDung', 'tongSanPham', 'daban', 'an', 'tinDaDuyet'));
     }
 
     public function doiTrangThai(Request $request)
@@ -49,17 +49,17 @@ class AdminController extends Controller
     public function quanLyNguoiDung()
     {
         $this->checkAdmin();
-        $dsNguoiDung = NguoiDung::latest()->get();
+        $dsNguoiDung = NguoiDung::orderBy('MaKH', 'desc')->get();
         return view('admin.quanlynguoidung', compact('dsNguoiDung'));
     }
 
     public function quanLySanPham()
     {
         $this->checkAdmin();
-        $dsSanPham = SanPham::with('nguoiDung')->orderBy('MaSP', 'desc')->get();
-        $dsLoaiSanPham = LoaiSanPham::with('sanPhams')->get();
+        $SanPhams = SanPham::with('nguoiDung')->orderBy('MaSP', 'desc')->get();
+        $LoaiSanPhams = LoaiSanPham::with('sanPhams')->get();
 
-        return view('admin.quanlysanpham', compact('dsSanPham', 'dsLoaiSanPham'));
+        return view('admin.quanlysanpham', compact('SanPhams', 'LoaiSanPhams'));
     }
 
     public function quanLyDonHang()
@@ -72,7 +72,7 @@ class AdminController extends Controller
                 if ($hd->ctHoaDons->isNotEmpty() && $hd->ctHoaDons->first()->sanPham && $hd->ctHoaDons->first()->sanPham->nguoiDung) {
                     $nguoiBan = $hd->ctHoaDons->first()->sanPham->nguoiDung->HoTen;
                 }
-                return (object)[
+                return [
                     'MaHD' => $hd->MaHD,
                     'NguoiMua' => $hd->nguoiDung->HoTen ?? '',
                     'NguoiBan' => $nguoiBan,
@@ -92,11 +92,12 @@ class AdminController extends Controller
         return view('admin.quanlykhieunai', compact('dsKhieuNai'));
     }
 
-    public function capNhatTrangThaiKN(Request $request, $id)
+    public function capNhatTrangThaiKN(Request $request)
     {
         $user = Session::get('user');
         if (!$user || $user->VaiTro != 'Admin') abort(403);
 
+        $id = $request->input('id');
         $kn = KhieuNai::find($id);
         if (!$kn) abort(404);
 
@@ -107,11 +108,12 @@ class AdminController extends Controller
         return redirect()->route('admin.quanlykhieunai');
     }
 
-    public function xoaKhieuNai(Request $request, $id)
+    public function xoaKhieuNai(Request $request)
     {
         $user = Session::get('user');
         if (!$user || $user->VaiTro != 'Admin') abort(403);
 
+        $id = $request->input('id');
         $kn = KhieuNai::find($id);
         if (!$kn) abort(404);
 
@@ -119,9 +121,11 @@ class AdminController extends Controller
         return redirect()->route('admin.quanlykhieunai')->with('success', 'Đã xoá khiếu nại thành công!');
     }
 
-    public function xoa(Request $request, $id)
+    public function xoa(Request $request)
     {
         $this->checkAdmin();
+        
+        $id = $request->input('id');
         $sp = SanPham::find($id);
         if (!$sp) return redirect()->route('admin.quanlysanpham')->with('error', 'Sản phẩm không tồn tại!');
 

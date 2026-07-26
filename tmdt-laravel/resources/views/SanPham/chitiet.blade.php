@@ -59,8 +59,8 @@
         <!-- ====================== -->
         <div class="col-md-6">
 
-            <h3 class="fw-bold mb-2">{{ $sp->TenSP }}</h3>
-            <p class="text-danger fs-3 fw-bold">{{ number_format($sp->Gia, 0, ',', '.') }} ₫</p>
+            <h3 class="fw-bold mb-2 text-dark">{{ $sp->TenSP }}</h3>
+            <p class="fs-3 fw-bold" style="color: #0d6efd;">{{ number_format($sp->Gia, 0, ',', '.') }} ₫</p>
 
             <p><b>Mô tả:</b> {{ $sp->MoTa }}</p>
 
@@ -71,10 +71,16 @@
                 </span>
             </p>
 
+            <style>
+                .badge-custom { padding: 8px 14px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.5px; }
+                .badge-success-custom { background-color: #0d6efd; color: white; }
+                .badge-danger-custom { background-color: #1e293b; color: white; }
+                .badge-pending-custom { background-color: white; color: #1e293b; border: 1px solid #1e293b; }
+            </style>
             <p>
                 <b>Trạng thái:</b>
-                <span class="badge {{ $sp->TrangThai == 'Đã bán' ? 'bg-danger' :
-                                     ($sp->TrangThai == 'Đã duyệt' ? 'bg-success' : 'bg-secondary') }}">
+                <span class="badge badge-custom {{ $sp->TrangThai == 'Đã bán' ? 'badge-danger-custom' :
+                                     ($sp->TrangThai == 'Đã duyệt' ? 'badge-success-custom' : 'badge-pending-custom') }}">
                     {{ $sp->TrangThai }}
                 </span>
             </p>
@@ -114,11 +120,11 @@
             <div class="mt-4 d-flex flex-wrap gap-3">
                 @if ($sp->SoLuong > 0 && $sp->TrangThai != "Đã bán")
                     <a href="{{ route('giohang.them', ['id' => $sp->MaSP]) }}"
-                       class="btn btn-warning fw-bold text-dark px-4">
+                       class="btn btn-dark fw-bold px-4 rounded-pill shadow-sm">
                         <i class="bi bi-cart-plus"></i> Thêm vào giỏ
                     </a>
                 @else
-                    <button class="btn btn-secondary fw-bold px-4" disabled>
+                    <button class="btn btn-secondary fw-bold px-4 rounded-pill" disabled>
                         <i class="bi bi-x-circle"></i> Hết hàng
                     </button>
                 @endif
@@ -127,14 +133,14 @@
                         'idNguoiNhan' => $sp->nguoiDung->MaKH,
                         'maSP' => $sp->MaSP
                     ]) }}"
-                   class="btn btn-outline-primary fw-bold px-4">
+                   class="btn btn-outline-dark fw-bold px-4 rounded-pill">
                     <i class="bi bi-chat-dots"></i> Liên hệ
                 </a>
 
                 <!-- Nút khiếu nại: chỉ hiện nếu user KHÔNG PHẢI người bán -->
                 @if ($currentUser && $currentUser->MaKH != $sp->nguoiDung->MaKH)
-                    <a href="{{ route('khieunai.taokhieunai', ['idSanPham' => $sp->MaSP]) }}"
-                       class="btn btn-outline-danger fw-bold px-4">
+                    <a href="{{ route('khieunai.taokhieunai', ['idsanpham' => $sp->MaSP]) }}"
+                       class="btn btn-light text-danger border fw-bold px-4 rounded-pill shadow-sm">
                         <i class="bi bi-exclamation-triangle"></i> Khiếu nại
                     </a>
                 @endif
@@ -356,7 +362,7 @@
     }
 
     .thumb-active {
-        border-color: #ff9800 !important;
+        border-color: #0d6efd !important;
     }
 
     .img-nav {
@@ -424,6 +430,13 @@
         }
     }
 
+    @keyframes slideFade {
+        0% { opacity: 0.4; transform: translateX(20px); }
+        100% { opacity: 1; transform: translateX(0); }
+    }
+    .slide-anim {
+        animation: slideFade 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
 </style>
 @endsection
 
@@ -442,29 +455,59 @@
     let currentIndex = 0;
 
     function updateMainImg() {
-        document.getElementById("mainImg").src = "/Content/Images/" + images[currentIndex];
+        const mainImg = document.getElementById("mainImg");
+        
+        // Remove class to reset animation
+        mainImg.classList.remove("slide-anim");
+        
+        // Trigger DOM reflow to apply the animation again
+        void mainImg.offsetWidth;
+        
+        mainImg.src = "/Content/Images/" + images[currentIndex];
+        mainImg.classList.add("slide-anim");
 
         document.querySelectorAll(".thumb").forEach((t, i) => {
             t.classList.toggle("thumb-active", i === currentIndex);
         });
     }
 
+    let autoSlideInterval;
+
+    function startAutoSlide() {
+        if (images.length > 1) {
+            autoSlideInterval = setInterval(() => {
+                nextImage();
+            }, 5000);
+        }
+    }
+
+    function resetAutoSlide() {
+        if (autoSlideInterval) {
+            clearInterval(autoSlideInterval);
+            startAutoSlide();
+        }
+    }
+
     function changeImage(index) {
         currentIndex = index;
         updateMainImg();
+        resetAutoSlide();
     }
 
     function nextImage() {
         currentIndex = (currentIndex + 1) % images.length;
         updateMainImg();
+        resetAutoSlide();
     }
 
     function prevImage() {
         currentIndex = (currentIndex - 1 + images.length) % images.length;
         updateMainImg();
+        resetAutoSlide();
     }
 
     function openLightbox() {
+        if (autoSlideInterval) clearInterval(autoSlideInterval);
         const src = document.getElementById("mainImg").src;
         document.getElementById("lightboxImg").src = src;
         document.getElementById("lightbox").style.display = "flex";
@@ -472,6 +515,9 @@
 
     function closeLightbox() {
         document.getElementById("lightbox").style.display = "none";
+        startAutoSlide();
     }
+
+    document.addEventListener("DOMContentLoaded", startAutoSlide);
 </script>
 @endsection

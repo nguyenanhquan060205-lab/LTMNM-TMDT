@@ -1,31 +1,24 @@
-{{-- @model ThuongMaiDienTu_DoAn.Models.LOAISANPHAM --}}
+@extends('Shared._LayoutAdmin')
+@section('title', 'Xóa loại sản phẩm')
 
-@extends('shared._layout')
+@section('content')
+<h2>Xóa</h2>
 
-<h2>Delete</h2>
-
-<h3>Are you sure you want to delete this?</h3>
+<h3>Bạn có chắc chắn muốn xóa loại sản phẩm này?</h3>
 <div>
-    <h4>LOAISANPHAM</h4>
+    <h4>Loại Sản Phẩm</h4>
     <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.TenLoai)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.TenLoai)
-        </dd>
-
+    <dl class="row">
+        <dt class="col-sm-3">Tên Loại:</dt>
+        <dd class="col-sm-9">{{ $model->TenLoai ?? '' }}</dd>
     </dl>
 
-    @using (Html.BeginForm()) {
-        @Html.AntiForgeryToken()
-
-        <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn btn-default" /> |
-            @Html.ActionLink("Back to List", "Index")
+    <form action="{{ url('/LoaiSanPham/Xoa/' . ($model->MaLoai ?? '')) }}" method="POST">
+        @csrf
+        <div class="form-actions no-color mt-3">
+            <input type="submit" value="Xóa" class="btn btn-danger" />
+            <a href="{{ url('/loaisanpham/index') }}" class="btn btn-secondary ms-2">Quay lại danh sách</a>
         </div>
-    }
+    </form>
 </div>
-
+@endsection

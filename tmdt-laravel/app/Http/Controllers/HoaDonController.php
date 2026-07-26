@@ -19,6 +19,11 @@ class HoaDonController extends Controller
         $kh = Session::get('user');
         if (!$kh) return redirect()->route('taikhoan.dangnhap');
 
+        if (empty(trim($kh->DiaChi))) {
+            return redirect()->route('taikhoan.thongtinkhachhang')
+                ->with('Error', 'Vui lòng cập nhật địa chỉ giao hàng trước khi thanh toán.');
+        }
+
         $gio = GioHang::with('ctGioHangs.sanPham')->where('MaKH', $kh->MaKH)->first();
 
         if (!$gio || $gio->ctGioHangs->isEmpty()) {
@@ -91,15 +96,15 @@ class HoaDonController extends Controller
         $ct = CtHoaDon::with('sanPham')->where('MaHD', $mahd)->where('MaSP', $masp)->first();
 
         if (!$ct) {
-            return redirect()->route('hoadon.chitiet', $mahd)->with('error', 'Không tìm thấy sản phẩm.');
+            return redirect()->route('sanpham.ctsanphamdaban', $mahd)->with('error', 'Không tìm thấy sản phẩm.');
         }
 
         if ($ct->sanPham->MaKH != $user->MaKH) {
-            return redirect()->route('hoadon.chitiet', $mahd)->with('error', 'Bạn không có quyền xác nhận sản phẩm này.');
+            return redirect()->route('sanpham.ctsanphamdaban', $mahd)->with('error', 'Bạn không có quyền xác nhận sản phẩm này.');
         }
 
         if ($ct->TrangThaiCT == 'Đã xác nhận') {
-            return redirect()->route('hoadon.chitiet', $mahd)->with('error', 'Sản phẩm này đã được xác nhận.');
+            return redirect()->route('sanpham.ctsanphamdaban', $mahd)->with('error', 'Sản phẩm này đã được xác nhận.');
         }
 
         $ct->TrangThaiCT = 'Đã xác nhận';
@@ -112,12 +117,12 @@ class HoaDonController extends Controller
             $hd->TrangThai = 'Đã thanh toán';
             $hd->NgayTT = now();
             $hd->save();
-            Session::flash('OK', 'Tất cả sản phẩm đã xác nhận. Đơn hàng hoàn tất!');
+            Session::flash('success', 'Tất cả sản phẩm đã xác nhận. Đơn hàng hoàn tất!');
         } else {
-            Session::flash('OK', 'Xác nhận thành công! Vẫn còn sản phẩm chưa xác nhận.');
+            Session::flash('success', 'Xác nhận thành công! Vẫn còn sản phẩm chưa xác nhận.');
         }
 
-        return redirect()->route('hoadon.chitiet', $mahd);
+        return redirect()->route('sanpham.ctsanphamdaban', $mahd);
     }
 
     public function huyDon(Request $request, $id)

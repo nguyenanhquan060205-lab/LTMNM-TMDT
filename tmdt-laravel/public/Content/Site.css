@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    TECHSECOND - CSS HOÀN CHỈNH
 ============================================ */
 
@@ -6,13 +6,13 @@
    1. GLOBAL & RESET
 ============================================ */
 :root {
-    --primary-color: #667eea;
-    --secondary-color: #764ba2;
-    --success-color: #48bb78;
+    --primary-color: #0d6efd;
+    --secondary-color: #0b5ed7;
+    --success-color: #198754;
     --warning-color: #ffc107;
-    --danger-color: #f56565;
-    --dark-color: #2d3748;
-    --light-bg: #f7fafc;
+    --danger-color: #dc3545;
+    --dark-color: #212529;
+    --light-bg: #f8f9fa;
 }
 
 * {
@@ -27,43 +27,67 @@ html, body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* ✅ Tùy chỉnh thanh trượt (Scrollbar) cho đồng bộ tông màu */
+::-webkit-scrollbar {
+    width: 12px;
+}
+::-webkit-scrollbar-track {
+    background: #f8f9fa;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #adb5bd;
+    border-radius: 10px;
+    border: 3px solid #f8f9fa;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: #6c757d;
+}
+
 /* ✅ Background mượt mà */
 body {
-    background: linear-gradient( to bottom, #5e68e8 0%, #7580ed 5%, #8b96f2 10%, #a1acf7 15%, #b7c2fc 20%, #cdd8ff 25%, #dde5ff 30%, #eaefff 35%, #f5f7ff 40%, #fbfcff 45%, #ffffff 50%, #fbfcff 55%, #f5f7ff 60%, #eaefff 65%, #dde5ff 70%, #cdd8ff 75%, #b7c2fc 80%, #a1acf7 85%, #8b96f2 90%, #7580ed 95%, #5e68e8 100% ) !important;
+    background: #f8f9fa !important;
     background-attachment: fixed;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #212529;
 }
 
 main {
-    flex: 1;
+    flex: 1 0 auto;
+}
+
+footer {
+    flex-shrink: 0;
 }
 
 /* ============================================
    2. NAVBAR
 ============================================ */
 .navbar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    background: #ffffff !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     padding: 1rem 0 !important;
     position: sticky !important;
     top: 0;
     z-index: 1050;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 .navbar-brand {
-    color: white !important;
+    color: #212529 !important;
     font-size: 1.8rem !important;
-    font-weight: 700 !important;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s;
+    font-weight: 800 !important;
+    transition: transform 0.3s, color 0.3s;
 }
 
     .navbar-brand:hover {
         transform: scale(1.05);
-        color: #ffc107 !important;
+        color: var(--primary-color) !important;
     }
 
     .navbar-brand i {
+        color: var(--primary-color);
         animation: bounce 2s infinite;
     }
 
@@ -78,8 +102,8 @@ main {
 }
 
 .nav-link {
-    color: rgba(255, 255, 255, 0.9) !important;
-    font-weight: 500 !important;
+    color: #495057 !important;
+    font-weight: 600 !important;
     padding: 0.5rem 1rem !important;
     border-radius: 8px;
     transition: all 0.3s;
@@ -101,51 +125,55 @@ main {
     .nav-link:hover::after,
     .nav-link.active::after {
         width: 80%;
+        background: var(--primary-color);
     }
 
     .nav-link:hover {
-        background: rgba(255, 255, 255, 0.15);
-        color: white !important;
+        background: rgba(13, 110, 253, 0.05);
+        color: var(--primary-color) !important;
     }
 
     .nav-link.active {
-        background: rgba(255, 255, 255, 0.2);
-        color: #ffc107 !important;
+        background: rgba(13, 110, 253, 0.1);
+        color: var(--primary-color) !important;
     }
 
 .navbar .form-control {
     border-radius: 25px !important;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
+    border: 1px solid #ced4da;
+    background: #f8f9fa;
+    color: #212529;
     padding: 0.6rem 1.2rem;
-    backdrop-filter: blur(10px);
     transition: all 0.3s;
 }
 
     .navbar .form-control::placeholder {
-        color: rgba(255, 255, 255, 0.7);
+        color: #6c757d;
     }
 
     .navbar .form-control:focus {
-        background: rgba(255, 255, 255, 0.25);
-        border-color: rgba(255, 255, 255, 0.5);
-        box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
-        color: white;
+        background: #ffffff;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        color: #212529;
     }
 
-.navbar .btn-warning {
-    border-radius: 20px !important;
-    font-weight: 600;
-    padding: 0.5rem 1.2rem;
-    box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
-    transition: all 0.3s;
+.nav-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: #4a5568;
+    background: #f8f9fa;
+    transition: all 0.2s ease;
+    text-decoration: none;
 }
-
-    .navbar .btn-warning:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(255, 193, 7, 0.5);
-    }
+.nav-icon-btn:hover {
+    background: rgba(13, 110, 253, 0.1);
+    color: var(--primary-color);
+}
 
 .navbar .rounded-circle {
     border: 2px solid white;
@@ -173,7 +201,7 @@ main {
 }
 
     .dropdown-item:hover {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--primary-color);
         color: white !important;
         transform: translateX(5px);
     }
@@ -237,10 +265,7 @@ main {
 }
 
 .text-danger {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 700 !important;
+    color: var(--danger-color) !important;
 }
 
 .badge {
@@ -266,57 +291,64 @@ main {
    4. BUTTONS
 ============================================ */
 .btn {
-    border-radius: 12px;
-    padding: 0.7rem 1.5rem;
-    font-weight: 600;
-    transition: all 0.3s;
+    border-radius: 8px;
+    padding: 0.5rem 1.2rem;
+    font-weight: 500;
+    transition: all 0.2s;
     border: none;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    background: var(--primary-color) !important;
+    color: white !important;
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.1);
 }
 
     .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        background: var(--secondary-color) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
     }
 
 .btn-success {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+    background: var(--success-color) !important;
+    color: white !important;
 }
 
     .btn-success:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(79, 172, 254, 0.6);
+        background: #157347 !important;
+        transform: translateY(-1px);
     }
 
 .btn-warning {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    color: #2d3748 !important;
-    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+    background: var(--warning-color) !important;
+    color: #212529 !important;
 }
 
     .btn-warning:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(255, 193, 7, 0.6);
+        background: #ffca2c !important;
+        transform: translateY(-1px);
     }
 
 .btn-danger {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    box-shadow: 0 4px 15px rgba(245, 85, 108, 0.4);
+    background: var(--danger-color) !important;
+    color: white !important;
 }
 
     .btn-danger:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(245, 85, 108, 0.6);
+        background: #bb2d3b !important;
+        transform: translateY(-1px);
     }
 
 .btn-secondary {
-    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+    background: #6c757d !important;
+    color: white !important;
 }
+    
+    .btn-secondary:hover {
+        background: #5c636a !important;
+        transform: translateY(-1px);
+    }
 
 /* ============================================
    5. FORMS
@@ -348,9 +380,7 @@ main {
 }
 
 .card-body h4 {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #212529;
     font-weight: 700;
 }
 
@@ -363,11 +393,11 @@ main {
 }
 
     .table thead th {
-        background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%) !important;
-        color: white !important;
+        background: #f8f9fa !important;
+        color: #495057 !important;
         font-weight: 600;
         padding: 1rem;
-        border: none;
+        border-bottom: 2px solid #dee2e6;
     }
 
 .table-hover tbody tr {
@@ -388,54 +418,54 @@ main {
    7. ALERTS
 ============================================ */
 .alert {
-    border: none;
-    border-radius: 15px;
+    border-radius: 12px;
     padding: 1rem 1.5rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .alert-success {
-    background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
-    color: #1e4620;
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
 }
 
 .alert-danger {
-    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-    color: #7f1d1d;
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
 }
 
 .alert-info {
-    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-    color: #1e3a8a;
+    background-color: #cff4fc;
+    color: #055160;
+    border: 1px solid #b6effb;
 }
 
 .alert-warning {
-    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
-    color: #78350f;
+    background-color: #fff3cd;
+    color: #664d03;
+    border: 1px solid #ffecb5;
 }
 
 /* ============================================
    8. FOOTER
 ============================================ */
 footer {
-    background: linear-gradient(135deg, #1f1c2c 0%, #2d2847 100%) !important;
-    color: rgba(255, 255, 255, 0.8) !important;
+    background: #ffffff !important;
+    color: #6c757d !important;
     padding: 3rem 0 1.5rem !important;
     margin-top: auto !important;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    border-top: 1px solid #e9ecef;
 }
 
     footer a {
-        color: #ffc107 !important;
+        color: #495057 !important;
         transition: all 0.3s;
         text-decoration: none;
     }
 
         footer a:hover {
-            color: white !important;
+            color: var(--primary-color) !important;
             text-decoration: none;
-            transform: translateX(5px);
-            display: inline-block;
         }
 
     footer p {

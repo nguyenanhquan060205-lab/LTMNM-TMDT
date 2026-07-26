@@ -2,19 +2,31 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class NguoiDung extends Model
+class NguoiDung extends Authenticatable
 {
-    use HasFactory;
-
-    protected $table = "nguoi_dungs";
-    protected $primaryKey = "MaKH";
+    protected $table = 'NGUOIDUNG';
+    protected $primaryKey = 'MaKH';
+    public $timestamps = false;
     protected $guarded = [];
+    protected $casts = [
+        'Khoa' => 'boolean',
+    ];
 
-    public function hoaDons() { return $this->hasMany(HoaDon::class, "MaKH", "MaKH"); }
-    public function sanPhams() { return $this->hasMany(SanPham::class, "MaKH", "MaKH"); }
-    public function gioHang() { return $this->hasOne(GioHang::class, "MaKH", "MaKH"); }
-    
+    public function getAuthPasswordName()
+    {
+        return 'MatKhau';
+    }
+
+    public function getAuthPassword()
+    {
+        return $this->MatKhau;
+    }
+
+    public function sanPhams() { return $this->hasMany(SanPham::class, 'MaKH', 'MaKH'); }
+    public function gioHang() { return $this->hasOne(GioHang::class, 'MaKH', 'MaKH'); }
+    public function hoaDons() { return $this->hasMany(HoaDon::class, 'MaKH', 'MaKH'); }
+    public function danhGias() { return $this->hasMany(DanhGia::class, 'MaKH', 'MaKH'); }
+    public function khieuNais() { return $this->hasMany(KhieuNai::class, 'MaKH', 'MaKH'); }
 }

@@ -1,102 +1,114 @@
-@extends('layouts.admin')
-
+@extends('Shared._LayoutAdmin')
 @section('title', 'Quản lý khiếu nại')
 
 @section('content')
 <style>
-    /* TAB */
+    /* Tabs hiện đại */
+    .nav-tabs {
+        border-bottom: 2px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+    }
     .nav-tabs .nav-link {
-        color: #6c757d;
+        color: #718096;
         font-weight: 600;
         border: none;
-        padding: 12px 20px;
-        transition: 0.2s;
+        padding: 12px 24px;
+        transition: all 0.3s ease;
+        border-radius: 10px 10px 0 0;
+        position: relative;
+    }
+    .nav-tabs .nav-link:hover {
+        color: #4a5568;
+        background: #edf2f7;
+    }
+    .nav-tabs .nav-link.active {
+        color: #667eea;
+        background: transparent;
+    }
+    .nav-tabs .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 3px 3px 0 0;
     }
 
-        .nav-tabs .nav-link.active {
-            color: #0d6efd;
-            border-bottom: 3px solid #0d6efd;
-            background: transparent;
-        }
-
-        .nav-tabs .nav-link:hover {
-            color: #0a58ca;
-        }
-
-    /* TABLE */
+    /* Bảng sang trọng */
+    .card {
+        border: 1px solid rgba(0,0,0,0.05);
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+        overflow: hidden;
+    }
     .table th {
-        background-color: #f8f9fa;
-        color: #495057;
+        background: #f8f9fa;
+        color: #4a5568;
         font-weight: 700;
         text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: .5px;
+        font-size: .85rem;
         cursor: pointer;
         user-select: none;
-        vertical-align: middle;
+        padding: 16px;
+        border-bottom: 2px solid #edf2f7;
     }
-
-        .table th:hover {
-            background: #e9ecef;
-            color: #0d6efd;
-        }
-
+    .table th:hover {
+        background: #edf2f7;
+        color: #667eea;
+    }
     .table td {
+        padding: 16px;
         vertical-align: middle;
+        border-bottom: 1px solid #edf2f7;
+        font-size: 0.95rem;
     }
 
-    /* SEARCH BOX */
-    .search-box .input-group-text {
-        background-color: #fff;
-        border-right: none;
-        color: #aaa;
+    .badge {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
     }
 
-    .search-box .form-control {
-        border-left: none;
-        box-shadow: none;
+    /* Lọc trạng thái */
+    .filter-section {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 24px;
+        border: 1px solid #edf2f7;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
     }
-
-    /* FILTER BUTTONS */
     .ts-filter-btn {
-        border: 1px solid #d0d5dd;
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid #e2e8f0;
         background: #fff;
-        padding: 6px 14px;
+        padding: 8px 16px;
         border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 500;
+        font-size: 0.875rem;
+        font-weight: 600;
         cursor: pointer;
-        transition: .15s;
-        color: #555;
+        transition: all 0.3s ease;
+        color: #4a5568;
+    }
+    .ts-filter-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border-color: #cbd5e0;
+    }
+    .ts-filter-btn.active {
+        border-color: #667eea;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        color: #5a67d8;
     }
 
-        .ts-filter-btn:hover {
-            background: #f1f4f8;
-        }
-
-        .ts-filter-btn.active {
-            border-color: #0d6efd;
-            background: #e7f0ff;
-            color: #0d6efd;
-        }
-
-    .ts-warning {
-        border-color: #e4a11b;
-        color: #e4a11b;
-    }
-
-        .ts-warning.active {
-            background: #fff3cd;
-        }
-
-    .ts-success {
-        border-color: #198754;
-        color: #198754;
-    }
-
-        .ts-success.active {
-            background: #d1f3e0;
-        }
+    .ts-warning { border-color: #f6ad55; color: #dd6b20; }
+    .ts-warning.active { background: #fffaf0; border-color: #dd6b20; }
+    .ts-success { border-color: #68d391; color: #2f855a; }
+    .ts-success.active { background: #f0fff4; border-color: #2f855a; }
 </style>
 
 <div class="container-fluid px-4 mt-4 pb-5">
@@ -110,38 +122,30 @@
                 </button>
             </li>
         </ul>
-
     </div>
 
     <!-- FILTER -->
-    <div class="bg-white p-3 rounded border mb-3 d-flex flex-wrap gap-2 align-items-center">
-
-        <div class="fw-bold text-secondary d-flex align-items-center me-2">
-            <i class="fa-solid fa-filter text-muted me-2"></i> Lọc theo trạng thái:
-        </div>
-
-        <button class="ts-filter-btn active" onclick="filterStatus('all', this)">
-            <i class="fa-solid fa-list me-1"></i> Tất cả
-        </button>
-
-        <button class="ts-filter-btn ts-warning" onclick="filterStatus('Chưa xử lý', this)">
-            <i class="fa-solid fa-clock me-1"></i> Chưa xử lý
-        </button>
-
-        <button class="ts-filter-btn ts-success" onclick="filterStatus('Đã giải quyết', this)">
-            <i class="fa-solid fa-check-circle me-1"></i> Đã giải quyết
-        </button>
-        <div class="input-group search-box" style="max-width: 300px;">
-            <span class="input-group-text"><i class="fa-solid fa-search"></i></span>
-            <input type="text" id="searchInput" class="form-control" placeholder="Tìm người gửi, nội dung...">
-        </div>
-
-        <div class="ms-auto">
-            <button class="btn btn-outline-secondary btn-sm" onclick="resetFilters()">
-                <i class="fa-solid fa-rotate-right me-1"></i> Reset
+    <div class="filter-section d-flex flex-wrap gap-3 align-items-center mb-4">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="text-muted fw-bold me-2"><i class="fa-solid fa-filter me-1"></i> Lọc trạng thái:</span>
+            <button class="ts-filter-btn active" onclick="filterStatus('all', this)">
+                <i class="fa-solid fa-list me-1"></i> Tất cả
+            </button>
+            <button class="ts-filter-btn ts-warning" onclick="filterStatus('Chưa xử lý', this)">
+                <i class="fa-solid fa-clock me-1"></i> Chưa xử lý
+            </button>
+            <button class="ts-filter-btn ts-success" onclick="filterStatus('Đã giải quyết', this)">
+                <i class="fa-solid fa-check-circle me-1"></i> Đã giải quyết
             </button>
         </div>
 
+        <div class="input-group search-box" style="max-width: 300px; margin-left: auto;">
+            <span class="input-group-text"><i class="fa-solid fa-search"></i></span>
+            <input type="text" id="searchInput" class="form-control" placeholder="Tìm người gửi, nội dung...">
+            <button class="btn btn-outline-secondary" onclick="resetFilters()">
+                <i class="fa-solid fa-rotate-right"></i> Reset
+            </button>
+        </div>
     </div>
 
     <!-- TABLE -->
@@ -168,20 +172,20 @@
                     </thead>
 
                     <tbody id="tableBody">
-                        @if (isset($dsKhieuNai) && count($dsKhieuNai) > 0)
+                        @if ($dsKhieuNai && $dsKhieuNai->count() > 0)
                             @foreach ($dsKhieuNai as $item)
                                 @php
-                                    $badgeClass = $item->TrangThai == "Đã giải quyết" ? "bg-success" : "bg-warning text-dark";
+                                    $badgeClass = $item->TrangThai == 'Đã giải quyết' ? 'bg-success' : 'bg-warning text-dark';
                                 @endphp
 
                                 <tr class="status-row text-center" data-status="{{ $item->TrangThai }}">
                                     <td class="text-start fw-bold text-dark" style="padding-left:20px;">
                                         <i class="fa-solid fa-user me-2 text-muted"></i>
-                                        {{ $item->nguoiDung->HoTen ?? "Ẩn danh" }}
+                                        {{ $item->nguoiDung->HoTen ?? 'Ẩn danh' }}
                                     </td>
 
                                     <td class="text-start text-primary fw-semibold">
-                                        {{ $item->sanPham->TenSP ?? "Sản phẩm đã xóa" }}
+                                        {{ $item->sanPham->TenSP ?? 'Sản phẩm đã xóa' }}
                                     </td>
 
                                     <td class="text-start text-muted small">{{ $item->MoTa }}</td>
@@ -197,30 +201,36 @@
                                     </td>
 
                                     <td>
-                                        @if ($item->TrangThai == "Chưa xử lý" || $item->TrangThai == "Đang chờ xử lý" || $item->TrangThai == "Đang chờ xữ lý")
-                                            <form action="{{ route('admin.capnhattrangthaikn') }}" method="post">
-                                                @csrf
-                                                <input type="hidden" name="id" value="{{ $item->MaKN }}" />
-                                                <button type="submit" class="btn btn-success btn-sm fw-bold" style="width:100px;">
-                                                    Xử lý xong
-                                                </button>
-                                            </form>
-                                        @else
-                                            <button type="button" class="btn btn-light btn-sm text-muted border" style="width:100px;" disabled>
-                                                Hoàn tất
-                                            </button>
-                                            <form action="{{ route('admin.xoakhieunai') }}"
-                                                  method="post"
-                                                  onsubmit="return confirm('Bạn có chắc chắn muốn xoá khiếu nại này?');"
-                                                  style="display:inline-block">
-                                                @csrf
-                                                <input type="hidden" name="id" value="{{ $item->MaKN }}" />
-
-                                                <button type="submit" class="btn btn-danger btn-sm fw-bold" style="width:100px;">
-                                                    Xoá
-                                                </button>
-                                            </form>
-                                        @endif
+                                        <div class="d-flex justify-content-center align-items-center gap-2">
+                                            <!-- Nút Chat -->
+                                            <a href="{{ url('/tinnhan/chat?idNguoiNhan=' . $item->MaKH) }}" class="btn btn-light text-primary border rounded-circle shadow-sm d-flex align-items-center justify-content-center" title="Chat với Người Mua" target="_blank" style="width: 38px; height: 38px;">
+                                                <i class="fa-solid fa-user-tag"></i>
+                                            </a>
+                                            <a href="{{ url('/tinnhan/chat?idNguoiNhan=' . ($item->sanPham->MaKH ?? '')) }}" class="btn btn-light text-info border rounded-circle shadow-sm d-flex align-items-center justify-content-center" title="Chat với Người Bán" target="_blank" style="width: 38px; height: 38px;">
+                                                <i class="fa-solid fa-store"></i>
+                                            </a>
+                                            
+                                            <div class="vr mx-1 text-muted"></div>
+                                            
+                                            <!-- Nút Thao tác -->
+                                            @if ($item->TrangThai == 'Chưa xử lý')
+                                                <form action="{{ url('/admin/capnhattrangthaikn') }}" method="post" class="m-0">
+                                                    @csrf
+                                                    <input type="hidden" name="id" value="{{ $item->MaKN }}" />
+                                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 shadow-sm fw-bold">
+                                                        <i class="fa-solid fa-check me-1"></i> Xong
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <form action="{{ url('/admin/xoakhieunai') }}" method="post" class="m-0" onsubmit="return confirm('Bạn có chắc chắn muốn xoá khiếu nại này?');">
+                                                    @csrf
+                                                    <input type="hidden" name="id" value="{{ $item->MaKN }}" />
+                                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm fw-bold">
+                                                        <i class="fa-solid fa-trash-can me-1"></i> Xoá
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -239,9 +249,7 @@
         </div>
     </div>
 </div>
-@endsection
 
-@section('scripts')
 <script>
     // SEARCH
     document.getElementById('searchInput').addEventListener('keyup', function () {
@@ -315,3 +323,4 @@
 
 </script>
 @endsection
+

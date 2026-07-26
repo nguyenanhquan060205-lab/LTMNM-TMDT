@@ -1,5 +1,4 @@
-@extends('layouts.app')
-
+@extends('Shared._Layout')
 @section('title', 'Đánh giá sản phẩm')
 
 @section('content')
@@ -13,11 +12,11 @@
         transition: 0.2s;
     }
 
-        .rating-box .star:hover,
-        .rating-box .star.active {
-            color: #ffc107;
-            transform: scale(1.2);
-        }
+    .rating-box .star:hover,
+    .rating-box .star.active {
+        color: #ffc107;
+        transform: scale(1.2);
+    }
 
     .review-card {
         max-width: 850px;
@@ -35,20 +34,19 @@
         gap: 25px;
     }
 
-        .product-preview img {
-            width: 150px;
-            height: 150px;
-            border-radius: 15px;
-            object-fit: cover;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
+    .product-preview img {
+        width: 150px;
+        height: 150px;
+        border-radius: 15px;
+        object-fit: cover;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
 
     @keyframes fadeIn {
         from {
             opacity: 0;
             transform: translateY(15px);
         }
-
         to {
             opacity: 1;
             transform: translateY(0);
@@ -64,16 +62,15 @@
         </h2>
 
         <div class="product-preview mb-4">
-            <img src="{{ asset('Content/Images/' . $vm->Hinh) }}" />
+            <img src="{{ url('Content/Images/' . ($vm->Hinh ?? 'no-image.jpg')) }}" />
             <div>
-                <h4 class="fw-bold">{{ $vm->TenSP }}</h4>
+                <h4 class="fw-bold">{{ $vm->TenSP ?? '' }}</h4>
                 <div class="text-muted">Hãy chia sẻ cảm nhận thực tế về sản phẩm!</div>
             </div>
         </div>
 
-        <form method="POST" action="{{ route('taikhoan.postdanhgia', ['maHD' => $vm->MaHD, 'maSP' => $vm->MaSP]) }}">
+        <form action="{{ route('taikhoan.danhgia', ['mahd' => $vm->MaHD, 'masp' => $vm->MaSP]) }}" method="POST">
             @csrf
-
             <input type="hidden" name="maHD" value="{{ $vm->MaHD }}" />
             <input type="hidden" name="maSP" value="{{ $vm->MaSP }}" />
             <input type="hidden" name="soSao" id="ratingValue" value="" />
@@ -99,7 +96,7 @@
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-                <a href="{{ route('taikhoan.ct_lichsu', ['id' => $vm->MaHD]) }}"
+                <a href="{{ url('/TaiKhoan/CT_LichSu/' . ($MaHD ?? '')) }}"
                    class="btn btn-secondary btn-back">
                     <i class="bi bi-arrow-left"></i> Quay lại
                 </a>
@@ -112,9 +109,7 @@
 
     </div>
 </div>
-@endsection
 
-@section('scripts')
 <script>
     const stars = document.querySelectorAll(".star");
     const ratingInput = document.getElementById("ratingValue");
@@ -122,15 +117,11 @@
 
     stars.forEach(star => {
         star.addEventListener("click", () => {
-
-            // set value
             const rating = star.dataset.value;
             ratingInput.value = rating;
 
-            // remove old active
             stars.forEach(s => s.classList.remove("active"));
 
-            // active clicked stars
             for (let i = 0; i < rating; i++) {
                 stars[i].classList.add("active");
             }
@@ -139,7 +130,6 @@
         });
     });
 
-    // Prevent submit if no star selected
     document.querySelector("form").addEventListener("submit", (e) => {
         if (!ratingInput.value || ratingInput.value === "0") {
             e.preventDefault();
@@ -149,4 +139,3 @@
     });
 </script>
 @endsection
-

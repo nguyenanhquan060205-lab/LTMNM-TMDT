@@ -1,38 +1,148 @@
-@extends('layouts.app')
-
+@extends('Shared._Layout')
 @section('title', 'Đăng nhập')
 
 @section('content')
-<div class="row justify-content-center mt-5">
-    <div class="col-md-4">
-        <div class="card shadow">
-            <div class="card-body">
-                <h4 class="text-center mb-3">Đăng nhập</h4>
+<style>
+    /* Nền chung nếu muốn bao phủ toàn màn hình */
+    .auth-wrapper {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 1rem;
+        animation: fadeIn 0.8s ease-out;
+    }
 
-                @if (session('error'))
-                    <div class="alert alert-danger">{{ session('error') }}</div>
-                @endif
-                @if (session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
+    /* Hiệu ứng xuất hiện */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-                <form method="post" action="{{ route('taikhoan.dangnhap') }}">
-                    @csrf
-                    <div class="mb-3">
-                        <label>Tài khoản</label>
-                        <input name="taikhoan" class="form-control" required />
-                    </div>
-                    <div class="mb-3">
-                        <label>Mật khẩu</label>
-                        <input name="matkhau" type="password" class="form-control" required />
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
-                </form>
+    /* Thẻ Glassmorphism */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.6) !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0,0,0,0.05) !important;
+        border-radius: 24px !important;
+        overflow: hidden;
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        max-width: 420px;
+    }
 
-                <p class="text-center mt-3">
-                    Chưa có tài khoản? <a href="{{ route('taikhoan.dangky') }}">Đăng ký ngay</a>
-                </p>
+    .glass-card::before {
+        content: '';
+        position: absolute;
+        top: -50%; left: -50%;
+        width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+        transform: rotate(30deg);
+        pointer-events: none;
+    }
+
+    /* Input hiện đại */
+    .modern-input {
+        background: rgba(255, 255, 255, 0.6) !important;
+        border: 2px solid transparent !important;
+        border-radius: 14px !important;
+        padding: 0.8rem 1.2rem !important;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    
+    .modern-input:focus {
+        background: white !important;
+        border-color: #0d6efd !important;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15), inset 0 2px 4px rgba(0,0,0,0.02) !important;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.9rem;
+        margin-left: 0.4rem;
+    }
+
+    /* Nút gradient hiện đại */
+    .btn-gradient {
+        background-color: #0d6efd;
+        color: white;
+        border: none;
+        border-radius: 14px;
+        padding: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+    }
+
+    .btn-gradient:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
+        background-color: #0b5ed7;
+        color: white;
+    }
+
+    /* Trang trí icon */
+    .auth-icon {
+        color: #0d6efd;
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .auth-link {
+        color: #0d6efd;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .auth-link:hover {
+        color: #0b5ed7;
+        text-decoration: underline;
+    }
+</style>
+
+<div class="auth-wrapper">
+    <div class="glass-card">
+        <div class="p-4 p-sm-5">
+            <div class="text-center">
+                <i class="fa-solid fa-circle-user auth-icon"></i>
+                <h3 class="fw-bold text-dark mb-4" style="letter-spacing: -0.5px;">Chào mừng trở lại!</h3>
             </div>
+
+            @if (session('error') || session('Error'))
+                <div class="alert alert-danger" style="border-radius: 12px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>{{ session('error') ?? session('Error') }}
+                </div>
+            @endif
+            @if (session('success') || session('Success'))
+                <div class="alert alert-success" style="border-radius: 12px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-circle-check me-2"></i>{{ session('success') ?? session('Success') }}
+                </div>
+            @endif
+
+            <form method="post" action="{{ url('/taikhoan/dangnhap') }}">
+                @csrf
+                <div class="mb-4">
+                    <label class="form-label"><i class="fa-solid fa-user me-2 text-muted"></i>Tài khoản</label>
+                    <input name="taikhoan" class="form-control modern-input" placeholder="Nhập tên tài khoản..." required />
+                </div>
+                <div class="mb-4">
+                    <label class="form-label"><i class="fa-solid fa-lock me-2 text-muted"></i>Mật khẩu</label>
+                    <input name="matkhau" type="password" class="form-control modern-input" placeholder="Nhập mật khẩu..." required />
+                </div>
+                <button type="submit" class="btn btn-gradient w-100 mt-2">
+                    Đăng nhập <i class="fa-solid fa-arrow-right ms-2"></i>
+                </button>
+            </form>
+
+            <p class="text-center mt-4 mb-0" style="color: #718096; font-size: 0.95rem;">
+                Chưa có tài khoản? <a href="{{ url('/taikhoan/dangky') }}" class="auth-link">Đăng ký ngay</a>
+            </p>
         </div>
     </div>
 </div>
