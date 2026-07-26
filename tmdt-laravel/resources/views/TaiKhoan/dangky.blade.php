@@ -2,57 +2,178 @@
 @section('title', 'Đăng ký')
 
 @section('content')
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="card shadow">
-            <div class="card-body">
-                <h4 class="text-center mb-3">Đăng ký</h4>
+<style>
+    /* Nền chung */
+    .auth-wrapper {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 1rem;
+        animation: fadeIn 0.8s ease-out;
+    }
 
-                @if (session('error') || session('Error'))
-                    <div class="alert alert-danger">{{ session('error') ?? session('Error') }}</div>
-                @endif
-                @if (session('success') || session('Success'))
-                    <div class="alert alert-success">{{ session('success') ?? session('Success') }}</div>
-                @endif
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-                <form method="post" action="{{ url('/taikhoan/dangky') }}">
-                    @csrf
-                    <div class="mb-3">
-                        <label>Họ tên</label>
-                        <input class="form-control" name="HoTen" required />
-                    </div>
-                    <div class="mb-3">
-                        <label>Tài khoản</label>
-                        <input class="form-control" name="TaiKhoan" required />
-                    </div>
-                    <div class="mb-3">
-                        <label>Mật khẩu</label>
-                        <input class="form-control" name="MatKhau" type="password" required />
-                    </div>
-                    <div class="mb-3">
-                        <label>Xác nhận mật khẩu</label>
-                        <input class="form-control" name="XacNhanMatKhau" type="password" required />
-                    </div>
-                    <div class="mb-3">
-                        <label>Email</label>
-                        <input class="form-control" name="Email" required />
-                    </div>
-                    <div class="mb-3">
-                        <label>SĐT</label>
-                        <input class="form-control" name="SDT" />
-                    </div>
-                    <div class="mb-3">
-                        <label>Địa chỉ</label>
-                        <textarea class="form-control" name="DiaChi"></textarea>
-                    </div>
+    /* Thẻ Glassmorphism */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.6) !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0,0,0,0.05) !important;
+        border-radius: 24px !important;
+        overflow: hidden;
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        max-width: 650px; /* Lớn hơn form đăng nhập vì có nhiều field */
+    }
 
-                    <button type="submit" class="btn btn-warning w-100 text-white fw-bold">Đăng ký</button>
-                </form>
+    .glass-card::before {
+        content: '';
+        position: absolute;
+        top: -50%; left: -50%;
+        width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+        transform: rotate(-30deg);
+        pointer-events: none;
+    }
 
-                <p class="text-center mt-3">
-                    Đã có tài khoản? <a href="{{ url('/taikhoan/dangnhap') }}" class="text-warning">Đăng nhập</a>
-                </p>
+    /* Input hiện đại */
+    .modern-input {
+        background: rgba(255, 255, 255, 0.6) !important;
+        border: 2px solid transparent !important;
+        border-radius: 14px !important;
+        padding: 0.8rem 1.2rem !important;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    
+    .modern-input:focus {
+        background: white !important;
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), inset 0 2px 4px rgba(0,0,0,0.02) !important;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.9rem;
+        margin-left: 0.4rem;
+        margin-bottom: 0.3rem;
+    }
+
+    /* Nút gradient hiện đại */
+    .btn-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        padding: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-gradient:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        color: white;
+    }
+
+    /* Trang trí icon */
+    .auth-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .auth-link {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .auth-link:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+</style>
+
+<div class="auth-wrapper">
+    <div class="card glass-card">
+        <div class="card-body p-4 p-sm-5">
+            <div class="text-center">
+                <i class="fa-solid fa-user-plus auth-icon"></i>
+                <h3 class="fw-bold text-dark mb-4" style="letter-spacing: -0.5px;">Tạo tài khoản mới</h3>
             </div>
+
+            @if (session('error') || session('Error'))
+                <div class="alert alert-danger" style="border-radius: 12px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>{{ session('error') ?? session('Error') }}
+                </div>
+            @endif
+            @if (session('success') || session('Success'))
+                <div class="alert alert-success" style="border-radius: 12px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-circle-check me-2"></i>{{ session('success') ?? session('Success') }}
+                </div>
+            @endif
+
+            <form method="post" action="{{ url('/taikhoan/dangky') }}">
+                @csrf
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fa-regular fa-id-card me-2 text-muted"></i>Họ tên</label>
+                        <input class="form-control modern-input" name="HoTen" placeholder="Nguyễn Văn A" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fa-solid fa-user me-2 text-muted"></i>Tài khoản</label>
+                        <input class="form-control modern-input" name="TaiKhoan" placeholder="Tên đăng nhập" required />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fa-solid fa-lock me-2 text-muted"></i>Mật khẩu</label>
+                        <input class="form-control modern-input" name="MatKhau" type="password" placeholder="Mật khẩu (ít nhất 6 ký tự)" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fa-solid fa-lock me-2 text-muted"></i>Xác nhận mật khẩu</label>
+                        <input class="form-control modern-input" name="XacNhanMatKhau" type="password" placeholder="Nhập lại mật khẩu" required />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fa-solid fa-envelope me-2 text-muted"></i>Email</label>
+                        <input class="form-control modern-input" name="Email" type="email" placeholder="example@gmail.com" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fa-solid fa-phone me-2 text-muted"></i>Số điện thoại</label>
+                        <input class="form-control modern-input" name="SDT" placeholder="090xxxxxxx" />
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label"><i class="fa-solid fa-location-dot me-2 text-muted"></i>Địa chỉ</label>
+                    <textarea class="form-control modern-input" name="DiaChi" rows="2" placeholder="Nhập địa chỉ của bạn..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-gradient w-100 mt-2">
+                    Tạo tài khoản <i class="fa-solid fa-check ms-2"></i>
+                </button>
+            </form>
+
+            <p class="text-center mt-4 mb-0" style="color: #718096; font-size: 0.95rem;">
+                Đã có tài khoản? <a href="{{ url('/taikhoan/dangnhap') }}" class="auth-link">Đăng nhập</a>
+            </p>
         </div>
     </div>
 </div>
