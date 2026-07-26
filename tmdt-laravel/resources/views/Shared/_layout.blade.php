@@ -27,7 +27,7 @@
 
 <body>
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">
                 <i class="fa-solid fa-cart-shopping me-2"></i>TechSecond
@@ -56,22 +56,22 @@
                 <div class="d-flex align-items-center gap-3">
                     <!-- TÌM KIẾM -->
                     <form class="d-flex align-items-center flex-shrink-0" method="get" action="{{ url('/sanpham') }}">
-                        <input class="form-control form-control-sm"
-                               type="text"
-                               name="q"
-                               placeholder="Tìm kiếm sản phẩm..."
-                               style="border-radius:20px; width: {{ ($user && $user->VaiTro == 'Admin') ? '320px' : '460px' }};" />
-                        <button class="btn btn-warning btn-sm px-3 ms-2" type="submit">
-                            <i class="fa fa-search"></i>
-                        </button>
+                        <div class="position-relative">
+                            <input class="form-control form-control-sm border-0 bg-light"
+                                   type="text"
+                                   name="q"
+                                   placeholder="Tìm kiếm sản phẩm..."
+                                   style="border-radius:20px; padding: 0.4rem 1rem 0.4rem 2.5rem; width: {{ ($user && $user->VaiTro == 'Admin') ? '320px' : '460px' }}; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);" />
+                            <i class="fa fa-search position-absolute text-muted" style="left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;"></i>
+                        </div>
                     </form>
 
                     <!-- GIỎ HÀNG -->
                     <div class="flex-shrink-0">
-                        <a href="{{ url('/giohang') }}" class="btn btn-warning btn-sm position-relative">
-                            <i class="fa-solid fa-cart-shopping"></i>
+                        <a href="{{ url('/giohang') }}" class="nav-icon-btn position-relative">
+                            <i class="fa-solid fa-cart-shopping fs-5"></i>
                             @if($cartCount > 0)
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
                                     {{ $cartCount }}
                                 </span>
                             @endif
@@ -81,7 +81,7 @@
                     <!-- NGƯỜI DÙNG -->
                     @if ($user)
                         <div class="dropdown flex-shrink-0">
-                            <a class="nav-link dropdown-toggle text-white d-flex align-items-center"
+                            <a class="nav-link dropdown-toggle d-flex align-items-center"
                                href="#"
                                data-bs-toggle="dropdown"
                                style="padding: 0.3rem 0.8rem;">
@@ -137,7 +137,7 @@
                             </ul>
                         </div>
                     @else
-                        <a class="btn btn-warning btn-sm px-3 flex-shrink-0"
+                        <a class="btn btn-nav-login btn-sm px-4 rounded-pill fw-bold"
                            href="{{ url('/taikhoan/dangnhap') }}"
                            style="white-space: nowrap;">
                             Đăng nhập
@@ -153,262 +153,38 @@
     </main>
 
     <!-- FOOTER -->
-    <footer>
-        <div class="container py-5">
-            <div class="text-center small">
-                © 2025 <b class="text-warning">TechSecond</b> – All rights reserved.
+    <footer style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-top: 1px solid rgba(0,0,0,0.05); color: #4a5568;">
+        <div class="container py-4">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                    <h5 class="fw-bold mb-0" style="color: #667eea;">
+                        <i class="fa-solid fa-cart-shopping me-2"></i>TechSecond
+                    </h5>
+                    <small class="text-muted mt-2 d-block">Trao đổi đồ công nghệ dễ dàng & an toàn.</small>
+                </div>
+                <div class="col-md-4 text-center mb-3 mb-md-0">
+                    <a href="#" class="text-decoration-none text-muted me-3 hover-primary"><i class="fa-brands fa-facebook fs-5"></i></a>
+                    <a href="#" class="text-decoration-none text-muted me-3 hover-primary"><i class="fa-brands fa-tiktok fs-5"></i></a>
+                    <a href="#" class="text-decoration-none text-muted hover-primary"><i class="fa-brands fa-youtube fs-5"></i></a>
+                </div>
+                <div class="col-md-4 text-center text-md-end text-muted small">
+                    © 2026 <strong>TechSecond</strong>. All rights reserved.
+                </div>
             </div>
         </div>
     </footer>
 
+    <style>
+        .hover-primary:hover { color: #0d6efd !important; transform: scale(1.1); transition: all 0.2s; }
+        .btn-nav-login { color: #2d3748; background: transparent; border: 2px solid #e2e8f0; transition: all 0.3s; }
+        .btn-nav-login:hover { background: #0d6efd; color: white; border-color: #0d6efd; }
+    </style>
+
     @yield('scripts')
 
-<!-- ===================== AI CHAT WIDGET ===================== -->
-<style>
-    #ai-widget-btn {
-        position: fixed;
-        bottom: 28px;
-        right: 28px;
-        width: 58px;
-        height: 58px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #4f46e5, #7c3aed);
-        color: white;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        box-shadow: 0 4px 20px rgba(79,70,229,0.5);
-        z-index: 9999;
-        transition: transform .2s, box-shadow .2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    #ai-widget-btn:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(79,70,229,0.7); }
-
-    #ai-widget-box {
-        position: fixed;
-        bottom: 100px;
-        right: 28px;
-        width: 340px;
-        height: 480px;
-        background: #fff;
-        border-radius: 18px;
-        box-shadow: 0 8px 40px rgba(0,0,0,0.18);
-        z-index: 9999;
-        display: none;
-        flex-direction: column;
-        overflow: hidden;
-        border: 1px solid #e5e7eb;
-    }
-    #ai-widget-box.open { display: flex; animation: slideUp .25s ease; }
-    @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-
-    .ai-header {
-        background: linear-gradient(135deg, #4f46e5, #7c3aed);
-        color: white;
-        padding: 14px 16px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-shrink: 0;
-    }
-    .ai-header .ai-avatar {
-        width: 36px; height: 36px; border-radius: 50%;
-        background: rgba(255,255,255,0.2);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 18px;
-    }
-    .ai-header .ai-info { flex: 1; }
-    .ai-header .ai-info b { display: block; font-size: 14px; }
-    .ai-header .ai-info small { font-size: 11px; opacity: 0.8; }
-    .ai-header .ai-close {
-        background: none; border: none; color: white;
-        font-size: 20px; cursor: pointer; opacity: 0.8; line-height: 1;
-    }
-    .ai-header .ai-close:hover { opacity: 1; }
-
-    .ai-messages {
-        flex: 1;
-        overflow-y: auto;
-        padding: 14px;
-        background: #f9fafb;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-    .ai-msg { display: flex; gap: 8px; align-items: flex-end; }
-    .ai-msg.user { flex-direction: row-reverse; }
-    .ai-bubble {
-        max-width: 78%;
-        padding: 9px 13px;
-        border-radius: 16px;
-        font-size: 13px;
-        line-height: 1.5;
-        white-space: pre-wrap;
-        word-break: break-word;
-    }
-    .ai-msg.bot .ai-bubble { background: #fff; border: 1px solid #e5e7eb; color: #1f2937; border-bottom-left-radius: 4px; }
-    .ai-msg.user .ai-bubble { background: #4f46e5; color: white; border-bottom-right-radius: 4px; }
-    .ai-bot-icon { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#4f46e5,#7c3aed); color:white; display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0; }
-
-    .ai-typing { display: flex; gap: 4px; align-items: center; padding: 10px 14px; }
-    .ai-typing span { width:7px;height:7px;border-radius:50%;background:#9ca3af;display:inline-block;animation:bounce 1.2s infinite; }
-    .ai-typing span:nth-child(2){animation-delay:.2s}
-    .ai-typing span:nth-child(3){animation-delay:.4s}
-    @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
-
-    .ai-input-area {
-        padding: 12px;
-        background: #fff;
-        border-top: 1px solid #e5e7eb;
-        display: flex;
-        gap: 8px;
-        flex-shrink: 0;
-    }
-    .ai-input-area input {
-        flex: 1;
-        border: 1px solid #d1d5db;
-        border-radius: 20px;
-        padding: 8px 14px;
-        font-size: 13px;
-        outline: none;
-    }
-    .ai-input-area input:focus { border-color: #4f46e5; }
-    .ai-send-btn {
-        width: 36px; height: 36px; border-radius: 50%;
-        background: #4f46e5; color: white; border: none;
-        cursor: pointer; display: flex; align-items: center; justify-content: center;
-        font-size: 15px; flex-shrink: 0;
-        transition: background .2s;
-    }
-    .ai-send-btn:hover { background: #7c3aed; }
-</style>
-
-<button id="ai-widget-btn" title="Hỏi AI hỗ trợ">🤖</button>
-
-<div id="ai-widget-box">
-    <div class="ai-header">
-        <div class="ai-avatar">🤖</div>
-        <div class="ai-info">
-            <b>TechBot AI</b>
-            <small>Trợ lý thông minh TechSecond</small>
-        </div>
-        <button class="ai-close" onclick="toggleAiWidget()">×</button>
-    </div>
-    <div class="ai-messages" id="aiMessages">
-        <div class="ai-msg bot">
-            <div class="ai-bot-icon">🤖</div>
-            @if(isset($user) && $user)
-            <div class="ai-bubble">
-                Xin chào <b>{{ $user->TaiKhoan }}</b>! Tôi là TechBot 👋<br>
-                Tôi có thể giúp bạn về:<br>
-                🛒 Mua bán sản phẩm<br>
-                📦 Theo dõi đơn hàng<br>
-                💬 Chính sách &amp; hỗ trợ<br><br>
-                <i style="color:#6b7280;font-size:11px;">Gợi ý: "Làm sao để đăng bán hàng?", "Tôi muốn huỷ đơn hàng"</i>
-            </div>
-            @else
-            <div class="ai-bubble">
-                👋 Xin chào! Tôi là <b>TechBot AI</b> của TechSecond.<br><br>
-                🔒 Vui lòng <b>đăng nhập</b> để trò chuyện với tôi nhé!<br><br>
-                <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;">
-                    <a href="{{ url('/taikhoan/dangnhap') }}"
-                       style="background:#4f46e5;color:white;padding:7px 16px;border-radius:20px;font-size:12px;text-decoration:none;font-weight:600;">
-                        🔑 Đăng nhập
-                    </a>
-                </div>
-            </div>
-            @endif
-        </div>
-    </div>
-    <div class="ai-input-area">
-        <input type="text" id="aiInput"
-               placeholder="{{ isset($user) && $user ? 'Nhập câu hỏi...' : 'Đăng nhập để sử dụng TechBot...' }}"
-               autocomplete="off"
-               {{ isset($user) && $user ? '' : 'disabled' }} />
-        <button class="ai-send-btn" onclick="sendAiMessage()">➤</button>
-    </div>
-</div>
-
-<script>
-    function toggleAiWidget() {
-        const box = document.getElementById('ai-widget-box');
-        box.classList.toggle('open');
-        if (box.classList.contains('open') && !document.getElementById('aiInput').disabled) {
-            document.getElementById('aiInput').focus();
-        }
-    }
-
-    document.getElementById('ai-widget-btn').addEventListener('click', toggleAiWidget);
-
-    document.getElementById('aiInput').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') sendAiMessage();
-    });
-
-    function appendMsg(role, html) {
-        const container = document.getElementById('aiMessages');
-        const div = document.createElement('div');
-        div.className = 'ai-msg ' + role;
-        div.innerHTML = role === 'bot'
-            ? `<div class="ai-bot-icon">🤖</div><div class="ai-bubble">${html}</div>`
-            : `<div class="ai-bubble">${html}</div>`;
-        container.appendChild(div);
-        container.scrollTop = container.scrollHeight;
-    }
-
-    function showTyping() {
-        const container = document.getElementById('aiMessages');
-        const div = document.createElement('div');
-        div.className = 'ai-msg bot';
-        div.id = 'aiTyping';
-        div.innerHTML = `<div class="ai-bot-icon">🤖</div><div class="ai-bubble ai-typing"><span></span><span></span><span></span></div>`;
-        container.appendChild(div);
-        container.scrollTop = container.scrollHeight;
-    }
-
-    function removeTyping() {
-        const t = document.getElementById('aiTyping');
-        if (t) t.remove();
-    }
-
-    async function sendAiMessage() {
-        const input = document.getElementById('aiInput');
-        const msg = input.value.trim();
-        if (!msg || input.disabled) return;
-
-        input.value = '';
-        appendMsg('user', msg);
-        showTyping();
-
-        try {
-            const res = await fetch('/ai/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ message: msg })
-            });
-            const data = await res.json();
-            removeTyping();
-
-            if (data.requireLogin) {
-                input.disabled = true;
-                input.placeholder = 'Đăng nhập để sử dụng TechBot...';
-                appendMsg('bot', `🔒 Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.<br><br>
-                    <a href="{{ url('/taikhoan/dangnhap') }}" style="background:#4f46e5;color:white;padding:6px 14px;border-radius:20px;font-size:12px;text-decoration:none;font-weight:600;">🔑 Đăng nhập</a>`);
-                return;
-            }
-
-            appendMsg('bot', (data.reply || 'Xin lỗi, có lỗi xảy ra.').replace(/\n/g, '<br>'));
-        } catch {
-            removeTyping();
-            appendMsg('bot', '⚠️ Kết nối bị lỗi. Vui lòng thử lại!');
-        }
-    }
-</script>
-<!-- =========================================================== -->
+    <!-- ===================== AI CHAT WIDGET ===================== -->
+    @include('components.ai_chat')
+    <!-- =========================================================== -->
 
 </body>
 </html>

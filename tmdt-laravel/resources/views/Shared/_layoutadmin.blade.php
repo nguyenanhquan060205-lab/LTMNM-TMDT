@@ -15,12 +15,43 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ asset('Scripts/bootstrap.bundle.min.js') }}"></script>
     <style>
-        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { min-height: 100vh; background: #343a40; color: #fff; }
-        .sidebar .nav-link { color: rgba(255,255,255,.75); padding: 12px 20px; font-weight: 500; transition: 0.2s; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { color: #fff; background: rgba(255,255,255,.1); border-left: 4px solid #ffc107; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* Sidebar siêu mượt */
+        .sidebar { 
+            min-height: 100vh; 
+            background: linear-gradient(180deg, #1e1e2f 0%, #2a2a40 100%);
+            color: #fff; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+        }
+        .sidebar .nav-link { 
+            color: rgba(255,255,255,.7); 
+            padding: 12px 20px; 
+            font-weight: 500; 
+            transition: all 0.3s ease; 
+            border-radius: 0 25px 25px 0;
+            margin-right: 15px;
+            margin-bottom: 5px;
+        }
+        .sidebar .nav-link:hover { 
+            color: #fff; 
+            background: rgba(255,255,255,.1); 
+            transform: translateX(5px);
+        }
+        .sidebar .nav-link.active { 
+            color: #fff; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .sidebar .text-warning { color: #f6ad55 !important; }
+        
         .content { width: 100%; }
-        .navbar-admin { background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.04); }
+        .navbar-admin { 
+            background: rgba(255,255,255,0.9); 
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,.03); 
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
     </style>
 </head>
 <body>
@@ -38,12 +69,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url('/admin/quanlysanpham') }}" class="nav-link {{ request()->is('Admin/DoiTrangThai') ? 'active' : '' }}">
-                        <i class="fa fa-box me-2"></i> Duyệt sản phẩm
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url('/admin/quanlysanpham') }}" class="nav-link {{ request()->is('Admin/QuanLySanPham') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/quanlysanpham') }}" class="nav-link {{ request()->is('admin/quanlysanpham*') || request()->is('Admin/DoiTrangThai*') || request()->is('Admin/QuanLySanPham*') ? 'active' : '' }}">
                         <i class="fa fa-boxes-stacked me-2"></i> Quản lý sản phẩm
                     </a>
                 </li>

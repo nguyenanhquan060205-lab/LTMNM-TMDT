@@ -170,9 +170,7 @@
     .cart-title {
         font-weight: 800;
         font-size: 2.2rem;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #2d3748; /* Đen nhám hiện đại */
         margin-bottom: 2rem;
     }
 
@@ -217,16 +215,14 @@
         margin-bottom: 0;
     }
 
-    .cart-table thead {
-        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-    }
-
     .cart-table thead th {
-        color: white !important;
-        font-weight: 600;
+        background-color: #f8fafc !important; /* Xám nhạt thay vì gradient đen */
+        color: #4a5568 !important; /* Chữ xám đậm dễ đọc */
+        font-weight: 700;
         padding: 1.2rem 1rem;
         border: none;
-        font-size: 0.9rem;
+        border-bottom: 2px solid #e2e8f0;
+        font-size: 0.85rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
@@ -281,7 +277,7 @@
     }
 
     .product-price-unit {
-        color: #667eea;
+        color: #6c757d;
         font-size: 0.85rem;
         font-weight: 500;
     }
@@ -303,18 +299,18 @@
         align-items: center;
         justify-content: center;
         background: transparent;
-        color: #667eea;
+        color: #0d6efd;
         border: none;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.2s;
         text-decoration: none;
         font-size: 1.1rem;
         font-weight: 600;
     }
 
     .qty-btn:hover {
-        background: #667eea;
-        color: white;
+        background: #f1f5f9;
+        color: #0b5ed7;
     }
 
     .qty-value {
@@ -330,9 +326,7 @@
     .cart-price {
         font-weight: 700;
         font-size: 1.2rem;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #0d6efd; /* Xanh dương đậm */
     }
 
     /* ===== DELETE BUTTON ===== */
@@ -427,22 +421,20 @@
     .total-amount {
         font-size: 1.8rem;
         font-weight: 700;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #0d6efd;
     }
 
     /* ===== BUTTONS ===== */
     .btn-checkout {
         width: 100%;
         padding: 1rem 1.5rem;
-        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        color: #2d3748;
+        background-color: #0d6efd;
+        color: white;
         border: none;
         border-radius: 15px;
         font-weight: 700;
         font-size: 1rem;
-        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
         transition: all 0.3s;
         cursor: pointer;
         display: flex;
@@ -451,16 +443,17 @@
     }
 
     .btn-checkout:hover {
+        background-color: #0b5ed7;
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(255, 193, 7, 0.6);
+        box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
     }
 
     .btn-continue {
         width: 100%;
         padding: 0.9rem 1.5rem;
         background: white;
-        color: #667eea;
-        border: 2px solid #667eea;
+        color: #4a5568;
+        border: 2px solid #e2e8f0;
         border-radius: 15px;
         font-weight: 600;
         text-align: center;
@@ -473,8 +466,9 @@
     }
 
     .btn-continue:hover {
-        background: #667eea;
-        color: white;
+        background: #f8fafc;
+        color: #2d3748;
+        border-color: #cbd5e1;
         text-decoration: none;
     }
 

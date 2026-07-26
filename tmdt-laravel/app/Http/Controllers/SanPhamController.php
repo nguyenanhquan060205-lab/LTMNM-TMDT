@@ -21,6 +21,10 @@ class SanPhamController extends Controller
     {
         $q = $request->query('q');
         $maloai = $request->query('maloai');
+        $min_price = $request->query('min_price');
+        $max_price = $request->query('max_price');
+        $rating = $request->query('rating');
+        $sort = $request->query('sort');
 
         $u = Session::get('user');
 
@@ -38,7 +42,29 @@ class SanPhamController extends Controller
             $query->where('MaLoai', $maloai);
         }
 
-        $dsSanPham = $query->orderBy('NgayTao', 'desc')->paginate(12);
+        if (!empty($min_price)) {
+            $query->where('Gia', '>=', $min_price);
+        }
+        
+        if (!empty($max_price)) {
+            $query->where('Gia', '<=', $max_price);
+        }
+        
+        if (!empty($rating)) {
+            $query->where('DanhGiaTB', '>=', $rating);
+        }
+
+        if ($sort == 'gia-tang') {
+            $query->orderBy('Gia', 'asc');
+        } elseif ($sort == 'gia-giam') {
+            $query->orderBy('Gia', 'desc');
+        } elseif ($sort == 'danh-gia') {
+            $query->orderBy('DanhGiaTB', 'desc');
+        } else {
+            $query->orderBy('NgayTao', 'desc'); // Mới nhất hoặc mặc định
+        }
+
+        $dsSanPham = $query->paginate(12);
 
         $loai = LoaiSanPham::all();
 
@@ -46,6 +72,10 @@ class SanPhamController extends Controller
             'dsSanPham' => $dsSanPham,
             'q' => $q,
             'maloai' => $maloai,
+            'min_price' => $min_price,
+            'max_price' => $max_price,
+            'rating' => $rating,
+            'sort' => $sort,
             'loai' => $loai
         ]);
     }

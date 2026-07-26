@@ -5,33 +5,39 @@
 <style>
     .card-hover {
         transition: all 0.3s ease;
-        border: 1px solid #e0e0e0;
+        border: none;
+        background: #fff;
+        border-radius: 16px;
     }
     .card-hover:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         cursor: pointer;
-        border-color: #00d9ff;
     }
     .section-title {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
         font-weight: 700;
-        color: #1e1e3b;
-        border-bottom: 2px solid #f0f0f0;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-        margin-top: 30px;
+        color: #2a2a40;
+        border-bottom: 2px solid #edf2f7;
+        padding-bottom: 12px;
+        margin-bottom: 24px;
+        margin-top: 35px;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
     }
-    .section-title i { color: #00d9ff; }
+    .section-title i { 
+        color: #667eea; 
+        background: rgba(102, 126, 234, 0.1);
+        padding: 8px;
+        border-radius: 8px;
+    }
+    .text-primary {
+        color: #667eea !important;
+    }
 </style>
 
 <div class="container-fluid px-2 pb-5">
-
-    <h2 class="fw-bold text-primary mt-2 mb-1">Tổng quan hệ thống</h2>
-    <p class="text-muted">Chào mừng quay trở lại, đây là bảng điều khiển trung tâm.</p>
 
     <!-- QUẢN LÝ SẢN PHẨM -->
     <div class="section-title">

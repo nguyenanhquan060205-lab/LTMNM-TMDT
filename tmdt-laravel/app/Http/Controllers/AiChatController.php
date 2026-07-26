@@ -103,6 +103,7 @@ Bạn là TechBot - trợ lý AI chăm sóc khách hàng chính thức của sà
 === GIAO TIẾP ===
 - Gọi người dùng là "{$userName}"
 - Thân thiện, ngắn gọn, dùng emoji vừa phải 😊
+- Trình bày dạng văn bản thuần tuý (plain text), KHÔNG dùng Markdown (như **in đậm**, *in nghiêng*, hay # heading) vì khung chat chưa hỗ trợ hiển thị Markdown. Hãy dùng gạch đầu dòng (-) hoặc số thứ tự (1,2) để liệt kê.
 - Nếu không chắc, hãy hướng người dùng tới Admin (CSKH ⭐) trên trang chat
 - Hãy chủ động gợi ý các câu hỏi hay ở cuối câu trả lời khi phù hợp
 PROMPT;
@@ -116,8 +117,8 @@ PROMPT;
                 ['parts' => [['text' => $userMessage]]]
             ],
             'generationConfig' => [
-                'maxOutputTokens' => 400,
-                'temperature'     => 0.4,  // Thấp hơn = nhất quán hơn, ít hallucinate
+                'maxOutputTokens' => 1024,
+                'temperature'     => 0.4,
             ],
             'safetySettings' => [
                 ['category' => 'HARM_CATEGORY_HARASSMENT',        'threshold' => 'BLOCK_MEDIUM_AND_ABOVE'],
@@ -128,10 +129,15 @@ PROMPT;
         ];
 
         try {
-            $response = Http::timeout(15)->post(
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={$apiKey}",
-                $payload
-            );
+            $response = Http::timeout(15)
+                ->withHeaders([
+                    'X-goog-api-key' => $apiKey,
+                    'Content-Type'   => 'application/json',
+                ])
+                ->post(
+                    'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent',
+                    $payload
+                );
 
             if ($response->successful()) {
                 $data  = $response->json();

@@ -31,7 +31,7 @@
     #previewCoverImg {
         border-radius: 10px;
         margin-top: 10px;
-        border: 2px solid #ffc107;
+        border: 2px solid #0d6efd;
     }
 
     .preview-thumb {
@@ -53,18 +53,21 @@
         font-weight: 600;
         font-size: 17px;
         border-radius: 10px;
-        background: linear-gradient(90deg, #ffca2c, #ffc107);
-        color: #000;
+        background-color: #0d6efd;
+        color: white;
+        border: none;
         transition: 0.2s;
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
     }
 
         .btn-submit:hover {
             transform: scale(1.05);
-            background: linear-gradient(90deg, #ffd953, #ffcd29);
+            background-color: #0b5ed7;
+            color: white;
         }
 
     .title-icon {
-        color: #dc3545;
+        color: #0d6efd;
         font-size: 28px;
     }
 </style>

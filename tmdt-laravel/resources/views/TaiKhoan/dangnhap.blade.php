@@ -56,8 +56,8 @@
     
     .modern-input:focus {
         background: white !important;
-        border-color: #667eea !important;
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), inset 0 2px 4px rgba(0,0,0,0.02) !important;
+        border-color: #0d6efd !important;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15), inset 0 2px 4px rgba(0,0,0,0.02) !important;
     }
 
     .form-label {
@@ -69,7 +69,7 @@
 
     /* Nút gradient hiện đại */
     .btn-gradient {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-color: #0d6efd;
         color: white;
         border: none;
         border-radius: 14px;
@@ -77,39 +77,38 @@
         font-weight: 700;
         letter-spacing: 0.5px;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
     }
 
     .btn-gradient:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
+        background-color: #0b5ed7;
         color: white;
     }
 
     /* Trang trí icon */
     .auth-icon {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #0d6efd;
         font-size: 3rem;
         margin-bottom: 1rem;
     }
 
     .auth-link {
-        color: #667eea;
+        color: #0d6efd;
         font-weight: 600;
         text-decoration: none;
         transition: all 0.2s;
     }
     .auth-link:hover {
-        color: #764ba2;
+        color: #0b5ed7;
         text-decoration: underline;
     }
 </style>
 
 <div class="auth-wrapper">
-    <div class="card glass-card">
-        <div class="card-body p-4 p-sm-5">
+    <div class="glass-card">
+        <div class="p-4 p-sm-5">
             <div class="text-center">
                 <i class="fa-solid fa-circle-user auth-icon"></i>
                 <h3 class="fw-bold text-dark mb-4" style="letter-spacing: -0.5px;">Chào mừng trở lại!</h3>

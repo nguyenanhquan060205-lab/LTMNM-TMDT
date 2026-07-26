@@ -44,6 +44,7 @@ Route::prefix('taikhoan')->name('taikhoan.')->group(function() {
     Route::post('/capnhatthongtin', [TaiKhoanController::class, 'capNhatThongTin'])->name('capnhatthongtin');
     Route::post('/capnhatmatkhau', [TaiKhoanController::class, 'capNhatMatKhau']);
     Route::post('/capnhatchuyenkhoan', [TaiKhoanController::class, 'capNhatChuyenKhoan']);
+    Route::get('/thongtinchuyenkhoan/{idNguoiBan}', [TaiKhoanController::class, 'thongTinChuyenKhoan']);
     
     Route::get('/danhgia/{mahd}/{masp}', [TaiKhoanController::class, 'getDanhGia'])->name('danhgia');
     Route::post('/danhgia/{mahd}/{masp}', [TaiKhoanController::class, 'postDanhGia']);
