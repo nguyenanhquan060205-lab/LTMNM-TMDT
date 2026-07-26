@@ -8,11 +8,11 @@
             <div class="card-body">
                 <h4 class="text-center mb-3">Đăng ký</h4>
 
-                @if (session('Error'))
-                    <div class="alert alert-danger">{{ session('Error') }}</div>
+                @if (session('error') || session('Error'))
+                    <div class="alert alert-danger">{{ session('error') ?? session('Error') }}</div>
                 @endif
-                @if (session('Success'))
-                    <div class="alert alert-success">{{ session('Success') }}</div>
+                @if (session('success') || session('Success'))
+                    <div class="alert alert-success">{{ session('success') ?? session('Success') }}</div>
                 @endif
 
                 <form method="post" action="{{ url('/taikhoan/dangky') }}">
@@ -28,6 +28,10 @@
                     <div class="mb-3">
                         <label>Mật khẩu</label>
                         <input class="form-control" name="MatKhau" type="password" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Xác nhận mật khẩu</label>
+                        <input class="form-control" name="XacNhanMatKhau" type="password" required />
                     </div>
                     <div class="mb-3">
                         <label>Email</label>

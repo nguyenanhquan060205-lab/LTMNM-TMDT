@@ -8,11 +8,11 @@
             <div class="card-body">
                 <h4 class="text-center mb-3">Đăng nhập</h4>
 
-                @if (session('Error'))
-                    <div class="alert alert-danger">{{ session('Error') }}</div>
+                @if (session('error') || session('Error'))
+                    <div class="alert alert-danger">{{ session('error') ?? session('Error') }}</div>
                 @endif
-                @if (session('Success'))
-                    <div class="alert alert-success">{{ session('Success') }}</div>
+                @if (session('success') || session('Success'))
+                    <div class="alert alert-success">{{ session('success') ?? session('Success') }}</div>
                 @endif
 
                 <form method="post" action="{{ url('/taikhoan/dangnhap') }}">
