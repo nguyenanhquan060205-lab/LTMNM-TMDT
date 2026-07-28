@@ -27,7 +27,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Cài đặt các thư viện (bỏ qua nếu vendor đã được push lên github, nhưng thường thì nên chạy lệnh này)
-RUN composer install --no-dev --optimize-autoloader
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader
 
 # Phân quyền cho thư mục Laravel
 RUN mkdir -p /var/www/html/storage/logs
