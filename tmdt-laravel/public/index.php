@@ -17,4 +17,16 @@ require __DIR__.'/../vendor/autoload.php';
 /** @var Application $app */
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
-$app->handleRequest(Request::capture());
+try {
+    $app->handleRequest(Request::capture());
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo "<h1>CRITICAL ERROR:</h1>";
+    echo "<pre>" . $e->getMessage() . "</pre>";
+    echo "<h3>Stack Trace:</h3>";
+    echo "<pre>" . $e->getTraceAsString() . "</pre>";
+    if (file_exists(__DIR__.'/../storage/logs/laravel.log')) {
+        echo "<h3>Logs:</h3>";
+        echo "<pre>" . file_get_contents(__DIR__.'/../storage/logs/laravel.log') . "</pre>";
+    }
+}
