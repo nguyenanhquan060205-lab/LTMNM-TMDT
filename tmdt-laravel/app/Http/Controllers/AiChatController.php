@@ -248,6 +248,14 @@ PROMPT;
                     'allow_unsafe_links' => false,
                 ]);
                 
+                // Thêm câu trả lời cuối cùng của model vào payload để lưu lịch sử
+                $payload['contents'][] = [
+                    'role' => 'model',
+                    'parts' => [
+                        ['text' => $finalReply]
+                    ]
+                ];
+
                 // Cập nhật session history (Lưu toàn bộ qúa trình trao đổi text + function)
                 $history = $payload['contents'];
                 // Chỉ giữ 20 tin nhắn gần nhất để khỏi tràn token
