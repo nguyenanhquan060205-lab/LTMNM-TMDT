@@ -1,0 +1,141 @@
+@extends('shared._layout')
+@section('title', 'Đánh giá sản phẩm')
+
+@section('content')
+<style>
+    .rating-box {
+        display: flex;
+        gap: 6px;
+        font-size: 32px;
+        cursor: pointer;
+        color: #ddd;
+        transition: 0.2s;
+    }
+
+    .rating-box .star:hover,
+    .rating-box .star.active {
+        color: #ffc107;
+        transform: scale(1.2);
+    }
+
+    .review-card {
+        max-width: 850px;
+        margin: auto;
+        padding: 40px;
+        border-radius: 20px;
+        background: #ffffff;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+        animation: fadeIn 0.4s ease;
+    }
+
+    .product-preview {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }
+
+    .product-preview img {
+        width: 150px;
+        height: 150px;
+        border-radius: 15px;
+        object-fit: cover;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="container mt-5 mb-5">
+    <div class="review-card">
+
+        <h2 class="text-center mb-4 fw-bold" style="font-size: 32px;">
+            <i class="bi bi-chat-square-heart text-danger"></i> Đánh giá sản phẩm
+        </h2>
+
+        <div class="product-preview mb-4">
+            <img src="{{ str_starts_with(($vm->Hinh ?? 'no-image.jpg'), 'http') ? ($vm->Hinh ?? 'no-image.jpg') : asset('Content/Images/' . ($vm->Hinh ?? 'no-image.jpg')) }}" />
+            <div>
+                <h4 class="fw-bold">{{ $vm->TenSP ?? '' }}</h4>
+                <div class="text-muted">Hãy chia sẻ cảm nhận thực tế về sản phẩm!</div>
+            </div>
+        </div>
+
+        <form action="{{ route('taikhoan.danhgia', ['mahd' => $vm->MaHD, 'masp' => $vm->MaSP]) }}" method="POST">
+            @csrf
+            <input type="hidden" name="maHD" value="{{ $vm->MaHD }}" />
+            <input type="hidden" name="maSP" value="{{ $vm->MaSP }}" />
+            <input type="hidden" name="soSao" id="ratingValue" value="" />
+
+            <div class="mb-4">
+                <label class="fw-bold">Số sao:</label>
+                <div class="rating-box mt-2">
+                    <span class="star" data-value="1">&#9733;</span>
+                    <span class="star" data-value="2">&#9733;</span>
+                    <span class="star" data-value="3">&#9733;</span>
+                    <span class="star" data-value="4">&#9733;</span>
+                    <span class="star" data-value="5">&#9733;</span>
+                </div>
+                <div class="text-danger mt-1" id="ratingError" style="display:none;">Vui lòng chọn số sao!</div>
+            </div>
+
+            <div class="mb-4">
+                <label class="fw-bold">Nội dung đánh giá:</label>
+                <textarea name="noiDung"
+                          rows="4"
+                          class="form-control mt-2"
+                          placeholder="Sản phẩm có tốt không? Có đáng tiền không?"></textarea>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{{ url('/TaiKhoan/CT_LichSu/' . ($MaHD ?? '')) }}"
+                   class="btn btn-secondary btn-back">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+
+                <button type="submit" class="btn btn-success btn-submit">
+                    <i class="bi bi-send"></i> Gửi đánh giá
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+    const stars = document.querySelectorAll(".star");
+    const ratingInput = document.getElementById("ratingValue");
+    const ratingError = document.getElementById("ratingError");
+
+    stars.forEach(star => {
+        star.addEventListener("click", () => {
+            const rating = star.dataset.value;
+            ratingInput.value = rating;
+
+            stars.forEach(s => s.classList.remove("active"));
+
+            for (let i = 0; i < rating; i++) {
+                stars[i].classList.add("active");
+            }
+
+            ratingError.style.display = "none";
+        });
+    });
+
+    document.querySelector("form").addEventListener("submit", (e) => {
+        if (!ratingInput.value || ratingInput.value === "0") {
+            e.preventDefault();
+            ratingError.style.display = "block";
+            window.scrollTo(0, 0);
+        }
+    });
+</script>
+@endsection
