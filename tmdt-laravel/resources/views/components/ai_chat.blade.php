@@ -151,6 +151,11 @@
     }
 
     /* ---- Typing Dots ---- */
+    .ai-bubble p { margin-bottom: 6px; }
+    .ai-bubble p:last-child { margin-bottom: 0; }
+    .ai-bubble a { color: #0d6efd; text-decoration: underline; font-weight: 500; }
+    .ai-bubble ul { padding-left: 20px; margin-bottom: 6px; }
+    
     .ai-typing { display: flex; gap: 5px; align-items: center; padding: 4px 2px; }
     .ai-typing span {
         width: 7px; height: 7px; border-radius: 50%;
@@ -366,7 +371,7 @@
                 return;
             }
 
-            appendMsg('bot', (data.reply || 'Xin lỗi, có lỗi xảy ra.').replace(/\n/g, '<br>'));
+            appendMsg('bot', data.reply || 'Xin lỗi, có lỗi xảy ra.');
         } catch {
             removeTyping();
             appendMsg('bot', '⚠️ Kết nối bị gián đoạn. Vui lòng thử lại!');

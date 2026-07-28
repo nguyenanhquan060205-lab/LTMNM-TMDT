@@ -102,10 +102,13 @@ Bạn là TechBot - trợ lý AI chăm sóc khách hàng chính thức của sà
 
 === GIAO TIẾP ===
 - Gọi người dùng là "{$userName}"
-- Thân thiện, ngắn gọn, dùng emoji vừa phải 😊
-- Trình bày dạng văn bản thuần tuý (plain text), KHÔNG dùng Markdown (như **in đậm**, *in nghiêng*, hay # heading) vì khung chat chưa hỗ trợ hiển thị Markdown. Hãy dùng gạch đầu dòng (-) hoặc số thứ tự (1,2) để liệt kê.
-- Nếu không chắc, hãy hướng người dùng tới Admin (CSKH ⭐) trên trang chat
-- Hãy chủ động gợi ý các câu hỏi hay ở cuối câu trả lời khi phù hợp
+- Thân thiện, nhiệt tình, chuyên nghiệp, dùng emoji để tạo cảm giác thân thiện 😊
+- BẮT BUỘC sử dụng Markdown để trình bày đẹp mắt:
+  + Dùng **in đậm** cho tên sản phẩm, giá tiền.
+  + Dùng danh sách (- hoặc 1,2,3) để liệt kê.
+  + ĐẶC BIÊT QUAN TRỌNG: Khi giới thiệu sản phẩm (từ kết quả tìm kiếm), PHẢI chèn link tới sản phẩm bằng định dạng Markdown: `[Tên Sản Phẩm](/sanpham/chitiet/MaSP)`. Ví dụ: `[iPhone 15 Pro Max](/sanpham/chitiet/123)`.
+- Nếu không tìm thấy sản phẩm, hãy gợi ý họ tìm từ khóa khác.
+- Nếu không chắc, hãy hướng người dùng tới Admin (CSKH ⭐) trên trang chat.
 PROMPT;
 
         // ==================== CALL GEMINI API ====================
@@ -172,7 +175,7 @@ PROMPT;
                     // Thực thi query bảo mật
                     $products = \App\Models\SanPham::where('TenSP', 'like', "%{$keyword}%")
                         ->where('TrangThai', 'Đã duyệt')
-                        ->select('TenSP', 'Gia', 'SoLuong')
+                        ->select('MaSP', 'TenSP', 'Gia', 'SoLuong')
                         ->take(5)
                         ->get();
 
@@ -230,15 +233,21 @@ PROMPT;
                     $reply = $firstPart['text'] ?? 'Xin lỗi, tôi chưa hiểu câu hỏi. Bạn có thể hỏi lại theo cách khác không?';
                 }
 
-                // Lưu memory (chỉ lưu text của user và model để tối ưu context)
-                $history[] = ['role' => 'user', 'parts' => [['text' => $userMessage]]];
-                $history[] = ['role' => 'model', 'parts' => [['text' => $reply]]];
-                if (count($history) > 10) {
-                    $history = array_slice($history, -10); // Giữ 10 tin nhắn gần nhất
-                }
-                Session::put('ai_chat_history', $history);
+                if ($reply) {
+                    // Convert Markdown to HTML
+                    $replyHtml = \Illuminate\Support\Str::markdown($reply);
+                    
+                    // Cập nhật lịch sử
+                    $history[] = ['role' => 'user', 'parts' => [['text' => $userMessage]]];
+                    $history[] = ['role' => 'model', 'parts' => [['text' => $reply]]];
+                    // Giới hạn 20 tin nhắn gần nhất
+                    if (count($history) > 20) {
+                        $history = array_slice($history, -20);
+                    }
+                    Session::put('ai_chat_history', $history);
 
-                return response()->json(['reply' => $reply]);
+                    return response()->json(['reply' => $replyHtml]);
+                }
             } else {
                 \Illuminate\Support\Facades\Log::error('Gemini API Error', ['status' => $response->status(), 'body' => $response->body()]);
             }
