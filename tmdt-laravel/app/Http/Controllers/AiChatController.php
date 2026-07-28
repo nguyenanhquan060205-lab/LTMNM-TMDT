@@ -123,6 +123,7 @@ PROMPT;
                     'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent',
                     $payload
                 );
+            dd($response->status(), $response->json() ?? $response->body());
 
             if ($response->successful()) {
                 $data = $response->json();
