@@ -225,15 +225,16 @@
     }
 
     /* ---- Login button inside chat ---- */
-    .ai-login-btn {
+    a.ai-login-btn {
         display: inline-block;
         background: var(--primary-color, #0d6efd);
-        color: white; padding: 7px 20px; border-radius: 20px;
-        font-size: 12.5px; font-weight: 600; text-decoration: none;
+        color: white !important; 
+        padding: 7px 20px; border-radius: 20px;
+        font-size: 12.5px; font-weight: 600; text-decoration: none !important;
         margin-top: 4px; transition: opacity .2s;
         box-shadow: 0 2px 8px rgba(13,110,253,.35);
     }
-    .ai-login-btn:hover { opacity: .88; color: white; }
+    a.ai-login-btn:hover { opacity: .88; color: white !important; }
 
     /* Mobile */
     @media (max-width: 480px) {
