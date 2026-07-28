@@ -142,7 +142,7 @@
                     <div class="col-md-6 mb-3">
                         <label class="form-label"><i class="fa-solid fa-lock me-2 text-muted"></i>Mật khẩu</label>
                         <div class="position-relative">
-                            <input class="form-control modern-input pe-5" name="MatKhau" id="matkhau_reg" type="password" placeholder="Mật khẩu (ít nhất 6 ký tự)" required />
+                            <input class="form-control modern-input pe-5" name="MatKhau" id="matkhau_reg" type="password" placeholder="Mật khẩu (≥10 ký tự, có ký tự đặc biệt)" minlength="10" pattern=".*[\W_].*" title="Mật khẩu phải có ít nhất 10 ký tự và chứa ít nhất 1 ký tự đặc biệt" required />
                             <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y text-muted" onclick="togglePassword('matkhau_reg', this)" tabindex="-1" style="border: none; background: transparent; padding-right: 15px;">
                                 <i class="fa-regular fa-eye"></i>
                             </button>
@@ -151,7 +151,7 @@
                     <div class="col-md-6 mb-3">
                         <label class="form-label"><i class="fa-solid fa-lock me-2 text-muted"></i>Xác nhận mật khẩu</label>
                         <div class="position-relative">
-                            <input class="form-control modern-input pe-5" name="XacNhanMatKhau" id="matkhau_conf" type="password" placeholder="Nhập lại mật khẩu" required />
+                            <input class="form-control modern-input pe-5" name="XacNhanMatKhau" id="matkhau_conf" type="password" placeholder="Nhập lại mật khẩu" minlength="10" pattern=".*[\W_].*" required />
                             <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y text-muted" onclick="togglePassword('matkhau_conf', this)" tabindex="-1" style="border: none; background: transparent; padding-right: 15px;">
                                 <i class="fa-regular fa-eye"></i>
                             </button>

@@ -93,6 +93,15 @@ class TaiKhoanController extends Controller
             return back()->with('error', 'Mật khẩu và Xác nhận mật khẩu không khớp!')->withInput();
         }
 
+        $password = $nd['MatKhau'];
+        if (strlen($password) < 10) {
+            return back()->with('error', 'Mật khẩu phải có ít nhất 10 ký tự!')->withInput();
+        }
+
+        if (!preg_match('/[\W_]/', $password)) {
+            return back()->with('error', 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt!')->withInput();
+        }
+
         $email = $request->input('Email');
         $sdt = $request->input('SDT');
 
