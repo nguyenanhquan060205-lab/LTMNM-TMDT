@@ -66,6 +66,7 @@ class TaiKhoanController extends Controller
         }
 
         Session::put('user', $user);
+        Session::forget('ai_chat_history'); // Xóa lịch sử chat cũ khi đăng nhập acc mới
 
         // Fetch Cart Count
         $gio = \App\Models\GioHang::where('MaKH', $user->MaKH)->first();
@@ -446,6 +447,7 @@ class TaiKhoanController extends Controller
     {
         Session::forget('user');
         Session::forget('CartCount');
+        Session::forget('ai_chat_history'); // Xóa bộ nhớ chat AI
         return redirect()->route('index');
     }
 
