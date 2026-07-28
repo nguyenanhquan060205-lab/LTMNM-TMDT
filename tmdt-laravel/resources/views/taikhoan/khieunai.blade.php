@@ -22,18 +22,32 @@
     </div>
 
     <!-- TABS -->
-    <ul class="nav nav-tabs justify-content-center mb-4" id="khieuNaiTabs" role="tablist">
+    <ul class="nav nav-pills justify-content-center mb-4 gap-2" id="khieuNaiTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active fw-bold" id="ve-toi-tab" data-bs-toggle="tab" data-bs-target="#ve-toi" type="button" role="tab" aria-controls="ve-toi" aria-selected="true">
-                Khiếu nại về sản phẩm của bạn
+            <button class="nav-link active rounded-pill px-4 fw-semibold shadow-sm" id="ve-toi-tab" data-bs-toggle="pill" data-bs-target="#ve-toi" type="button" role="tab" aria-controls="ve-toi" aria-selected="true">
+                <i class="fa-solid fa-inbox me-2"></i> Khiếu nại về sản phẩm của bạn
             </button>
         </li>
-        <li class="nav-item ms-2" role="presentation">
-            <button class="nav-link fw-bold" id="toi-gui-tab" data-bs-toggle="tab" data-bs-target="#toi-gui" type="button" role="tab" aria-controls="toi-gui" aria-selected="false">
-                Khiếu nại bạn đã gửi
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4 fw-semibold shadow-sm text-dark bg-white border" id="toi-gui-tab" data-bs-toggle="pill" data-bs-target="#toi-gui" type="button" role="tab" aria-controls="toi-gui" aria-selected="false">
+                <i class="fa-solid fa-paper-plane me-2"></i> Khiếu nại bạn đã gửi
             </button>
         </li>
     </ul>
+
+    <style>
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd;
+            color: white !important;
+            border-color: #0d6efd !important;
+        }
+        .nav-pills .nav-link:not(.active):hover {
+            background-color: #f8f9fa;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
 
     <div class="tab-content" id="khieuNaiTabsContent">
         <!-- TAB: VỀ SẢN PHẨM CỦA BẠN -->
@@ -61,7 +75,7 @@
                                     <tr>
                                         <td class="fw-semibold text-center">{{ $kn->nguoiDung->HoTen ?? '' }}</td>
                                         <td class="fw-semibold">{{ $kn->sanPham->TenSP ?? '' }}</td>
-                                        <td class="text-center">{{ $kn->NgayGui ? \Carbon\Carbon::parse($kn->NgayGui)->format('d/m/Y HH:mm') : '' }}</td>
+                                        <td class="text-center">{{ $kn->NgayGui ? \Carbon\Carbon::parse($kn->NgayGui)->format('d/m/Y H:i') : '' }}</td>
                                         <td>{{ $kn->MoTa }}</td>
                                         <td class="text-center">
                                             @if ($kn->TrangThai == 'Chưa xử lý')
@@ -116,7 +130,7 @@
                                     <tr>
                                         <td class="fw-semibold text-center">{{ $kn->sanPham->nguoiDung->HoTen ?? 'Người bán' }}</td>
                                         <td class="fw-semibold">{{ $kn->sanPham->TenSP ?? '' }}</td>
-                                        <td class="text-center">{{ $kn->NgayGui ? \Carbon\Carbon::parse($kn->NgayGui)->format('d/m/Y HH:mm') : '' }}</td>
+                                        <td class="text-center">{{ $kn->NgayGui ? \Carbon\Carbon::parse($kn->NgayGui)->format('d/m/Y H:i') : '' }}</td>
                                         <td>{{ $kn->MoTa }}</td>
                                         <td class="text-center">
                                             @if ($kn->TrangThai == 'Chưa xử lý')

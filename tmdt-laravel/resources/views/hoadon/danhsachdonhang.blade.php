@@ -40,7 +40,7 @@
                             {{ $hd->TrangThai }}
                         </span>
                     </td>
-                    <td>{{ $hd->NgayDat ? \Carbon\Carbon::parse($hd->NgayDat)->format('d/m/Y HH:mm') : '' }}</td>
+                    <td>{{ $hd->NgayDat ? \Carbon\Carbon::parse($hd->NgayDat)->format('d/m/Y H:i') : '' }}</td>
                     <td>
                         <a href="{{ url('/HoaDon/ChiTiet/' . $hd->MaHD) }}" class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-eye"></i> Xem
