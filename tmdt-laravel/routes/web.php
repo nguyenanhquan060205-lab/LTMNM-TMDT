@@ -139,6 +139,14 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
 // AI CHAT WIDGET
 Route::post('/ai/chat', [AiChatController::class, 'chat'])->name('ai.chat');
 
+Route::get('/debug-log', function () {
+    $logFile = storage_path('logs/laravel.log');
+    if (file_exists($logFile)) {
+        return response('<pre>' . htmlspecialchars(file_get_contents($logFile)) . '</pre>');
+    }
+    return 'No log file.';
+});
+
 Route::get('/test-upload', function() {
     return '<form method="POST" enctype="multipart/form-data" action="/test-upload-post"><input type="hidden" name="_token" value="'.csrf_token().'"><input type="file" name="files[]" required><input type="file" name="files[]" multiple><button type="submit">Submit</button></form>';
 });
