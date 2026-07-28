@@ -177,7 +177,7 @@ PROMPT;
                             'Content-Type'   => 'application/json',
                         ])
                         ->post(
-                            'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent',
+                            'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent',
                             $payload
                         );
 
