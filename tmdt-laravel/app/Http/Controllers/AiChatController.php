@@ -14,8 +14,8 @@ class AiChatController extends Controller
     private function containsDangerousInput(string $text): bool
     {
         $dangerousPatterns = [
-            // SQL injection keywords
-            '/\b(SELECT|INSERT|UPDATE|DELETE|DROP|TRUNCATE|ALTER|CREATE|EXEC|EXECUTE|UNION|FROM|WHERE|JOIN|INTO|VALUES|HAVING|GROUP BY|ORDER BY|INFORMATION_SCHEMA|SYS\.)\b/i',
+            // SQL injection keywords (Bỏ các từ thông dụng dễ bị trùng như FROM, WHERE, UPDATE... chỉ giữ các cụm nguy hiểm thực sự)
+            '/\b(DROP TABLE|TRUNCATE TABLE|ALTER TABLE|UNION SELECT|INFORMATION_SCHEMA|SYS\.)\b/i',
             // Shell / system commands
             '/\b(system|exec|passthru|shell_exec|popen|proc_open|eval|assert|base64_decode)\b/i',
             // Script / code injection
@@ -258,7 +258,8 @@ PROMPT;
             }
 
             return response()->json(['reply' => '😔 Tôi đang gặp sự cố kết nối. Vui lòng thử lại sau hoặc liên hệ Admin!']);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('AI Chat Error (Throwable)', ['msg' => $e->getMessage(), 'line' => $e->getLine()]);
             return response()->json(['reply' => '⚠️ Kết nối AI bị lỗi. Bạn có thể nhắn tin cho Admin (CSKH ⭐) để được hỗ trợ nhé!']);
         }
     }
