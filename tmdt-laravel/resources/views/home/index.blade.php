@@ -328,7 +328,7 @@
     <div class="container">
         <div class="d-flex flex-wrap justify-content-between align-items-end mb-4">
             <div>
-                <span class="text-primary-custom fw-bold text-uppercase" style="letter-spacing: 2px; font-size: 0.85rem;">Trending Now</span>
+                <span class="text-primary-custom fw-bold text-uppercase" style="letter-spacing: 2px; font-size: 0.85rem;">Xu Hướng Mới</span>
                 <h2 class="fw-bold text-dark mt-2 mb-0">Sản phẩm mới lên kệ</h2>
             </div>
             <a href="{{ url('/sanpham') }}" class="text-decoration-none fw-bold text-primary-custom mt-3 mt-md-0">Xem tất cả <i class="fa-solid fa-arrow-right ms-1"></i></a>
