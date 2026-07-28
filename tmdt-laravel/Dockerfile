@@ -38,7 +38,4 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Pass environment variables to PHP
-RUN echo "PassEnv APP_NAME APP_ENV APP_KEY APP_DEBUG DB_CONNECTION DB_HOST DB_PORT DB_DATABASE DB_USERNAME DB_PASSWORD SESSION_DRIVER FILESYSTEM_DISK QUEUE_CONNECTION BROADCAST_CONNECTION CLOUDINARY_URL GEMINI_API_KEY PUSHER_APP_ID PUSHER_APP_KEY PUSHER_APP_SECRET PUSHER_APP_CLUSTER" >> /etc/apache2/apache2.conf
-
 EXPOSE 80
