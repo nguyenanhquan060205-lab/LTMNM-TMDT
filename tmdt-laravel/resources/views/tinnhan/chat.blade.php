@@ -696,7 +696,7 @@
             data: { _token: token },
             success: function() { loadTinNhan(); },
             error: function(xhr) {
-                alert('Không thể xóa tin nhắn: ' + (xhr.responseJSON?.error || ''));
+                Swal.fire('Lỗi', 'Không thể xóa tin nhắn: ' + (xhr.responseJSON?.error || ''), 'error');
             }
         });
     }

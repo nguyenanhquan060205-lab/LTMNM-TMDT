@@ -34,7 +34,7 @@
     $("#btnGui").click(function () {
         let moTa = $("#MoTa").val().trim();
         if (!moTa) {
-            alert("Vui lòng nhập nội dung khiếu nại!");
+            Swal.fire('Cảnh báo', 'Vui lòng nhập nội dung khiếu nại!', 'warning');
             return;
         }
 
@@ -42,10 +42,15 @@
             _token: "{{ csrf_token() }}",
             MoTa: moTa
         }, function () {
-            alert("Gửi khiếu nại thành công! Vui lòng chờ Admin xử lý.");
-            window.location.href = "{{ route('sanpham.chitiet', ['id' => $sp->MaSP]) }}";
+            Swal.fire({
+                title: 'Thành công',
+                text: 'Gửi khiếu nại thành công! Vui lòng chờ Admin xử lý.',
+                icon: 'success'
+            }).then(() => {
+                window.location.href = "{{ route('sanpham.chitiet', ['id' => $sp->MaSP]) }}";
+            });
         }).fail(function() {
-            alert("Có lỗi xảy ra, vui lòng thử lại.");
+            Swal.fire('Lỗi', 'Có lỗi xảy ra, vui lòng thử lại.', 'error');
         });
     });
 </script>

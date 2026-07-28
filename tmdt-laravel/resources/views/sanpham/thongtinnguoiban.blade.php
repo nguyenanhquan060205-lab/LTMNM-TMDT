@@ -179,12 +179,12 @@
                         var myModal = new bootstrap.Modal(document.getElementById('modalChuyenKhoan'));
                         myModal.show();
                     } else {
-                        alert("Người bán chưa cập nhật thông tin chuyển khoản");
+                        Swal.fire('Thông báo', 'Người bán chưa cập nhật thông tin chuyển khoản', 'info');
                     }
                 },
                 error: function(xhr, status, error) {
                     console.error(error);
-                    alert("Không thể tải thông tin chuyển khoản");
+                    Swal.fire('Lỗi', 'Không thể tải thông tin chuyển khoản', 'error');
                 }
             });
         });
@@ -204,7 +204,7 @@
                 btn.style.color = '';
             }, 2000);
         }).catch(function (err) {
-            alert("Không thể sao chép. Vui lòng thử lại!");
+            Swal.fire('Lỗi', 'Không thể sao chép. Vui lòng thử lại!', 'error');
         });
     }
 </script>
