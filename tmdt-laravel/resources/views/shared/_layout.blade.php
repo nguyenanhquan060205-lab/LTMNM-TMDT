@@ -2,7 +2,7 @@
     $user = Session::get('user');
     $anh = $user && !empty($user->AnhDaiDien)
         ? str_starts_with($user->AnhDaiDien, 'http') ? $user->AnhDaiDien : asset('Content/Avatars/' . $user->AnhDaiDien)
-        : url('content/avatars/default.jpg');
+        : url('Content/Avatars/Default.jpg');
 
     $cartCount = 0;
     if ($user) {
@@ -18,12 +18,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@yield('title', 'TechSecond')</title>
-    <link rel="stylesheet" href="{{ url('content/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ url('Content/bootstrap.min.css') }}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <link rel="stylesheet" href="{{ url('content/site.css') }}" />
+    <link rel="stylesheet" href="{{ url('Content/Site.css') }}" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{{ url('scripts/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url('Scripts/bootstrap.bundle.min.js') }}"></script>
 </head>
 
 <body>
@@ -87,7 +87,7 @@
                                data-bs-toggle="dropdown"
                                style="padding: 0.3rem 0.8rem;">
                                 <img src="{{ $anh }}"
-                                     onerror="this.src='{{ url('content/avatars/default.jpg') }}';"
+                                     onerror="this.src='{{ url('Content/Avatars/Default.jpg') }}';"
                                      class="rounded-circle me-2 shadow-sm"
                                      width="30"
                                      height="30" />

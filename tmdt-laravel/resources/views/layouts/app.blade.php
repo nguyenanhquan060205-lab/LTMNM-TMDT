@@ -80,7 +80,7 @@
                                data-bs-toggle="dropdown"
                                style="padding: 0.3rem 0.8rem;">
                                 <img src="{{ $anh }}"
-                                     onerror="this.src='{{ url('content/avatars/default.jpg') }}';"
+                                     onerror="this.src='{{ url('Content/Avatars/Default.jpg') }}';"
                                      class="rounded-circle me-2 shadow-sm"
                                      width="30"
                                      height="30" />

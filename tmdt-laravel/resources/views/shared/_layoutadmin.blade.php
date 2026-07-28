@@ -2,7 +2,7 @@
     $user = Session::get('user');
     $anh = $user && !empty($user->AnhDaiDien)
         ? str_starts_with($user->AnhDaiDien, 'http') ? $user->AnhDaiDien : asset('Content/Avatars/' . $user->AnhDaiDien)
-        : url('content/avatars/default.jpg');
+        : url('Content/Avatars/Default.jpg');
 @endphp
 <!DOCTYPE html>
 <html lang="vi">
