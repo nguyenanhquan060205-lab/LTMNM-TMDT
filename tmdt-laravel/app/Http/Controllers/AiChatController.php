@@ -160,7 +160,7 @@ PROMPT;
                     'Content-Type'   => 'application/json',
                 ])
                 ->post(
-                    'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent',
+                    'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent',
                     $payload
                 );
 
@@ -217,7 +217,7 @@ PROMPT;
                             'Content-Type'   => 'application/json',
                         ])
                         ->post(
-                            'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent',
+                            'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent',
                             $payload
                         );
 
