@@ -200,7 +200,7 @@ PROMPT;
                     }
 
                     $contents[] = [
-                        'role' => 'user',
+                        'role' => 'function',
                         'parts' => [
                             [
                                 'functionResponse' => $functionResponsePart
