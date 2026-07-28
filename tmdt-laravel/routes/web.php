@@ -25,6 +25,10 @@ Route::get('/', [HomeController::class, 'index'])->name('index');
 Route::get('/home', [HomeController::class, 'index']);
 Route::get('/home/index', [HomeController::class, 'index']);
 
+// SOCIALITE (Đăng nhập MXH)
+Route::get('/auth/{provider}', [\App\Http\Controllers\SocialController::class, 'redirectToProvider'])->name('social.redirect');
+Route::get('/auth/{provider}/callback', [\App\Http\Controllers\SocialController::class, 'handleProviderCallback'])->name('social.callback');
+
 // TAI KHOAN
 Route::prefix('taikhoan')->name('taikhoan.')->group(function() {
     Route::get('/dangnhap', [TaiKhoanController::class, 'dangNhap'])->name('dangnhap');
@@ -34,6 +38,16 @@ Route::prefix('taikhoan')->name('taikhoan.')->group(function() {
     Route::get('/dangxuat', [TaiKhoanController::class, 'dangXuat'])->name('dangxuat');
     
     Route::get('/lichsu', [TaiKhoanController::class, 'lichSu'])->name('lichsu');
+    Route::get('/xac-nhan-email/{token}', [TaiKhoanController::class, 'xacNhanEmail'])->name('xacNhanEmail');
+    Route::get('/quenmatkhau', [TaiKhoanController::class, 'quenMatKhau'])->name('quenmatkhau');
+    Route::post('/quenmatkhau', [TaiKhoanController::class, 'postQuenMatKhau']);
+    Route::get('/datlaimatkhau/{token}', [TaiKhoanController::class, 'datLaiMatKhau'])->name('datlaimatkhau');
+    Route::post('/datlaimatkhau', [TaiKhoanController::class, 'postDatLaiMatKhau']);
+
+    Route::post('/send-otp-email', [TaiKhoanController::class, 'sendOtpChangeEmail'])->name('sendOtpEmail');
+    Route::post('/verify-otp-email', [TaiKhoanController::class, 'verifyOtpChangeEmail'])->name('verifyOtpEmail');
+    Route::post('/update-new-email', [TaiKhoanController::class, 'updateNewEmail'])->name('updateNewEmail');
+
     Route::get('/ctlichsu/{id}', [TaiKhoanController::class, 'ctLichSu'])->name('ct_lichsu');
     Route::get('/suadonhang/{id}', [TaiKhoanController::class, 'suaDonHang'])->name('suadonhang');
     Route::post('/suadonhang/{id}', [TaiKhoanController::class, 'postSuaDonHang']);

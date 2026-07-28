@@ -180,6 +180,20 @@
                 </button>
             </form>
 
+            <div class="mt-4 mb-4 position-relative text-center">
+                <hr style="border-color: #cbd5e1;">
+                <span class="position-absolute top-50 start-50 translate-middle bg-white px-2 text-muted" style="font-size: 0.85rem; border-radius: 4px;">Hoặc đăng ký nhanh bằng</span>
+            </div>
+
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="{{ route('social.redirect', 'google') }}" class="btn w-50 d-flex align-items-center justify-content-center gap-2" style="border-radius: 12px; border: 1px solid #e2e8f0; background-color: #fff; color: #ea4335; font-weight: 500; transition: all 0.2s;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width: 18px; height: 18px;"> Google
+                </a>
+                <a href="{{ route('social.redirect', 'facebook') }}" class="btn w-50 d-flex align-items-center justify-content-center gap-2" style="border-radius: 12px; border: 1px solid #e2e8f0; background-color: #fff; color: #1877f2; font-weight: 500; transition: all 0.2s;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook" style="width: 18px; height: 18px;"> Facebook
+                </a>
+            </div>
+
             <p class="text-center mt-4 mb-0" style="color: #718096; font-size: 0.95rem;">
                 Đã có tài khoản? <a href="{{ url('/taikhoan/dangnhap') }}" class="auth-link">Đăng nhập</a>
             </p>

@@ -57,6 +57,10 @@ class TaiKhoanController extends Controller
             return back()->with('error', 'Tài khoản của bạn đã bị khóa! Vui lòng liên hệ Admin.');
         }
 
+        if (!empty($user->Email) && is_null($user->email_verified_at)) {
+            return back()->with('error', 'Vui lòng kiểm tra hộp thư Email để xác nhận tài khoản trước khi đăng nhập!');
+        }
+
         Session::put('user', $user);
 
         // Fetch Cart Count
@@ -107,11 +111,115 @@ class TaiKhoanController extends Controller
         $nd['NgayTao'] = now();
         $nd['AnhDaiDien'] = 'Default.jpg';
         $nd['Khoa'] = false;
-
         $nd['MatKhau'] = \Illuminate\Support\Facades\Hash::make($nd['MatKhau']);
+
+        if (!empty($email)) {
+            $token = \Illuminate\Support\Str::random(60);
+            $nd['verification_token'] = $token;
+        }
+
         NguoiDung::create($nd);
 
+        if (!empty($email) && isset($token)) {
+            $verifyUrl = route('taikhoan.xacNhanEmail', ['token' => $token]);
+            try {
+                \Illuminate\Support\Facades\Mail::send('emails.verify', ['url' => $verifyUrl, 'name' => $nd['HoTen']], function ($message) use ($email) {
+                    $message->to($email)->subject('Xác nhận địa chỉ Email của bạn - TechSecond');
+                });
+            } catch (\Exception $e) {
+                // Log the error if mail fails
+                \Illuminate\Support\Facades\Log::error("Failed to send verification email to $email: " . $e->getMessage());
+            }
+            return redirect()->route('taikhoan.dangnhap')->with('success', 'Đăng ký thành công! Vui lòng kiểm tra hộp thư Email để xác nhận tài khoản.');
+        }
+
         return redirect()->route('taikhoan.dangnhap')->with('success', 'Đăng ký thành công!');
+    }
+
+    public function xacNhanEmail($token)
+    {
+        $user = NguoiDung::where('verification_token', $token)->first();
+
+        if (!$user) {
+            return redirect()->route('taikhoan.dangnhap')->with('error', 'Liên kết xác nhận không hợp lệ hoặc đã hết hạn.');
+        }
+
+        $user->email_verified_at = now();
+        $user->verification_token = null;
+        $user->save();
+
+        return redirect()->route('taikhoan.dangnhap')->with('success', 'Xác nhận Email thành công! Bạn có thể đăng nhập ngay bây giờ.');
+    }
+
+    public function quenMatKhau()
+    {
+        return view('taikhoan.quenmatkhau');
+    }
+
+    public function postQuenMatKhau(Request $request)
+    {
+        $email = $request->input('Email');
+        $user = NguoiDung::where('Email', $email)->first();
+
+        if (!$user) {
+            return back()->with('error', 'Không tìm thấy tài khoản nào đăng ký với email này.');
+        }
+
+        $token = \Illuminate\Support\Str::random(60);
+
+        \Illuminate\Support\Facades\DB::table('password_resets')->insert([
+            'email' => $email,
+            'token' => $token,
+            'created_at' => now()
+        ]);
+
+        $resetUrl = url('/taikhoan/datlaimatkhau/' . $token);
+        
+        try {
+            \Illuminate\Support\Facades\Mail::send('emails.reset', ['url' => $resetUrl, 'name' => $user->HoTen], function ($message) use ($email) {
+                $message->to($email)->subject('Yêu cầu đặt lại mật khẩu - TechSecond');
+            });
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Failed to send reset password email to $email: " . $e->getMessage());
+            return back()->with('error', 'Có lỗi xảy ra khi gửi email, vui lòng thử lại sau.');
+        }
+
+        return back()->with('success', 'Một liên kết đặt lại mật khẩu đã được gửi đến email của bạn.');
+    }
+
+    public function datLaiMatKhau($token)
+    {
+        $reset = \Illuminate\Support\Facades\DB::table('password_resets')->where('token', $token)->first();
+        if (!$reset) {
+            return redirect()->route('taikhoan.dangnhap')->with('error', 'Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.');
+        }
+        return view('taikhoan.datlaimatkhau', compact('token'));
+    }
+
+    public function postDatLaiMatKhau(Request $request)
+    {
+        $token = $request->input('token');
+        $mkMoi = $request->input('MatKhauMoi');
+        $xnMkMoi = $request->input('XacNhanMatKhauMoi');
+
+        if ($mkMoi !== $xnMkMoi) {
+            return back()->with('error', 'Mật khẩu xác nhận không khớp.');
+        }
+
+        $reset = \Illuminate\Support\Facades\DB::table('password_resets')->where('token', $token)->first();
+        if (!$reset) {
+            return redirect()->route('taikhoan.dangnhap')->with('error', 'Liên kết không hợp lệ.');
+        }
+
+        $user = NguoiDung::where('Email', $reset->email)->first();
+        if ($user) {
+            $user->MatKhau = \Illuminate\Support\Facades\Hash::make($mkMoi);
+            $user->save();
+        }
+
+        \Illuminate\Support\Facades\DB::table('password_resets')->where('email', $reset->email)->delete();
+
+        return redirect()->route('taikhoan.dangnhap')->with('success', 'Đặt lại mật khẩu thành công! Bạn có thể đăng nhập bằng mật khẩu mới.');
     }
 
     public function thongTinKhachHang($id = null)
@@ -140,6 +248,97 @@ class TaiKhoanController extends Controller
         return view('taikhoan.thongtinadmin', compact('user'));
     }
 
+    public function adminQuyen()
+    {
+        $user = Session::get('user');
+        if (!$user || $user->VaiTro != 'Admin') {
+            return redirect()->route('taikhoan.dangnhap');
+        }
+        return view('taikhoan.adminquyen', compact('user'));
+    }
+
+    // --- OTP EMAIL CHANGE API ---
+    public function sendOtpChangeEmail(Request $request)
+    {
+        $user = Session::get('user');
+        if (!$user) return response()->json(['success' => false, 'message' => 'Chưa đăng nhập!']);
+
+        if (empty($user->Email)) {
+            return response()->json(['success' => false, 'message' => 'Bạn chưa cập nhật Email nên không thể đổi bằng cách này!']);
+        }
+
+        $otp = rand(1000, 9999);
+        Session::put('otp_change_email', [
+            'code' => $otp,
+            'expires_at' => time() + 60
+        ]);
+
+        try {
+            \Illuminate\Support\Facades\Mail::send('emails.otp', ['otp' => $otp, 'name' => $user->HoTen], function ($message) use ($user) {
+                $message->to($user->Email)->subject('Mã OTP xác thực thay đổi Email - TechSecond');
+            });
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("OTP Mail Error: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Không thể gửi email OTP lúc này.']);
+        }
+    }
+
+    public function verifyOtpChangeEmail(Request $request)
+    {
+        $user = Session::get('user');
+        if (!$user) return response()->json(['success' => false]);
+
+        $inputOtp = $request->input('otp');
+        $sessionOtp = Session::get('otp_change_email');
+
+        if (!$sessionOtp) {
+            return response()->json(['success' => false, 'message' => 'Mã OTP không tồn tại hoặc đã hết hạn!']);
+        }
+
+        if (time() > $sessionOtp['expires_at']) {
+            Session::forget('otp_change_email');
+            return response()->json(['success' => false, 'message' => 'Mã OTP đã hết hạn! Vui lòng lấy mã mới.']);
+        }
+
+        if ((int)$inputOtp === (int)$sessionOtp['code']) {
+            Session::put('otp_email_verified', true);
+            Session::forget('otp_change_email');
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Mã OTP không chính xác!']);
+    }
+
+    public function updateNewEmail(Request $request)
+    {
+        $userSession = Session::get('user');
+        if (!$userSession || !Session::get('otp_email_verified')) {
+            return response()->json(['success' => false, 'message' => 'Bạn chưa xác thực OTP!']);
+        }
+
+        $newEmail = $request->input('new_email');
+        if (empty($newEmail) || !filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+            return response()->json(['success' => false, 'message' => 'Email không hợp lệ!']);
+        }
+
+        if (NguoiDung::where('Email', $newEmail)->exists()) {
+            return response()->json(['success' => false, 'message' => 'Email này đã được sử dụng bởi người khác!']);
+        }
+
+        $user = NguoiDung::find($userSession->MaKH);
+        if ($user) {
+            $user->Email = $newEmail;
+            $user->save();
+            
+            Session::put('user', $user);
+            Session::forget('otp_email_verified');
+            return response()->json(['success' => true, 'message' => 'Đổi Email thành công!']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Không tìm thấy người dùng!']);
+    }
+
     public function capNhatThongTin(Request $request)
     {
         $model = $request->except('_token', 'fileUpload');
@@ -149,9 +348,7 @@ class TaiKhoanController extends Controller
         $actionName = ($user->VaiTro == 'Admin') ? 'taikhoan.thongtinadmin' : 'taikhoan.thongtinkhachhang';
 
         try {
-            if (!empty($model['Email']) && NguoiDung::where('Email', $model['Email'])->where('MaKH', '!=', $model['MaKH'])->exists()) {
-                return redirect()->route($actionName)->with('error', 'Email đã được sử dụng bởi tài khoản khác!');
-            }
+            // Logic đổi Email đã được chuyển sang xử lý bằng AJAX OTP
 
             if (!empty($model['SDT']) && NguoiDung::where('SDT', $model['SDT'])->where('MaKH', '!=', $model['MaKH'])->exists()) {
                 return redirect()->route($actionName)->with('error', 'Số điện thoại đã được sử dụng bởi tài khoản khác!');
@@ -182,8 +379,8 @@ class TaiKhoanController extends Controller
             $user->DiaChi = $model['DiaChi'] ?? $user->DiaChi;
 
             $user->save();
+            
             Session::put('user', $user);
-
             return redirect()->route($actionName)->with('success', '✅ Cập nhật thông tin thành công!');
         } catch (\Exception $ex) {
             return redirect()->route($actionName)->with('error', 'Đã xảy ra lỗi hệ thống: ' . $ex->getMessage());

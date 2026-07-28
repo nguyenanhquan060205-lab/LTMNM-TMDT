@@ -64,7 +64,12 @@
 
                         <div class="mb-3">
                             <label class="small mb-1 fw-bold">Email (Tên đăng nhập)</label>
-                            <input type="email" name="Email" class="form-control bg-light" readonly value="{{ $user->Email }}" />
+                            <div class="input-group">
+                                <input type="email" id="currentEmail" class="form-control bg-light" readonly value="{{ $user->Email }}" />
+                                <button class="btn btn-outline-primary" type="button" onclick="startChangeEmailFlow()">
+                                    <i class="fa-solid fa-envelope-circle-check me-1"></i> Đổi Email
+                                </button>
+                            </div>
                         </div>
 
                         <div class="row gx-3 mb-3">
@@ -139,5 +144,129 @@
         const file = event.target.files[0];
         if (file) img.src = URL.createObjectURL(file);
     }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function startChangeEmailFlow() {
+    Swal.fire({
+        title: 'Đang gửi mã OTP...',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+    });
+
+    fetch('{{ route("taikhoan.sendOtpEmail") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(!data.success) {
+            Swal.fire('Lỗi', data.message, 'error');
+            return;
+        }
+        showOtpPopup();
+    })
+    .catch(() => Swal.fire('Lỗi', 'Có lỗi kết nối', 'error'));
+}
+
+function showOtpPopup() {
+    let timeLeft = 60;
+    let timerInterval;
+
+    Swal.fire({
+        title: 'Nhập mã OTP',
+        html: `
+            Mã OTP 4 số đã được gửi về email hiện tại.<br>
+            Vui lòng kiểm tra hộp thư của bạn.<br><br>
+            <b id="swal-timer" style="color: #dc3545; font-size: 24px;">60s</b><br><br>
+            <input type="text" id="otp-input" class="swal2-input" placeholder="Nhập mã 4 số" maxlength="4" style="text-align: center; font-size: 20px; letter-spacing: 5px;">
+        `,
+        confirmButtonText: 'Xác nhận',
+        confirmButtonColor: '#0d6efd',
+        allowOutsideClick: false,
+        didOpen: () => {
+            const b = Swal.getHtmlContainer().querySelector('#swal-timer');
+            timerInterval = setInterval(() => {
+                timeLeft -= 1;
+                b.textContent = timeLeft + 's';
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    Swal.fire('Hết hạn', 'Mã OTP đã hết hạn, vui lòng gửi lại.', 'warning');
+                }
+            }, 1000);
+        },
+        willClose: () => { clearInterval(timerInterval); },
+        preConfirm: () => {
+            const otp = document.getElementById('otp-input').value;
+            if(!otp || otp.length !== 4) {
+                Swal.showValidationMessage('Vui lòng nhập đủ 4 số');
+                return false;
+            }
+            return fetch('{{ route("taikhoan.verifyOtpEmail") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ otp: otp })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if(!data.success) { throw new Error(data.message); }
+                return true;
+            })
+            .catch(err => {
+                Swal.showValidationMessage(err.message);
+                return false;
+            });
+        }
+    }).then(result => {
+        if(result.isConfirmed) {
+            showNewEmailPopup();
+        }
+    });
+}
+
+function showNewEmailPopup() {
+    Swal.fire({
+        title: 'Nhập Email mới',
+        input: 'email',
+        inputPlaceholder: 'vidu@gmail.com',
+        confirmButtonText: 'Lưu thay đổi',
+        confirmButtonColor: '#198754',
+        allowOutsideClick: false,
+        preConfirm: (newEmail) => {
+            if(!newEmail) {
+                Swal.showValidationMessage('Vui lòng nhập email');
+                return false;
+            }
+            return fetch('{{ route("taikhoan.updateNewEmail") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ new_email: newEmail })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if(!data.success) { throw new Error(data.message); }
+                return true;
+            })
+            .catch(err => {
+                Swal.showValidationMessage(err.message);
+                return false;
+            });
+        }
+    }).then(result => {
+        if(result.isConfirmed) {
+            Swal.fire('Thành công!', 'Email của bạn đã được cập nhật.', 'success')
+            .then(() => location.reload());
+        }
+    });
+}
 </script>
 @endsection
