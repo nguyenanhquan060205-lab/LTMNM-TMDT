@@ -17,7 +17,11 @@ class SocialController extends Controller
         if (!in_array($provider, ['google', 'facebook'])) {
             abort(404);
         }
-        return Socialite::driver($provider)->redirect();
+        $driver = Socialite::driver($provider);
+        if ($provider === 'facebook') {
+            $driver->setScopes([]); // Xóa scope email mặc định của Socialite
+        }
+        return $driver->redirect();
     }
 
     public function handleProviderCallback($provider)
@@ -35,10 +39,13 @@ class SocialController extends Controller
 
         $providerIdField = $provider . '_id';
 
-        // Tìm người dùng theo provider_id hoặc email
-        $user = NguoiDung::where($providerIdField, $socialUser->id)
-                    ->orWhere('Email', $socialUser->email)
-                    ->first();
+        // Tìm người dùng theo provider_id
+        $user = NguoiDung::where($providerIdField, $socialUser->id)->first();
+        
+        // Nếu không thấy bằng provider_id thì thử tìm bằng email (nếu có email)
+        if (!$user && !empty($socialUser->email)) {
+            $user = NguoiDung::where('Email', $socialUser->email)->first();
+        }
 
         if ($user) {
             // Nếu tìm thấy theo email nhưng chưa có provider_id, thì cập nhật
@@ -64,7 +71,8 @@ class SocialController extends Controller
             return redirect()->route('index');
         } else {
             // Tạo mới người dùng
-            $baseUsername = strtolower(explode('@', $socialUser->email)[0] ?? Str::slug($socialUser->name));
+            $emailParts = explode('@', $socialUser->email ?? '');
+            $baseUsername = strtolower($emailParts[0] ?: Str::slug($socialUser->name ?: 'user'));
             $username = $baseUsername;
             $counter = 1;
             while (NguoiDung::where('TaiKhoan', $username)->exists()) {
@@ -79,9 +87,9 @@ class SocialController extends Controller
             }
 
             $newUser = NguoiDung::create([
-                'HoTen' => $socialUser->name,
+                'HoTen' => $socialUser->name ?: 'Người dùng Facebook',
                 'TaiKhoan' => $username,
-                'Email' => $socialUser->email,
+                'Email' => $socialUser->email ?? null,
                 'MatKhau' => Hash::make(Str::random(16)), // Mật khẩu ngẫu nhiên
                 'VaiTro' => 'User',
                 'AnhDaiDien' => $avatarPath,
