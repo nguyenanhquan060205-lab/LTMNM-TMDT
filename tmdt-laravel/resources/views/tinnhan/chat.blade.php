@@ -422,7 +422,8 @@
                  style="display:none; padding:10px 15px; border-top:1px solid #ddd; background:#fff;">
                 <div style="position:relative; display:inline-block;">
                     <img id="previewImg"
-                         style="max-width:120px; border-radius:10px; border:1px solid #ccc;" />
+                         style="max-width:120px; border-radius:10px; border:1px solid #ccc; cursor: pointer;"
+                         onclick="openImageModal(this.src)" />
                     <button id="removeImage"
                             type="button"
                             style="position:absolute; top:-8px; right:-8px;

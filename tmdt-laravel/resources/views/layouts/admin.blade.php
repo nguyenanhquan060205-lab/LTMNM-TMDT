@@ -294,7 +294,7 @@
 
             <div class="user">
                 @php
-                    $avatar = empty($user->AnhDaiDien) ? "Default.jpg" : $user->AnhDaiDien;
+                    $avatar = (empty($user->AnhDaiDien) || strtolower($user->AnhDaiDien) == 'default.jpg') ? "Default.jpg" : $user->AnhDaiDien;
                 @endphp
 
                 @if ($user)
