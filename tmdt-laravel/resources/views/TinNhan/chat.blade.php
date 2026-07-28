@@ -114,8 +114,8 @@
 
     .bubble {
         padding: 10px 14px;
-        max-width: 70%;
-        margin: 0 8px;
+        max-width: 65%;         
+        width: fit-content;      
         border-radius: 18px;
         background: #fff;
         box-shadow: 0 1px 2px rgba(0,0,0,.1);
@@ -123,6 +123,7 @@
 
     .msg.me {
         justify-content: flex-end;
+        text-align: right;
     }
 
         .msg.me .bubble {
@@ -179,6 +180,23 @@
         white-space: pre-wrap;
         word-break: break-word;
         line-height: 1.4;
+    }
+
+    .chat-product-card{
+        display:flex;
+        gap:12px;
+        border:1px solid #ddd;
+        border-radius:12px;
+        padding:10px;
+        margin-bottom:10px;
+        background:#fafafa;
+        color: #333 !important;
+    }
+
+    .chat-product-card img{
+        width:70px;
+        height:70px;
+        object-fit:cover;
     }
 
     .msg-options {
@@ -429,6 +447,30 @@
                     }
                 }
 
+                let messageHtml = "";
+                if (m.MaSP) {
+                    messageHtml += `
+                        <div class="chat-product-card">
+                            <img src="/Content/images/${m.AnhSP}">
+                            <div>
+                                <div><b>${m.TenSP}</b></div>
+                                <a href="/sanpham/chitiet/${m.MaSP}"
+                                class="btn btn-sm btn-outline-primary mt-2">
+                                    Xem sản phẩm
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (m.NoiDung) {
+                    messageHtml += `
+                        <div class="chat-text">
+                            ${m.NoiDung}
+                        </div>
+                    `;
+                }
+
                 html += `
                 <div class="msg ${isMe ? 'me' : 'them'}" data-dadoc="${m.DaDoc}">
                     ${!isMe ? `<img class="avatar" src="${av}">` : ""}
@@ -451,10 +493,7 @@
                         : ""
                         }
 
-                        ${m.NoiDung
-                        ? `<div class="chat-text">${m.NoiDung}</div>`
-                        : ""
-                        }
+                        ${messageHtml}
 
                         <div class="bubble-time">${m.Gio}</div>
                         ${receiptHtml}
@@ -481,16 +520,18 @@
         const idGui = $('#NguoiGuiID').val();
         const idNhan = $('#NguoiNhanID').val();
         const msg = $("#txtMsg").val().trim();
+        const maSP = $("#maSP").val();
         const file = $("#imgUpload")[0] ? $("#imgUpload")[0].files[0] : null;
         let token = $('#RequestVerificationToken').val();
 
-        if (!msg && !file) return;
+        if (!msg && !file && !maSP) return;
 
         let formData = new FormData();
         formData.append("_token", token);
         formData.append("nguoiGui", idGui);
         formData.append("nguoiNhan", idNhan);
         formData.append("noiDung", msg);
+        if (maSP) formData.append("maSP", maSP);
         if (file) formData.append("anh", file);
 
         $.ajax({
@@ -502,6 +543,9 @@
             success: function () {
                 $("#txtMsg").val('');
                 $("#imgUpload").val('');
+                $("#maSP").val('');
+                $("#anhSP").val('');
+                $("#tenSP").val('');
                 $("#imagePreview").hide();
                 autoScroll = true;
                 loadTinNhan();
@@ -600,23 +644,7 @@
         const maSP = $("#maSP").val();
         const tenSP = $("#tenSP").val();
 
-        if (anhSP) {
-            const imgUrl = `/Content/images/${anhSP}`;
-
-            // preview ảnh
-            $("#previewImg").attr("src", imgUrl);
-            $("#imagePreview").show();
-
-            // convert URL → File (để gửi như upload)
-            fetch(imgUrl)
-                .then(res => res.blob())
-                .then(blob => {
-                    const file = new File([blob], anhSP, { type: blob.type });
-                    const dt = new DataTransfer();
-                    dt.items.add(file);
-                    document.getElementById("imgUpload").files = dt.files;
-                });
-
+        if (maSP) {
             $("#txtMsg").val("Mình muốn hỏi về sản phẩm " + tenSP + " này");
         }
     });

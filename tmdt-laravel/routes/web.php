@@ -55,6 +55,7 @@ Route::prefix('taikhoan')->name('taikhoan.')->group(function() {
 // SAN PHAM
 Route::prefix('sanpham')->name('sanpham.')->group(function() {
     Route::get('/', [SanPhamController::class, 'index'])->name('index');
+    Route::get('/index', [SanPhamController::class, 'index']);
     Route::get('/chitiet/{id}', [SanPhamController::class, 'chiTiet'])->name('chitiet');
     Route::get('/thongtinnguoiban/{id}', [SanPhamController::class, 'thongTinNguoiBan'])->name('thongtinnguoiban');
     Route::get('/taomoi', [SanPhamController::class, 'taoMoi'])->name('taomoi');
@@ -125,9 +126,14 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::post('/xoakhieunai', [AdminController::class, 'xoaKhieuNai']);
 
     // LOAI SAN PHAM
-    Route::post('/loaisanpham/them', [LoaiSanPhamController::class, 'them']);
-    Route::post('/loaisanpham/sua/{id}', [LoaiSanPhamController::class, 'sua']);
-    Route::get('/loaisanpham/xoa/{id}', [LoaiSanPhamController::class, 'xoa']);
+    Route::get('/loaisanpham/them', [LoaiSanPhamController::class, 'create'])->name('loaisanpham.create');
+    Route::post('/loaisanpham/them', [LoaiSanPhamController::class, 'store'])->name('loaisanpham.store');
+    // Thêm Route GET để mở trang giao diện Sửa
+    Route::get('/loaisanpham/sua/{id}', [LoaiSanPhamController::class, 'edit'])->name('loaisanpham.edit');
+    // Route POST để lưu dữ liệu Sửa
+    Route::post('/loaisanpham/sua/{id}', [LoaiSanPhamController::class, 'update'])->name('loaisanpham.update');
+    // Route Xóa truyền {id} trên URL
+    Route::get('/loaisanpham/xoa/{id}', [LoaiSanPhamController::class, 'delete'])->name('loaisanpham.delete');
 });
 
 // AI CHAT WIDGET

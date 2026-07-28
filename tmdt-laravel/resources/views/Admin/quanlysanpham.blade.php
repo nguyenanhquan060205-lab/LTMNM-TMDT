@@ -374,11 +374,9 @@
                                         </td>
                                         <td class="text-center">
                                             <button class="btn btn-sm btn-outline-primary border-0" data-bs-toggle="modal" data-bs-target="#modalEdit-{{ $loai->MaLoai }}"><i class="fa-solid fa-pen-to-square"></i></button>
-                                            <form action="{{ url('/loaisanpham/xoa') }}" method="post" class="d-inline" onsubmit="return confirm('Xóa {{ $loai->TenLoai }}?');">
-                                                @csrf
-                                                <input type="hidden" name="id" value="{{ $loai->MaLoai }}" />
-                                                <button class="btn btn-sm btn-outline-danger border-0"><i class="fa-solid fa-trash"></i></button>
-                                            </form>
+                                            <a href="{{ route('admin.loaisanpham.delete', $loai->MaLoai) }}" class="btn btn-sm btn-outline-danger border-0" onclick="return confirm('Xóa {{ $loai->TenLoai }}?');">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -400,10 +398,9 @@
                         <h6 class="modal-title">Cập nhật tên</h6>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-                    <form action="{{ url('/loaisanpham/sua') }}" method="post">
+                    <form action="{{ route('admin.loaisanpham.update', $loai->MaLoai) }}" method="post">
                         @csrf
                         <div class="modal-body">
-                            <input type="hidden" name="id" value="{{ $loai->MaLoai }}" />
                             <input type="text" name="TenLoaiMoi" class="form-control" value="{{ $loai->TenLoai }}" required />
                         </div>
                         <div class="modal-footer py-1">

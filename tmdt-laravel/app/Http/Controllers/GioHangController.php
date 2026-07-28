@@ -89,9 +89,12 @@ class GioHangController extends Controller
                 'ThanhTien' => $sp->Gia * $soLuongThem
             ]);
         } else {
-            $ctGioHang->SoLuong = $soLuongMoi;
-            $ctGioHang->ThanhTien = $sp->Gia * $soLuongMoi;
-            $ctGioHang->save();
+            CtGioHang::where('MaGH', $gio->MaGH)
+                ->where('MaSP', $id)
+                ->update([
+                    'SoLuong' => $soLuongMoi,
+                    'ThanhTien' => $sp->Gia * $soLuongMoi
+                ]);
         }
 
         $this->updateCartCount($user->MaKH);
@@ -112,9 +115,13 @@ class GioHangController extends Controller
 
         if ($ct && $sp) {
             if ($ct->SoLuong < $sp->SoLuong) {
-                $ct->SoLuong++;
-                $ct->ThanhTien = $ct->SoLuong * $sp->Gia;
-                $ct->save();
+                $soLuongMoi = $ct->SoLuong + 1;
+                CtGioHang::where('MaGH', $gio->MaGH)
+                    ->where('MaSP', $id)
+                    ->update([
+                        'SoLuong' => $soLuongMoi,
+                        'ThanhTien' => $soLuongMoi * $sp->Gia
+                    ]);
                 $this->updateCartCount($user->MaKH);
             } else {
                 Session::flash('CartWarning', "⚠️ Sản phẩm '{$sp->TenSP}' còn {$sp->SoLuong} sản phẩm!");
@@ -136,11 +143,18 @@ class GioHangController extends Controller
         if ($ct) {
             $sp = SanPham::find($id);
             if ($ct->SoLuong > 1) {
-                $ct->SoLuong--;
-                $ct->ThanhTien = $ct->SoLuong * $sp->Gia;
-                $ct->save();
+                $soLuongMoi = $ct->SoLuong - 1;
+                CtGioHang::where('MaGH', $gio->MaGH)
+                    ->where('MaSP', $id)
+                    ->update([
+                        'SoLuong' => $soLuongMoi,
+                        'ThanhTien' => $soLuongMoi * $sp->Gia
+                    ]);
             } else {
                 $ct->delete();
+                return redirect()
+                    ->route('giohang.index')
+                    ->with('CartOK', "Đã xóa sản phẩm khỏi giỏ hàng.");
             }
             $this->updateCartCount($user->MaKH);
         }

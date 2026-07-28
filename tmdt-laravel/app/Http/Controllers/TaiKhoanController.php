@@ -30,10 +30,20 @@ class TaiKhoanController extends Controller
             return back()->with('error', 'Vui lòng nhập đầy đủ thông tin đăng nhập!');
         }
 
-        $user = NguoiDung::where('TaiKhoan', $taikhoan)->where('MatKhau', $matkhau)->first();
+        $user = NguoiDung::where('TaiKhoan', $taikhoan)->first();
 
         if (!$user) {
             return back()->with('error', 'Sai tài khoản hoặc mật khẩu!');
+        }
+
+        if (!\Illuminate\Support\Facades\Hash::check($matkhau, $user->MatKhau)) {
+            if ($user->MatKhau === $matkhau) {
+                // Tự động mã hoá tài khoản cũ (plaintext)
+                $user->MatKhau = \Illuminate\Support\Facades\Hash::make($matkhau);
+                $user->save();
+            } else {
+                return back()->with('error', 'Sai tài khoản hoặc mật khẩu!');
+            }
         }
 
         if ($user->Khoa == true) {
@@ -91,6 +101,7 @@ class TaiKhoanController extends Controller
         $nd['AnhDaiDien'] = 'default.jpg';
         $nd['Khoa'] = false;
 
+        $nd['MatKhau'] = \Illuminate\Support\Facades\Hash::make($nd['MatKhau']);
         NguoiDung::create($nd);
 
         return redirect()->route('taikhoan.dangnhap')->with('success', 'Đăng ký thành công!');
@@ -188,7 +199,7 @@ class TaiKhoanController extends Controller
         $user = NguoiDung::find($request->MaKH);
         if (!$user) abort(404);
 
-        if ($user->MatKhau != $request->MatKhauHienTai) {
+        if (!\Illuminate\Support\Facades\Hash::check($request->MatKhauHienTai, $user->MatKhau) && $user->MatKhau !== $request->MatKhauHienTai) {
             return redirect()->route('taikhoan.thongtinkhachhang')->with('error', 'Mật khẩu hiện tại không đúng!');
         }
 
@@ -196,7 +207,7 @@ class TaiKhoanController extends Controller
             return redirect()->route('taikhoan.thongtinkhachhang')->with('error', 'Xác nhận mật khẩu không khớp!');
         }
 
-        $user->MatKhau = $request->MatKhauMoi;
+        $user->MatKhau = \Illuminate\Support\Facades\Hash::make($request->MatKhauMoi);
         $user->save();
         return redirect()->route('taikhoan.thongtinkhachhang')->with('success', 'Cập nhật mật khẩu thành công!');
     }
@@ -328,12 +339,26 @@ class TaiKhoanController extends Controller
                     return back()->withErrors(["Số lượng sản phẩm '{$sp->TenSP}' không đủ. Tồn kho: " . ($sp->SoLuong + $ct->SoLuong)]);
                 }
 
+                $chenhLech = $ctModel['SoLuong'] - $ct->SoLuong;
+
                 $ct->SoLuong = $ctModel['SoLuong'];
                 $ct->ThanhTien = $ct->SoLuong * $sp->Gia;
                 $ct->save();
+
+                // Cập nhật lại số lượng tồn kho của sản phẩm
+                if ($chenhLech != 0) {
+                    $sp->SoLuong -= $chenhLech;
+                    if ($sp->SoLuong == 0) {
+                        $sp->TrangThai = 'Đã bán';
+                    } elseif ($sp->SoLuong > 0 && $sp->TrangThai == 'Đã bán') {
+                        $sp->TrangThai = 'Đã duyệt';
+                    }
+                    $sp->save();
+                }
             }
         }
 
+        $hd->TongTien = \App\Models\CtHoaDon::where('MaHD', $hd->MaHD)->sum('ThanhTien');
         $hd->PhuongThucTT = $request->input('PhuongThucTT');
         $hd->DiaChiGiaoHang = $request->input('DiaChiGiaoHang');
         $hd->save();
