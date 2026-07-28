@@ -365,7 +365,7 @@
                      onclick="location.href='{{ url('/tinnhan/chat') }}?idNguoiNhan={{ $u->MaKH }}&mode={{ $mode }}'">
 
                     <div style="position:relative; flex-shrink:0;">
-                        <img src="{{ Str::startsWith($u->AnhDaiDien, 'http') ? $u->AnhDaiDien : url('Content/avatars/' . (empty($u->AnhDaiDien) ? 'Default.jpg' : $u->AnhDaiDien)) }}"
+                        <img src="{{ Str::startsWith($u->AnhDaiDien, 'http') ? $u->AnhDaiDien : url('Content/Avatars/' . (empty($u->AnhDaiDien) ? 'Default.jpg' : $u->AnhDaiDien)) }}"
                              style="width:36px;height:36px;border-radius:50%;object-fit:cover;" />
                         @if($u->VaiTro == 'Admin')
                             <span style="position:absolute;bottom:-2px;right:-4px;font-size:12px;" title="Chăm sóc khách hàng">⭐</span>
@@ -451,6 +451,28 @@
     </div>
 </div>
 
+<!-- Image Zoom Modal -->
+<div class="modal fade" id="imageZoomModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-0">
+                <img id="zoomedImage" src="" class="img-fluid rounded shadow" style="max-height: 80vh;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openImageModal(src) {
+        document.getElementById('zoomedImage').src = src;
+        var myModal = new bootstrap.Modal(document.getElementById('imageZoomModal'));
+        myModal.show();
+    }
+</script>
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 
@@ -493,7 +515,7 @@
 
             $.each(data, function (i, m) {
                 let isMe = m.NguoiGui == idGui;
-                let av = m.AvatarGui ? `${m.AvatarGui.startsWith('http') ? m.AvatarGui : '/Content/avatars/' + m.AvatarGui}` : '/Content/avatars/Default.jpg';
+                let av = m.AvatarGui ? `${m.AvatarGui.startsWith('http') ? m.AvatarGui : '/Content/Avatars/' + m.AvatarGui}` : '/Content/Avatars/Default.jpg';
 
                 // --- Receipt (chỉ hiện ở tin cuối cùng của mình) ---
                 let receiptHtml = '';
@@ -509,7 +531,7 @@
                 if (m.MaSP) {
                     messageHtml += `
                         <div class="chat-product-card">
-                            <img src="${m.AnhSP.startsWith('http') ? m.AnhSP : '/Content/images/' + m.AnhSP}">
+                            <img src="${m.AnhSP.startsWith('http') ? m.AnhSP : '/Content/Images/' + m.AnhSP}">
                             <div class="product-info">
                                 <div class="product-name">${m.TenSP}</div>
                                 <a href="/sanpham/chitiet/${m.MaSP}" class="product-link">Xem sản phẩm</a>
@@ -540,7 +562,7 @@
                     <div class="bubble ${m.MaSP ? 'has-product' : ''}">
                         ${m.Anh
                         ? `<img src="${m.Anh.startsWith('http') ? m.Anh : '/Content/chat_images/' + m.Anh}"
-                                   class="chat-image">`
+                                   class="chat-image" style="cursor: pointer;" onclick="openImageModal(this.src)">`
                         : ""
                         }
 

@@ -9,7 +9,7 @@
         <!-- THÔNG TIN NGƯỜI BÁN -->
         <!-- ====================== -->
         <div class="col-md-4 text-center mb-4">
-            <img src="{{ str_starts_with(($nguoiBan->AnhDaiDien ?? 'default.jpg'), 'http') ? ($nguoiBan->AnhDaiDien ?? 'default.jpg') : asset('Content/Avatars/' . ($nguoiBan->AnhDaiDien ?? 'default.jpg')) }}"
+            <img src="{{ str_starts_with(($nguoiBan->AnhDaiDien ?? 'Default.jpg'), 'http') ? ($nguoiBan->AnhDaiDien ?? 'Default.jpg') : asset('Content/Avatars/' . ($nguoiBan->AnhDaiDien ?? 'Default.jpg')) }}"
                  class="img-fluid rounded-circle mb-3"
                  style="width:150px;height:150px;object-fit:cover;" />
 

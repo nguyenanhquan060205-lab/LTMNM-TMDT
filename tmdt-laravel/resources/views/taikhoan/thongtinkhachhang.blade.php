@@ -30,7 +30,7 @@
                             <div class="col-md-4 d-flex flex-column align-items-center mb-4 mb-md-0 border-end-md">
                                 <div class="avatar-upload position-relative mb-4">
                                     <img id="previewAvatar"
-                                         src="{{ str_starts_with(($targetUser->AnhDaiDien ?? 'default.jpg'), 'http') ? ($targetUser->AnhDaiDien ?? 'default.jpg') : asset('Content/Avatars/' . ($targetUser->AnhDaiDien ?? 'default.jpg')) }}"
+                                         src="{{ str_starts_with(($targetUser->AnhDaiDien ?? 'Default.jpg'), 'http') ? ($targetUser->AnhDaiDien ?? 'Default.jpg') : asset('Content/Avatars/' . ($targetUser->AnhDaiDien ?? 'Default.jpg')) }}"
                                          class="rounded-circle shadow-sm avatar-img"
                                          style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #fff; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;" />
                                 </div>

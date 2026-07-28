@@ -105,7 +105,7 @@ class TaiKhoanController extends Controller
 
         $nd['VaiTro'] = 'User';
         $nd['NgayTao'] = now();
-        $nd['AnhDaiDien'] = 'default.jpg';
+        $nd['AnhDaiDien'] = 'Default.jpg';
         $nd['Khoa'] = false;
 
         $nd['MatKhau'] = \Illuminate\Support\Facades\Hash::make($nd['MatKhau']);
