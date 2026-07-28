@@ -83,7 +83,23 @@ class SocialController extends Controller
             // Tải ảnh avatar từ MXH (nếu có thể)
             $avatarPath = 'Default.jpg';
             if ($socialUser->avatar) {
-                $avatarPath = $socialUser->avatar; // Lưu trực tiếp URL ảnh
+                try {
+                    $avatarContent = file_get_contents($socialUser->avatar);
+                    if ($avatarContent) {
+                        $filename = $provider . '_' . $socialUser->id . '_' . time() . '.jpg';
+                        $destinationPath = public_path('Content/Avatars/' . $filename);
+                        
+                        if (!file_exists(public_path('Content/Avatars'))) {
+                            mkdir(public_path('Content/Avatars'), 0777, true);
+                        }
+                        
+                        file_put_contents($destinationPath, $avatarContent);
+                        $avatarPath = $filename;
+                    }
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Cannot download avatar: " . $e->getMessage());
+                    // Nếu lỗi thì giữ nguyên Default.jpg
+                }
             }
 
             $newUser = NguoiDung::create([
