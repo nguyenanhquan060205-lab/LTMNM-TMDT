@@ -168,7 +168,7 @@
                                 @endif
                             @endfor
                         </span>
-                        <span class="text-muted small"> • {{ $dg->NgayDG ? \Carbon\Carbon::parse($dg->NgayDG)->format('d/m/Y HH:mm') : '' }}</span>
+                        <span class="text-muted small"> • {{ $dg->NgayDG ? \Carbon\Carbon::parse($dg->NgayDG)->format('d/m/Y H:i') : '' }}</span>
                     </div>
                 </div>
                 <div class="mt-2">

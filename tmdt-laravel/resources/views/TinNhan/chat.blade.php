@@ -365,7 +365,7 @@
                      onclick="location.href='{{ url('/tinnhan/chat') }}?idNguoiNhan={{ $u->MaKH }}&mode={{ $mode }}'">
 
                     <div style="position:relative; flex-shrink:0;">
-                        <img src="{{ url('Content/avatars/' . (empty($u->AnhDaiDien) ? 'Default.jpg' : $u->AnhDaiDien)) }}"
+                        <img src="{{ Str::startsWith($u->AnhDaiDien, 'http') ? $u->AnhDaiDien : url('Content/avatars/' . (empty($u->AnhDaiDien) ? 'Default.jpg' : $u->AnhDaiDien)) }}"
                              style="width:36px;height:36px;border-radius:50%;object-fit:cover;" />
                         @if($u->VaiTro == 'Admin')
                             <span style="position:absolute;bottom:-2px;right:-4px;font-size:12px;" title="Chăm sóc khách hàng">⭐</span>
@@ -452,6 +452,7 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 
 <script>
     // ======================= TÌM KIẾM USER REALTIME =======================
@@ -538,7 +539,7 @@
 
                     <div class="bubble ${m.MaSP ? 'has-product' : ''}">
                         ${m.Anh
-                        ? `<img src="/Content/chat_images/${m.Anh}"
+                        ? `<img src="${m.Anh.startsWith('http') ? m.Anh : '/Content/chat_images/' + m.Anh}"
                                    class="chat-image">`
                         : ""
                         }
@@ -607,9 +608,47 @@
         if (e.which === 13) { $("#btnSend").click(); return false; }
     });
 
-    setInterval(loadTinNhan, 2000);
     loadTinNhan();
-    
+
+    // ======================= PUSHER REAL-TIME =======================
+    // Khởi tạo Pusher
+    var pusher = new Pusher('ef7c3d0d3073e7a57338', {
+      cluster: 'ap1'
+    });
+
+    // Lắng nghe kênh của User hiện tại (ID của tài khoản đang đăng nhập)
+    var currentUserId = $('#NguoiGuiID').val();
+    var channel = pusher.subscribe('chat.' + currentUserId);
+
+    // Khi có tin nhắn mới gửi đến
+    channel.bind('App\\Events\\TinNhanMoi', function(data) {
+        let m = data.message;
+        if (m.NguoiGui == $('#NguoiNhanID').val()) {
+            autoScroll = true;
+            loadTinNhan();
+            sendDanhDauDaDoc(); // Tự động đánh dấu đã xem khi đang mở khung chat
+        } else {
+            let userItem = $('.user-item').filter(function() {
+                return $(this).attr('onclick') && $(this).attr('onclick').includes('idNguoiNhan=' + m.NguoiGui);
+            });
+            if (userItem.length > 0) {
+                userItem.attr('data-unread', 1);
+                if (userItem.find('.text-warning').length === 0) {
+                    userItem.find('b').parent().append('<span class="ms-1 text-warning">●</span>');
+                }
+            } else {
+                location.reload(); 
+            }
+        }
+    });
+
+    // Khi người kia đã đọc tin nhắn của mình
+    channel.bind('App\\Events\\TinNhanDaDoc', function(data) {
+        if (data.message.NguoiDoc == $('#NguoiNhanID').val()) {
+            loadTinNhan(); // Reload lại để cập nhật chữ "Đã xem"
+        }
+    });
+    // ================================================================
     function sendDanhDauDaDoc() {
         const idGui = $('#NguoiGuiID').val();
         const idNhan = $('#NguoiNhanID').val();

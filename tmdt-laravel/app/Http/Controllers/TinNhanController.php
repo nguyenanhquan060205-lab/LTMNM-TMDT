@@ -183,8 +183,37 @@ class TinNhanController extends Controller
                 'NgayGui' => now(),
                 'DaDoc' => false
             ]);
+
+            $tn->load(['nguoiGui', 'sanPham.hinhAnhs']);
             
-            return response()->json(['success' => true, 'message' => clone $tn]);
+            $avatar = $tn->nguoiGui->AnhDaiDien ?? 'Default.jpg';
+            if (!file_exists(public_path('Content/avatars/' . $avatar))) {
+                $avatar = 'Default.jpg';
+            }
+            
+            $anhSP = '';
+            if ($tn->sanPham) {
+                $anhBiaObj = collect($tn->sanPham->hinhAnhs)->firstWhere('AnhBia', true);
+                $anhSP = $anhBiaObj ? $anhBiaObj->URLAnh : ($tn->sanPham->AnhBia ?? "noimage.jpg");
+            }
+
+            $formattedMessage = [
+                'MaTN' => $tn->MaTN,
+                'NguoiGui' => $tn->NguoiGui,
+                'NguoiNhan' => $tn->NguoiNhan,
+                'NoiDung' => $tn->NoiDung,
+                'Anh' => $tn->Anh,
+                'MaSP' => $tn->MaSP,
+                'TenSP' => $tn->sanPham ? $tn->sanPham->TenSP : '',
+                'AnhSP' => $anhSP,
+                'Gio' => $tn->NgayGui ? \Carbon\Carbon::parse($tn->NgayGui)->setTimezone('Asia/Ho_Chi_Minh')->format('H:i d/m') : '',
+                'AvatarGui' => $avatar,
+                'DaDoc' => $tn->DaDoc ? true : false,
+            ];
+
+            event(new \App\Events\TinNhanMoi($formattedMessage));
+            
+            return response()->json(['success' => true, 'message' => clone $tn, 'formatted_message' => $formattedMessage]);
         }
 
         return response()->json(['success' => false]);
@@ -213,9 +242,17 @@ class TinNhanController extends Controller
 
     public function danhDauDaDoc($idNguoiGui, $idNguoiNhan)
     {
-        TinNhan::where('NguoiGui', $idNguoiNhan)
+        $updated = TinNhan::where('NguoiGui', $idNguoiNhan)
                ->where('NguoiNhan', $idNguoiGui)
+               ->where('DaDoc', false)
                ->update(['DaDoc' => true]);
+
+        if ($updated > 0) {
+            event(new \App\Events\TinNhanDaDoc([
+                'NguoiNhan' => $idNguoiNhan, // Gửi thông báo cho người đã gửi tin (nay được người kia đọc)
+                'NguoiDoc' => $idNguoiGui
+            ]));
+        }
 
         return response()->json(['success' => true]);
     }
