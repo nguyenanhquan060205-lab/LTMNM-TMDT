@@ -33,20 +33,25 @@
         color: #9ca3af;
         border-color: #e5e7eb;
     }
-    /* Make the text look nicer */
+    /* Make the text look nicer and put it below */
     nav p.small.text-muted, nav p.leading-5 {
-        display: inline-block;
-        margin-top: 10px;
+        display: block;
+        margin-top: 15px;
         color: #6b7280 !important;
-        font-weight: 500;
-        background-color: #f8f9fa;
-        padding: 5px 12px;
-        border-radius: 6px;
-        border: 1px solid #e5e7eb;
+        font-size: 0.875rem;
+        text-align: center;
     }
-    /* Separate them */
-    nav > div.d-flex, nav > div.hidden {
+    /* Layout: column-reverse puts pagination on top, text on bottom */
+    nav > div.d-flex, nav > div.hidden, nav > div.d-none.d-sm-flex {
+        flex-direction: column-reverse !important;
         align-items: center !important;
+        justify-content: center !important;
+        width: 100%;
+    }
+    /* Center the pagination ul */
+    nav ul.pagination {
+        margin-bottom: 0;
+        justify-content: center;
     }
 </style>
 <div class="container mt-4 mb-5">
