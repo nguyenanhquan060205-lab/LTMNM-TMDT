@@ -1,7 +1,7 @@
 @php
     $user = Session::get('user');
     $anh = $user && !empty($user->AnhDaiDien)
-        ? asset('Content/Avatars/' . $user->AnhDaiDien)
+        ? str_starts_with($user->AnhDaiDien, 'http') ? $user->AnhDaiDien : asset('Content/Avatars/' . $user->AnhDaiDien)
         : asset('Content/Avatars/Default.jpg');
 @endphp
 <!DOCTYPE html>

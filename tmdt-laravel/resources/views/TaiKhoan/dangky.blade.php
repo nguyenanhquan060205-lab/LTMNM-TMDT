@@ -141,11 +141,21 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label"><i class="fa-solid fa-lock me-2 text-muted"></i>Mật khẩu</label>
-                        <input class="form-control modern-input" name="MatKhau" type="password" placeholder="Mật khẩu (ít nhất 6 ký tự)" required />
+                        <div class="position-relative">
+                            <input class="form-control modern-input pe-5" name="MatKhau" id="matkhau_reg" type="password" placeholder="Mật khẩu (ít nhất 6 ký tự)" required />
+                            <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y text-muted" onclick="togglePassword('matkhau_reg', this)" tabindex="-1" style="border: none; background: transparent; padding-right: 15px;">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label"><i class="fa-solid fa-lock me-2 text-muted"></i>Xác nhận mật khẩu</label>
-                        <input class="form-control modern-input" name="XacNhanMatKhau" type="password" placeholder="Nhập lại mật khẩu" required />
+                        <div class="position-relative">
+                            <input class="form-control modern-input pe-5" name="XacNhanMatKhau" id="matkhau_conf" type="password" placeholder="Nhập lại mật khẩu" required />
+                            <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y text-muted" onclick="togglePassword('matkhau_conf', this)" tabindex="-1" style="border: none; background: transparent; padding-right: 15px;">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -176,4 +186,22 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        const icon = button.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
 @endsection

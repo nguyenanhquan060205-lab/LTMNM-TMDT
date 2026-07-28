@@ -419,3 +419,6 @@ FodyWeavers.xsd
 .vs/
 bin/
 obj/
+
+*.sql
+tmdt_new_clean.sql

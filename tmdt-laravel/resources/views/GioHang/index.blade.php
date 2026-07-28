@@ -55,7 +55,7 @@
                     @foreach ($model as $item)
                         @php
                             $anh = $item->sanPham && $item->sanPham->hinhAnhSPs ? $item->sanPham->hinhAnhSPs->where('AnhBia', true)->first() : null;
-                            $url = $anh ? url('Content/Images/' . $anh->URLAnh) : url('content/images/default.jpg');
+                            $url = $anh ? str_starts_with($anh->URLAnh, 'http') ? $anh->URLAnh : asset('Content/Images/' . $anh->URLAnh) : url('content/images/default.jpg');
                         @endphp
 
                         <tr class="cart-row">
@@ -73,11 +73,11 @@
                             <td>
                                 <div class="quantity-control">
                                     <a href="{{ url('/giohang/giam/' . $item->MaSP) }}" class="qty-btn qty-minus">
-                                        <i class="bi bi-dash"></i>
+                                        <i class="fa-solid fa-minus"></i>
                                     </a>
                                     <span class="qty-value">{{ $item->SoLuong }}</span>
                                     <a href="{{ url('/giohang/tang/' . $item->MaSP) }}" class="qty-btn qty-plus">
-                                        <i class="bi bi-plus"></i>
+                                        <i class="fa-solid fa-plus"></i>
                                     </a>
                                 </div>
                             </td>
@@ -91,7 +91,7 @@
                                    class="btn-delete"
                                    onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?');"
                                    title="Xóa sản phẩm">
-                                    <i class="bi bi-trash"></i>
+                                    <i class="fa-solid fa-trash"></i>
                                 </a>
                             </td>
                         </tr>
@@ -104,7 +104,7 @@
         <div class="cart-footer">
             <div class="cart-summary">
                 <div class="summary-header">
-                    <i class="bi bi-receipt-cutoff me-2"></i>
+                    <i class="fa-solid fa-file-invoice-dollar me-2 text-primary"></i>
                     <span>Tổng đơn hàng</span>
                 </div>
 
@@ -117,7 +117,7 @@
                     <div class="summary-row">
                         <span class="summary-label">Phí vận chuyển:</span>
                         <span class="summary-value text-success fw-semibold">
-                            <i class="bi bi-truck me-1"></i>Miễn phí
+                            <i class="fa-solid fa-truck-fast me-1"></i>Miễn phí
                         </span>
                     </div>
 
@@ -132,13 +132,12 @@
                 <form action="{{ url('/hoadon/dathang') }}" method="post" class="mt-3">
                     @csrf
                     <button type="submit" class="btn-checkout">
-                        <i class="bi bi-credit-card me-2"></i>
-                        Thanh toán khi nhận hàng
+                        <i class="fa-solid fa-credit-card me-2"></i>Thanh toán khi nhận hàng
                     </button>
                 </form>
 
                 <a href="{{ url('/sanpham/index') }}" class="btn-continue">
-                    <i class="bi bi-arrow-left me-2"></i>
+                    <i class="fa-solid fa-arrow-left me-2"></i>
                     Tiếp tục mua sắm
                 </a>
             </div>

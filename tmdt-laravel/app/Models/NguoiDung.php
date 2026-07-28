@@ -6,7 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class NguoiDung extends Authenticatable
 {
-    protected $table = 'NGUOIDUNG';
+    protected $table = 'nguoidung';
     protected $primaryKey = 'MaKH';
     public $timestamps = false;
     protected $guarded = [];

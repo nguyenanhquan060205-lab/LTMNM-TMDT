@@ -115,7 +115,7 @@
                             
                             <div class="position-relative rounded-top bg-white" style="border-bottom: 1px solid #f8f9fa;">
                                 <div class="ratio ratio-1x1 overflow-hidden">
-                                    <img src="{{ asset('Content/Images/' . $anh) }}" alt="{{ $sp->TenSP }}" class="object-fit-contain w-100 h-100 p-3" />
+                                    <img src="{{ str_starts_with($anh, 'http') ? $anh : asset('Content/Images/' . $anh) }}" alt="{{ $sp->TenSP }}" class="object-fit-contain w-100 h-100 p-3" />
                                 </div>
                                 
                                 @if($danhGia > 0)

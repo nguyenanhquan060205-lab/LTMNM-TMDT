@@ -119,6 +119,7 @@
         border-radius: 18px;
         background: #fff;
         box-shadow: 0 1px 2px rgba(0,0,0,.1);
+        text-align: left;
     }
 
     .msg.me {
@@ -180,23 +181,79 @@
         white-space: pre-wrap;
         word-break: break-word;
         line-height: 1.4;
+        text-align: left !important;
     }
 
-    .chat-product-card{
-        display:flex;
-        gap:12px;
-        border:1px solid #ddd;
-        border-radius:12px;
-        padding:10px;
-        margin-bottom:10px;
-        background:#fafafa;
+    .chat-product-card {
+        display: flex;
+        gap: 12px;
+        padding: 12px;
+        background: #fff;
         color: #333 !important;
+        align-items: center;
     }
 
-    .chat-product-card img{
-        width:70px;
-        height:70px;
-        object-fit:cover;
+    .chat-product-card img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid #eee;
+    }
+
+    .product-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: left;
+    }
+
+    .product-name {
+        font-weight: 600;
+        font-size: 13px;
+        color: #333;
+        margin-bottom: 4px;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .product-link {
+        font-size: 12px;
+        color: #0078ff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .product-link:hover {
+        text-decoration: underline;
+    }
+
+    .bubble.has-product {
+        padding: 0 !important;
+        overflow: hidden;
+        width: 280px;
+        max-width: 100%;
+    }
+
+    .bubble.has-product .chat-product-card {
+        margin: 0;
+        border-radius: 0;
+        border: none;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        width: 100%;
+    }
+
+    .bubble.has-product .chat-text {
+        padding: 12px 14px 4px 14px;
+        text-align: left;
+    }
+
+    .bubble.has-product .bubble-time,
+    .bubble.has-product .receipt-label {
+        padding: 0 14px 10px 14px;
     }
 
     .msg-options {
@@ -435,7 +492,7 @@
 
             $.each(data, function (i, m) {
                 let isMe = m.NguoiGui == idGui;
-                let av = m.AvatarGui ? `/Content/avatars/${m.AvatarGui}` : '/Content/avatars/Default.jpg';
+                let av = m.AvatarGui ? `${m.AvatarGui.startsWith('http') ? m.AvatarGui : '/Content/avatars/' + m.AvatarGui}` : '/Content/avatars/Default.jpg';
 
                 // --- Receipt (chỉ hiện ở tin cuối cùng của mình) ---
                 let receiptHtml = '';
@@ -451,24 +508,17 @@
                 if (m.MaSP) {
                     messageHtml += `
                         <div class="chat-product-card">
-                            <img src="/Content/images/${m.AnhSP}">
-                            <div>
-                                <div><b>${m.TenSP}</b></div>
-                                <a href="/sanpham/chitiet/${m.MaSP}"
-                                class="btn btn-sm btn-outline-primary mt-2">
-                                    Xem sản phẩm
-                                </a>
+                            <img src="${m.AnhSP.startsWith('http') ? m.AnhSP : '/Content/images/' + m.AnhSP}">
+                            <div class="product-info">
+                                <div class="product-name">${m.TenSP}</div>
+                                <a href="/sanpham/chitiet/${m.MaSP}" class="product-link">Xem sản phẩm</a>
                             </div>
                         </div>
                     `;
                 }
 
                 if (m.NoiDung) {
-                    messageHtml += `
-                        <div class="chat-text">
-                            ${m.NoiDung}
-                        </div>
-                    `;
+                    messageHtml += `<div class="chat-text">${m.NoiDung}</div>`;
                 }
 
                 html += `
@@ -486,7 +536,7 @@
                     </div>
                     ` : ``}
 
-                    <div class="bubble">
+                    <div class="bubble ${m.MaSP ? 'has-product' : ''}">
                         ${m.Anh
                         ? `<img src="/Content/chat_images/${m.Anh}"
                                    class="chat-image">`

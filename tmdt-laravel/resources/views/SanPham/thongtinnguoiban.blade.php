@@ -9,7 +9,7 @@
         <!-- THÔNG TIN NGƯỜI BÁN -->
         <!-- ====================== -->
         <div class="col-md-4 text-center mb-4">
-            <img src="{{ url('Content/Avatars/' . ($nguoiBan->AnhDaiDien ?? 'default.jpg')) }}"
+            <img src="{{ str_starts_with(($nguoiBan->AnhDaiDien ?? 'default.jpg'), 'http') ? ($nguoiBan->AnhDaiDien ?? 'default.jpg') : asset('Content/Avatars/' . ($nguoiBan->AnhDaiDien ?? 'default.jpg')) }}"
                  class="img-fluid rounded-circle mb-3"
                  style="width:150px;height:150px;object-fit:cover;" />
 
@@ -41,7 +41,7 @@
                             <div class="card product-card border-0 shadow-sm h-100">
                                 <a href="{{ url('/sanpham/chitiet/' . $sp->MaSP) }}">
                                     <div class="ratio ratio-1x1 bg-light rounded-top overflow-hidden">
-                                        <img src="{{ url('Content/Images/' . $anhBia) }}"
+                                        <img src="{{ str_starts_with($anhBia, 'http') ? $anhBia : asset('Content/Images/' . $anhBia) }}"
                                              class="card-img-top p-3"
                                              style="object-fit: contain; width:100%; height:100%;" />
                                     </div>

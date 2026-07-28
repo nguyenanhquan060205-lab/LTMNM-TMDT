@@ -114,7 +114,7 @@
                 <small class="text-muted mb-2 d-block">Ảnh bìa hiện tại:</small>
 
                 @if (!empty($anhBiaCu))
-                    <img id="previewCoverImg" src="{{ url('Content/Images/' . $anhBiaCu) }}" class="mt-2" style="width:160px;height:auto;" />
+                    <img id="previewCoverImg" src="{{ str_starts_with($anhBiaCu, 'http') ? $anhBiaCu : asset('Content/Images/' . $anhBiaCu) }}" class="mt-2" style="width:160px;height:auto;" />
                 @else
                     <img id="previewCoverImg" class="mt-2 d-none" style="width:160px;height:auto;" />
                 @endif
@@ -132,7 +132,7 @@
 
                 <div id="previewList" class="mt-3 d-flex flex-wrap gap-2">
                     @foreach ($anhChiTietCu as $anh)
-                        <img src="{{ url('Content/Images/' . $anh->URLAnh) }}" class="preview-thumb" />
+                        <img src="{{ str_starts_with($anh->URLAnh, 'http') ? $anh->URLAnh : asset('Content/Images/' . $anh->URLAnh) }}" class="preview-thumb" />
                     @endforeach
                 </div>
             </div>

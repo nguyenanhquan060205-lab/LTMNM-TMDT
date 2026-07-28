@@ -1,7 +1,7 @@
 @php
     $user = Session::get('user');
     $anh = $user && !empty($user->AnhDaiDien)
-        ? url('Content/Avatars/' . $user->AnhDaiDien)
+        ? str_starts_with($user->AnhDaiDien, 'http') ? $user->AnhDaiDien : asset('Content/Avatars/' . $user->AnhDaiDien)
         : url('content/avatars/default.jpg');
 
     $cartCount = 0;

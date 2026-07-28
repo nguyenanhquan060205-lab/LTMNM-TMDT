@@ -302,7 +302,7 @@
                        class="d-flex align-items-center gap-2 text-decoration-none text-dark"
                        title="Xem thÃƒÆ’Ã‚Â´ng tin cÃƒÆ’Ã‚Â¡ nhÃƒÆ’Ã‚Â¢n">
 
-                        <img src="{{ asset('Content/Avatars/' . $avatar) }}"
+                        <img src="{{ str_starts_with($avatar, 'http') ? $avatar : asset('Content/Avatars/' . $avatar) }}"
                              style="width:40px;height:40px;border-radius:50%;object-fit:cover; border: 2px solid #00d9ff;" />
 
                         <span class="fw-bold">{{ $user->HoTen }}</span>

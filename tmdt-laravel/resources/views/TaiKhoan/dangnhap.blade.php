@@ -133,7 +133,12 @@
                 </div>
                 <div class="mb-4">
                     <label class="form-label"><i class="fa-solid fa-lock me-2 text-muted"></i>Mật khẩu</label>
-                    <input name="matkhau" type="password" class="form-control modern-input" placeholder="Nhập mật khẩu..." required />
+                    <div class="position-relative">
+                        <input name="matkhau" id="matkhau_login" type="password" class="form-control modern-input pe-5" placeholder="Nhập mật khẩu..." required />
+                        <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y text-muted" onclick="togglePassword('matkhau_login', this)" tabindex="-1" style="border: none; background: transparent; padding-right: 15px;">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-gradient w-100 mt-2">
                     Đăng nhập <i class="fa-solid fa-arrow-right ms-2"></i>
@@ -146,4 +151,22 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        const icon = button.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
 @endsection

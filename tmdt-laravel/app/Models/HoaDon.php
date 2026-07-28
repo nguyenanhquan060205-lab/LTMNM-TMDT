@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class HoaDon extends Model
 {
-    protected $table = 'HOADON';
+    protected $table = 'hoadon';
     protected $primaryKey = 'MaHD';
     public $timestamps = false;
     protected $guarded = [];

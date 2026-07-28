@@ -62,7 +62,7 @@
         </h2>
 
         <div class="product-preview mb-4">
-            <img src="{{ url('Content/Images/' . ($vm->Hinh ?? 'no-image.jpg')) }}" />
+            <img src="{{ str_starts_with(($vm->Hinh ?? 'no-image.jpg'), 'http') ? ($vm->Hinh ?? 'no-image.jpg') : asset('Content/Images/' . ($vm->Hinh ?? 'no-image.jpg')) }}" />
             <div>
                 <h4 class="fw-bold">{{ $vm->TenSP ?? '' }}</h4>
                 <div class="text-muted">Hãy chia sẻ cảm nhận thực tế về sản phẩm!</div>

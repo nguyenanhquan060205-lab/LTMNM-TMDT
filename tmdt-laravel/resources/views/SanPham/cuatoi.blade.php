@@ -84,7 +84,7 @@
                                 $anhObj = collect($sp->hinhAnhs ?? $sp->hinhAnhSPs)->first();
                             }
                             $anh = $anhObj ? $anhObj->URLAnh : ($sp->AnhBia ?? "noimage.jpg");
-                            $anhUrl = url('/Content/Images/' . $anh);
+                            $anhUrl = str_starts_with($anh, 'http') ? $anh : url('/Content/Images/' . $anh);
                         @endphp
                         <tr>
                             <td class="text-start ps-4">

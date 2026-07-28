@@ -26,7 +26,7 @@
             <!-- Hộp ảnh cố định giống CellphoneS -->
             <div class="main-img-box position-relative mx-auto mb-3">
                 <img id="mainImg"
-                     src="{{ asset('Content/Images/' . $anhBia) }}"
+                     src="{{ str_starts_with($anhBia, 'http') ? $anhBia : asset('Content/Images/' . $anhBia) }}"
                      class="main-img" 
                      onclick="openLightbox()"
                      style="cursor: zoom-in;" />
@@ -40,13 +40,13 @@
             <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
 
                 <!-- Ảnh bìa -->
-                <img src="{{ asset('Content/Images/' . $anhBia) }}"
+                <img src="{{ str_starts_with($anhBia, 'http') ? $anhBia : asset('Content/Images/' . $anhBia) }}"
                      class="thumb thumb-active"
                      onclick="changeImage(0)" />
 
                 <!-- Ảnh phụ -->
                 @foreach ($AnhChiTiet as $i => $anh)
-                    <img src="{{ asset('Content/Images/' . $anh->URLAnh) }}"
+                    <img src="{{ str_starts_with($anh->URLAnh, 'http') ? $anh->URLAnh : asset('Content/Images/' . $anh->URLAnh) }}"
                          class="thumb"
                          onclick="changeImage({{ $i + 1 }})" />
                 @endforeach
@@ -242,29 +242,45 @@
                 @endphp
 
                 <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="card product-card border-0 shadow-sm h-100">
-                        <a href="{{ route('sanpham.chitiet', ['id' => $item->MaSP]) }}">
-                            <div class="ratio ratio-1x1 bg-light rounded-top overflow-hidden">
-                                <img src="{{ asset('Content/Images/' . $anhBiaItem) }}"
-                                     class="card-img-top p-3"
-                                     style="object-fit: contain; width:100%; height:100%;"
-                                     alt="{{ $item->TenSP }}" />
+                    <div class="card product-card h-100 shadow-sm border-0 position-relative">
+                        <div class="position-relative rounded-top bg-white" style="border-bottom: 1px solid #f8f9fa;">
+                            <div class="ratio ratio-1x1 overflow-hidden">
+                                <a href="{{ route('sanpham.chitiet', ['id' => $item->MaSP]) }}">
+                                    <img src="{{ str_starts_with($anhBiaItem, 'http') ? $anhBiaItem : asset('Content/Images/' . $anhBiaItem) }}" alt="{{ $item->TenSP }}" class="object-fit-contain w-100 h-100 p-3" />
+                                </a>
                             </div>
-                        </a>
-
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <div>
-                                <h6 class="fw-semibold text-truncate" title="{{ $item->TenSP }}">{{ $item->TenSP }}</h6>
-                                <p class="text-danger fw-bold mb-1">{{ number_format($item->Gia, 0, ',', '.') }} ₫</p>
-                                <p class="small text-muted mb-0">
-                                    <i class="bi bi-person"></i> {{ $item->nguoiDung->HoTen ?? '' }}
-                                </p>
+                            
+                            @if(($item->DanhGiaTB ?? 0) > 0)
+                            <div class="position-absolute bottom-0 end-0 m-2 z-3 bg-white rounded-pill px-2 py-1 shadow-sm d-flex align-items-center">
+                                <i class="fa-solid fa-star text-warning me-1" style="font-size: 10px;"></i>
+                                <span class="fw-bold" style="font-size: 11px;">{{ number_format($item->DanhGiaTB, 1) }}</span>
                             </div>
+                            @endif
+                        </div>
 
-                            <a href="{{ route('sanpham.chitiet', ['id' => $item->MaSP]) }}"
-                               class="btn btn-warning w-100 fw-semibold mt-3 rounded-pill shadow-sm">
-                                Xem chi tiết
+                        <div class="card-body d-flex flex-column p-4">
+                            <small class="text-primary text-uppercase fw-bold mb-2" style="font-size: 0.7rem; letter-spacing: 1px;">
+                                {{ $item->loaiSanPham->TenLoai ?? 'Khác' }}
+                            </small>
+                            
+                            <a href="{{ route('sanpham.chitiet', ['id' => $item->MaSP]) }}" class="text-decoration-none text-dark">
+                                <h6 class="product-title line-clamp-2 mb-3" style="min-height: 2.4rem;">
+                                    {{ $item->TenSP }}
+                                </h6>
                             </a>
+
+                            <div class="mt-auto d-flex align-items-end justify-content-between">
+                                <div class="product-price text-primary" style="font-size: 1.1rem; font-weight: 700;">
+                                    {{ number_format($item->Gia, 0, ',', '.') }}₫
+                                </div>
+                                <a class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center"
+                                   style="width: 40px; height: 40px; transition: transform 0.2s;"
+                                   onmouseover="this.style.transform='scale(1.1)'"
+                                   onmouseout="this.style.transform='scale(1)'"
+                                   href="{{ route('sanpham.chitiet', ['id' => $item->MaSP]) }}">
+                                    <i class="fa-solid fa-cart-shopping fs-6"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -463,7 +479,7 @@
         // Trigger DOM reflow to apply the animation again
         void mainImg.offsetWidth;
         
-        mainImg.src = "/Content/Images/" + images[currentIndex];
+        mainImg.src = images[currentIndex].startsWith('http') ? images[currentIndex] : '/Content/Images/' + images[currentIndex];
         mainImg.classList.add("slide-anim");
 
         document.querySelectorAll(".thumb").forEach((t, i) => {

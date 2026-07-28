@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CtGioHang extends Model
 {
-    protected $table = 'CT_GIOHANG';
+    protected $table = 'ct_giohang';
     public $incrementing = false;
     protected $primaryKey = null;
     public $timestamps = false;

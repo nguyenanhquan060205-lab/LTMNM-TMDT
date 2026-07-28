@@ -181,8 +181,7 @@ class SanPhamController extends Controller
                 if ($file->isValid()) {
                     $ext = strtolower($file->getClientOriginalExtension());
                     if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-                        $fileName = (string)Str::uuid() . '.' . $ext;
-                        $file->move(public_path('Content/Images'), $fileName);
+                        $fileName = \App\Services\CloudinaryService::upload($file->getRealPath(), 'Content/Images');
 
                         HinhAnhSP::create([
                             'MaSP' => $sp->MaSP,
@@ -253,12 +252,13 @@ class SanPhamController extends Controller
                 if (in_array($ext, $allow)) {
                     $anhBiaCu = HinhAnhSP::where('MaSP', $sp->MaSP)->where('AnhBia', true)->first();
                     if ($anhBiaCu && $anhBiaCu->URLAnh != 'noimage.jpg') {
-                        @unlink($imgPath . $anhBiaCu->URLAnh);
+                        if (!str_starts_with($anhBiaCu->URLAnh, 'http')) {
+                            @unlink($imgPath . $anhBiaCu->URLAnh);
+                        }
                         $anhBiaCu->delete();
                     }
 
-                    $fileName = (string)Str::uuid() . '.' . $ext;
-                    $anhBiaMoi->move($imgPath, $fileName);
+                    $fileName = \App\Services\CloudinaryService::upload($anhBiaMoi->getRealPath(), 'Content/Images');
 
                     HinhAnhSP::create([
                         'MaSP' => $sp->MaSP,
@@ -274,7 +274,9 @@ class SanPhamController extends Controller
             if (count($validFiles) > 0 && $validFiles[0] != null) {
                 $anhChiTietCu = HinhAnhSP::where('MaSP', $sp->MaSP)->where('AnhBia', false)->get();
                 foreach ($anhChiTietCu as $anhCu) {
-                    @unlink($imgPath . $anhCu->URLAnh);
+                    if (!str_starts_with($anhCu->URLAnh, 'http')) {
+                        @unlink($imgPath . $anhCu->URLAnh);
+                    }
                 }
                 HinhAnhSP::where('MaSP', $sp->MaSP)->where('AnhBia', false)->delete();
 
@@ -282,8 +284,7 @@ class SanPhamController extends Controller
                     if ($file && $file->isValid()) {
                         $ext = strtolower($file->getClientOriginalExtension());
                         if (in_array($ext, $allow)) {
-                            $fileName = (string)Str::uuid() . '.' . $ext;
-                            $file->move($imgPath, $fileName);
+                            $fileName = \App\Services\CloudinaryService::upload($file->getRealPath(), 'Content/Images');
 
                             HinhAnhSP::create([
                                 'MaSP' => $sp->MaSP,
@@ -314,7 +315,7 @@ class SanPhamController extends Controller
             $hinhAnh = HinhAnhSP::where('MaSP', $id)->get();
             $path = public_path('Content/Images/');
             foreach ($hinhAnh as $anh) {
-                if ($anh->URLAnh != 'noimage.jpg') {
+                if ($anh->URLAnh != 'noimage.jpg' && !str_starts_with($anh->URLAnh, 'http')) {
                     @unlink($path . $anh->URLAnh);
                 }
             }

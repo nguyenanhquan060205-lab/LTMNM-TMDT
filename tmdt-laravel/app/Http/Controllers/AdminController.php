@@ -133,7 +133,7 @@ class AdminController extends Controller
             $hinhAnhs = HinhAnhSP::where('MaSP', $id)->get();
             $path = public_path('Content/Images/');
             foreach ($hinhAnhs as $item) {
-                if ($item->URLAnh != 'noimage.jpg') {
+                if ($item->URLAnh != 'noimage.jpg' && !str_starts_with($item->URLAnh, 'http')) {
                     @unlink($path . $item->URLAnh);
                 }
             }

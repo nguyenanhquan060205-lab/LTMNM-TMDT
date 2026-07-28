@@ -36,7 +36,14 @@ class TaiKhoanController extends Controller
             return back()->with('error', 'Sai tài khoản hoặc mật khẩu!');
         }
 
-        if (!\Illuminate\Support\Facades\Hash::check($matkhau, $user->MatKhau)) {
+        $isValid = false;
+        try {
+            $isValid = \Illuminate\Support\Facades\Hash::check($matkhau, $user->MatKhau);
+        } catch (\Exception $e) {
+            $isValid = false;
+        }
+
+        if (!$isValid) {
             if ($user->MatKhau === $matkhau) {
                 // Tự động mã hoá tài khoản cũ (plaintext)
                 $user->MatKhau = \Illuminate\Support\Facades\Hash::make($matkhau);
@@ -157,12 +164,13 @@ class TaiKhoanController extends Controller
                     return redirect()->route($actionName)->with('error', 'Định dạng ảnh không hợp lệ!');
                 }
 
-                $fileName = 'user_' . $user->MaKH . '_' . time() . '.' . $ext;
-                $file->move(public_path('Content/Avatars'), $fileName);
+                $fileName = \App\Services\CloudinaryService::upload($file->getRealPath(), 'Content/Avatars');
 
                 if (!empty($user->AnhDaiDien) && $user->AnhDaiDien != 'default.jpg') {
-                    $oldPath = public_path('Content/Avatars/' . $user->AnhDaiDien);
-                    if (file_exists($oldPath)) unlink($oldPath);
+                    if (!str_starts_with($user->AnhDaiDien, 'http')) {
+                        $oldPath = public_path('Content/Avatars/' . $user->AnhDaiDien);
+                        if (file_exists($oldPath)) @unlink($oldPath);
+                    }
                 }
 
                 $user->AnhDaiDien = $fileName;

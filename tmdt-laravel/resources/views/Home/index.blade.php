@@ -346,7 +346,7 @@
                     <div class="card product-card h-100 shadow-sm border-0">
 
                         <div class="ratio ratio-1x1 bg-white overflow-hidden p-3" style="border-bottom: 1px solid #f8f9fa;">
-                            <img src="{{ url('/Content/Images/' . $anh) }}"
+                            <img src="{{ str_starts_with($anh, 'http') ? $anh : url('/Content/Images/' . $anh) }}"
                                  class="card-img-top w-100 h-100"
                                  style="object-fit: contain;"
                                  alt="{{ $item->TenSP }}" />

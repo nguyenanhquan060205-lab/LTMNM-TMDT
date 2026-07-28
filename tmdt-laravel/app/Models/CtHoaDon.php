@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CtHoaDon extends Model
 {
-    protected $table = 'CT_HOADON';
+    protected $table = 'ct_hoadon';
     public $incrementing = false;
     protected $primaryKey = null;
     public $timestamps = false;

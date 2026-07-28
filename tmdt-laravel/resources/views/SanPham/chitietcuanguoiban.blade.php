@@ -32,7 +32,7 @@
             <!-- Hộp ảnh cố định giống CellphoneS -->
             <div class="main-img-box position-relative mx-auto mb-3">
                 <img id="mainImg"
-                     src="{{ url('Content/Images/' . $anhBia) }}"
+                     src="{{ str_starts_with($anhBia, 'http') ? $anhBia : asset('Content/Images/' . $anhBia) }}"
                      class="main-img" 
                      onclick="openLightbox()"
                      style="cursor: zoom-in;" />
@@ -46,13 +46,13 @@
             <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
 
                 <!-- Ảnh bìa -->
-                <img src="{{ url('Content/Images/' . $anhBia) }}"
+                <img src="{{ str_starts_with($anhBia, 'http') ? $anhBia : asset('Content/Images/' . $anhBia) }}"
                      class="thumb thumb-active"
                      onclick="changeImage(0)" />
 
                 <!-- Ảnh phụ -->
                 @foreach ($anhChiTiet as $i => $anh)
-                    <img src="{{ url('Content/Images/' . $anh->URLAnh) }}"
+                    <img src="{{ str_starts_with($anh->URLAnh, 'http') ? $anh->URLAnh : asset('Content/Images/' . $anh->URLAnh) }}"
                          class="thumb"
                          onclick="changeImage({{ $i + 1 }})" />
                 @endforeach
@@ -349,7 +349,7 @@
     let currentIndex = 0;
 
     function updateMainImg() {
-        document.getElementById("mainImg").src = "/Content/Images/" + images[currentIndex];
+        document.getElementById("mainImg").src = images[currentIndex].startsWith('http') ? images[currentIndex] : '/Content/Images/' + images[currentIndex];
 
         document.querySelectorAll(".thumb").forEach((t, i) => {
             t.classList.toggle("thumb-active", i === currentIndex);

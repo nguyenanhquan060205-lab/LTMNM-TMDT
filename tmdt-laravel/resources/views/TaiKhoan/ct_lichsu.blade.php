@@ -238,7 +238,7 @@
                             if (!$anhObj) {
                                 $anhObj = collect($item->sanPham->hinhAnhs ?? $item->sanPham->hinhAnhSPs ?? [])->first();
                             }
-                            $anhUrl = $anhObj ? url('Content/Images/' . $anhObj->URLAnh) : url('content/images/no-image.jpg');
+                            $anhUrl = $anhObj ? str_starts_with($anhObj->URLAnh, 'http') ? $anhObj->URLAnh : asset('Content/Images/' . $anhObj->URLAnh) : url('content/images/no-image.jpg');
                             
                             $donGia = $item->sanPham->Gia ?? 0;
                             $thanhTien = $item->ThanhTien;

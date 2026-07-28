@@ -28,7 +28,7 @@
                     <div class="card-body text-center">
                         <div class="position-relative d-inline-block">
                             <img id="previewAvatar"
-                                 src="{{ url('Content/Avatars/' . ($user->AnhDaiDien ?? 'default.jpg')) }}"
+                                 src="{{ str_starts_with(($user->AnhDaiDien ?? 'default.jpg'), 'http') ? ($user->AnhDaiDien ?? 'default.jpg') : asset('Content/Avatars/' . ($user->AnhDaiDien ?? 'default.jpg')) }}"
                                  class="rounded-circle img-thumbnail"
                                  style="width: 160px; height: 160px; object-fit: cover;" />
 

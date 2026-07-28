@@ -170,8 +170,7 @@ class TinNhanController extends Controller
                 $file = $request->file('anh');
                 $ext = strtolower($file->getClientOriginalExtension());
                 if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-                    $fileName = 'chat_' . time() . '_' . $currentUser->MaKH . '.' . $ext;
-                    $file->move(public_path('Content/chat_images'), $fileName);
+                    $fileName = \App\Services\CloudinaryService::upload($file->getRealPath(), 'Content/chat_images');
                 }
             }
 
