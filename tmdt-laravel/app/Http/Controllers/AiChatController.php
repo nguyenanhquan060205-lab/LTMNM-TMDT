@@ -109,12 +109,34 @@ Bạn là TechBot - trợ lý AI chăm sóc khách hàng chính thức của sà
 PROMPT;
 
         // ==================== CALL GEMINI API ====================
+        $history = Session::get('ai_chat_history', []);
+        $contents = $history;
+        $contents[] = ['role' => 'user', 'parts' => [['text' => $userMessage]]];
+
         $payload = [
             'system_instruction' => [
                 'parts' => [['text' => $systemContext]]
             ],
-            'contents' => [
-                ['parts' => [['text' => $userMessage]]]
+            'contents' => $contents,
+            'tools' => [
+                [
+                    'functionDeclarations' => [
+                        [
+                            'name' => 'search_db',
+                            'description' => 'Tìm kiếm sản phẩm trên hệ thống theo từ khóa do khách hàng cung cấp. Hàm sẽ trả về tối đa 5 sản phẩm đang được bán thực tế.',
+                            'parameters' => [
+                                'type' => 'OBJECT',
+                                'properties' => [
+                                    'keyword' => [
+                                        'type' => 'STRING',
+                                        'description' => 'Từ khóa tìm kiếm (ví dụ: iphone, laptop, dell, macbook)',
+                                    ],
+                                ],
+                                'required' => ['keyword'],
+                            ],
+                        ]
+                    ]
+                ]
             ],
             'generationConfig' => [
                 'maxOutputTokens' => 1024,
@@ -129,20 +151,84 @@ PROMPT;
         ];
 
         try {
-            $response = Http::timeout(15)
+            $response = Http::timeout(20)
                 ->withHeaders([
                     'X-goog-api-key' => $apiKey,
                     'Content-Type'   => 'application/json',
                 ])
                 ->post(
-                    'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent',
+                    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent',
                     $payload
                 );
 
             if ($response->successful()) {
-                $data  = $response->json();
-                $reply = $data['candidates'][0]['content']['parts'][0]['text']
-                    ?? 'Xin lỗi, tôi chưa hiểu câu hỏi. Bạn có thể hỏi lại theo cách khác không?';
+                $data = $response->json();
+                $firstPart = $data['candidates'][0]['content']['parts'][0] ?? null;
+
+                // Kiểm tra xem AI có yêu cầu gọi hàm search_db không
+                if (isset($firstPart['functionCall']) && $firstPart['functionCall']['name'] === 'search_db') {
+                    $keyword = $firstPart['functionCall']['args']['keyword'] ?? '';
+                    
+                    // Thực thi query bảo mật
+                    $products = \App\Models\SanPham::where('TenSP', 'like', "%{$keyword}%")
+                        ->where('TrangThai', 'Đã duyệt')
+                        ->select('TenSP', 'Gia', 'SoLuong')
+                        ->take(5)
+                        ->get();
+
+                    $functionResult = $products->isEmpty() 
+                        ? ['message' => 'Không tìm thấy sản phẩm nào'] 
+                        : $products->toArray();
+
+                    // Chuẩn bị payload lần 2 với kết quả của function
+                    $contents[] = $data['candidates'][0]['content']; // Gắn model's functionCall vào lịch sử
+                    $contents[] = [
+                        'role' => 'function',
+                        'parts' => [
+                            [
+                                'functionResponse' => [
+                                    'name' => 'search_db',
+                                    'response' => [
+                                        'name' => 'search_db',
+                                        'content' => $functionResult
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ];
+
+                    $payload['contents'] = $contents;
+                    
+                    // Gọi Gemini lần 2
+                    $response2 = Http::timeout(20)
+                        ->withHeaders([
+                            'X-goog-api-key' => $apiKey,
+                            'Content-Type'   => 'application/json',
+                        ])
+                        ->post(
+                            'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent',
+                            $payload
+                        );
+
+                    if ($response2->successful()) {
+                        $data2 = $response2->json();
+                        $reply = $data2['candidates'][0]['content']['parts'][0]['text'] ?? 'Lỗi sinh phản hồi từ kết quả tìm kiếm.';
+                    } else {
+                        throw new \Exception("Lỗi gọi Gemini lần 2");
+                    }
+                } else {
+                    // Nếu không gọi hàm, lấy text bình thường
+                    $reply = $firstPart['text'] ?? 'Xin lỗi, tôi chưa hiểu câu hỏi. Bạn có thể hỏi lại theo cách khác không?';
+                }
+
+                // Lưu memory (chỉ lưu text của user và model để tối ưu context)
+                $history[] = ['role' => 'user', 'parts' => [['text' => $userMessage]]];
+                $history[] = ['role' => 'model', 'parts' => [['text' => $reply]]];
+                if (count($history) > 10) {
+                    $history = array_slice($history, -10); // Giữ 10 tin nhắn gần nhất
+                }
+                Session::put('ai_chat_history', $history);
+
                 return response()->json(['reply' => $reply]);
             }
 
