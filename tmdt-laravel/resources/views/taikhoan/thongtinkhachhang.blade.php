@@ -58,16 +58,10 @@
                                     <div class="col-12">
                                         <label class="form-label text-muted fw-semibold small">Email</label>
                                         <div class="input-group">
-                                            <input type="email" id="currentEmail" class="form-control form-control-lg border-0 bg-light rounded-start-3" value="{{ $targetUser->Email }}" readonly placeholder="Chưa có email" />
-                                            @if(empty($targetUser->Email))
-                                                <button class="btn btn-outline-success fw-bold" type="button" onclick="startAddEmailFlow()">
-                                                    <i class="fa-solid fa-plus-circle me-1"></i> Thêm Email
-                                                </button>
-                                            @else
-                                                <button class="btn btn-outline-primary fw-bold" type="button" onclick="startChangeEmailFlow()">
-                                                    <i class="fa-solid fa-envelope-circle-check me-1"></i> Đổi Email
-                                                </button>
-                                            @endif
+                                            <input type="email" id="currentEmail" class="form-control form-control-lg border-0 bg-light rounded-start-3" value="{{ $targetUser->Email }}" readonly />
+                                            <button class="btn btn-outline-primary fw-bold" type="button" onclick="startChangeEmailFlow()">
+                                                <i class="fa-solid fa-envelope-circle-check me-1"></i> Đổi Email
+                                            </button>
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -316,105 +310,6 @@ function showNewEmailPopup() {
     }).then(result => {
         if(result.isConfirmed) {
             Swal.fire('Thành công!', 'Email của bạn đã được cập nhật.', 'success')
-            .then(() => location.reload());
-        }
-    });
-}
-
-function startAddEmailFlow() {
-    Swal.fire({
-        title: 'Nhập Email mới',
-        input: 'email',
-        inputPlaceholder: 'vidu@gmail.com',
-        confirmButtonText: 'Gửi mã xác nhận',
-        confirmButtonColor: '#0d6efd',
-        showCancelButton: true,
-        cancelButtonText: 'Hủy',
-        allowOutsideClick: false,
-        preConfirm: (newEmail) => {
-            if(!newEmail) {
-                Swal.showValidationMessage('Vui lòng nhập email');
-                return false;
-            }
-            return fetch('{{ route("taikhoan.sendOtpAddEmail") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ new_email: newEmail })
-            })
-            .then(r => r.json())
-            .then(data => {
-                if(!data.success) { throw new Error(data.message); }
-                return true;
-            })
-            .catch(err => {
-                Swal.showValidationMessage(err.message);
-                return false;
-            });
-        }
-    }).then(result => {
-        if(result.isConfirmed) {
-            showOtpAddPopup();
-        }
-    });
-}
-
-function showOtpAddPopup() {
-    let timeLeft = 60;
-    let timerInterval;
-
-    Swal.fire({
-        title: 'Nhập mã OTP',
-        html: `
-            Mã OTP 4 số đã được gửi về email bạn vừa nhập.<br>
-            Vui lòng kiểm tra hộp thư của bạn.<br><br>
-            <b id="swal-timer-add" style="color: #dc3545; font-size: 24px;">60s</b><br><br>
-            <input type="text" id="otp-input-add" class="swal2-input" placeholder="Nhập mã 4 số" maxlength="4" style="text-align: center; font-size: 20px; letter-spacing: 5px;">
-        `,
-        confirmButtonText: 'Xác nhận',
-        confirmButtonColor: '#198754',
-        allowOutsideClick: false,
-        didOpen: () => {
-            const b = Swal.getHtmlContainer().querySelector('#swal-timer-add');
-            timerInterval = setInterval(() => {
-                timeLeft -= 1;
-                b.textContent = timeLeft + 's';
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    Swal.fire('Hết hạn', 'Mã OTP đã hết hạn.', 'warning');
-                }
-            }, 1000);
-        },
-        willClose: () => { clearInterval(timerInterval); },
-        preConfirm: () => {
-            const otp = document.getElementById('otp-input-add').value;
-            if(!otp || otp.length !== 4) {
-                Swal.showValidationMessage('Vui lòng nhập đủ 4 số');
-                return false;
-            }
-            return fetch('{{ route("taikhoan.verifyOtpAddEmail") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ otp: otp })
-            })
-            .then(r => r.json())
-            .then(data => {
-                if(!data.success) { throw new Error(data.message); }
-                return true;
-            })
-            .catch(err => {
-                Swal.showValidationMessage(err.message);
-                return false;
-            });
-        }
-    }).then(result => {
-        if(result.isConfirmed) {
-            Swal.fire('Thành công!', 'Email của bạn đã được thêm.', 'success')
             .then(() => location.reload());
         }
     });
