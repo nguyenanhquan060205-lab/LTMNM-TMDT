@@ -33,16 +33,20 @@
         color: #9ca3af;
         border-color: #e5e7eb;
     }
-    /* Hide the "Showing 1 to X of Y results" text if it looks cluttered */
+    /* Make the text look nicer */
     nav p.small.text-muted, nav p.leading-5 {
-        display: none !important;
+        display: inline-block;
+        margin-top: 10px;
+        color: #6b7280 !important;
+        font-weight: 500;
+        background-color: #f8f9fa;
+        padding: 5px 12px;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
     }
-    /* Align pagination to center if the text on the left is hidden */
-    nav > div.d-flex.justify-content-between.flex-fill {
-        justify-content: center !important;
-    }
-    nav > div.hidden.sm\:flex-1.sm\:flex.sm\:items-center.sm\:justify-between {
-        justify-content: center !important;
+    /* Separate them */
+    nav > div.d-flex, nav > div.hidden {
+        align-items: center !important;
     }
 </style>
 <div class="container mt-4 mb-5">
