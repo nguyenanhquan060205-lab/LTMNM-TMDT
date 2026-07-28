@@ -222,7 +222,7 @@
                                                     </button>
                                                 </form>
                                             @else
-                                                <form action="{{ url('/admin/xoakhieunai') }}" method="post" class="m-0" onsubmit="return confirm('Bạn có chắc chắn muốn xoá khiếu nại này?');">
+                                                <form action="{{ url('/admin/xoakhieunai') }}" method="post" class="m-0" onsubmit="event.preventDefault(); Swal.fire({ title: 'Xác nhận', text: 'Bạn có chắc chắn muốn xoá khiếu nại này?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Xóa', cancelButtonText: 'Hủy', confirmButtonColor: '#d33' }).then((result) => { if (result.isConfirmed) this.submit(); });">
                                                     @csrf
                                                     <input type="hidden" name="id" value="{{ $item->MaKN }}" />
                                                     <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm fw-bold">

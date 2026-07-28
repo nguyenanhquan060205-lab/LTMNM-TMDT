@@ -140,7 +140,7 @@
                                             <form action="{{ route('sanpham.hoanthanhhoadon', ['id' => $item->MaHD]) }}"
                                                   method="post"
                                                   class="d-inline"
-                                                  onsubmit="return confirm('Xác nhận hoàn thành toàn bộ sản phẩm trong hóa đơn này?')">
+                                                  onsubmit="event.preventDefault(); Swal.fire({ title: 'Xác nhận', text: 'Xác nhận hoàn thành toàn bộ sản phẩm trong hóa đơn này?', icon: 'question', showCancelButton: true, confirmButtonText: 'Đồng ý', cancelButtonText: 'Hủy' }).then((result) => { if (result.isConfirmed) this.submit(); })">
                                                 @csrf
                                                 <button type="submit"
                                                         class="btn btn-outline-success btn-action" title="Xác nhận hoàn thành">
@@ -152,7 +152,7 @@
                                             <form action="{{ route('sanpham.huyhoadonban', ['id' => $item->MaHD]) }}"
                                                   method="post"
                                                   class="d-inline"
-                                                  onsubmit="return confirm('Bạn có chắc muốn hủy hóa đơn này?')">
+                                                  onsubmit="event.preventDefault(); Swal.fire({ title: 'Xác nhận', text: 'Bạn có chắc muốn hủy hóa đơn này?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Đồng ý', cancelButtonText: 'Hủy' }).then((result) => { if (result.isConfirmed) this.submit(); })">
                                                 @csrf
                                                 <button type="submit" class="btn btn-outline-danger btn-action" title="Hủy đơn hàng">
                                                     <i class="fa-solid fa-xmark"></i>

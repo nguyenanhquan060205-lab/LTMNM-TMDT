@@ -129,7 +129,7 @@
                 </a>
                 <a href="{{ url('/sanpham/xoa/' . ($sp->MaSP ?? '')) }}"
                    class="btn btn-danger fw-bold px-4"
-                   onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
+                   onclick="event.preventDefault(); Swal.fire({ title: 'Xác nhận', text: 'Bạn có chắc chắn muốn xóa sản phẩm này không?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Xóa', cancelButtonText: 'Hủy', confirmButtonColor: '#d33' }).then((result) => { if (result.isConfirmed) window.location.href = this.href; });">
                     <i class="bi bi-trash"></i> Xóa sản phẩm
                 </a>
 

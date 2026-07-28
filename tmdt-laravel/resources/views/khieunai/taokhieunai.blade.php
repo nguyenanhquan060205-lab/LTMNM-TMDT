@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container my-5">
-    <h3 class="fw-bold mb-4 text-center">📝 Gửi khiếu nại sản phẩm</h3>
+    <h3 class="fw-bold mb-4 text-center">Gửi khiếu nại sản phẩm</h3>
 
     <div class="card shadow-sm p-4">
         <div class="mb-3">

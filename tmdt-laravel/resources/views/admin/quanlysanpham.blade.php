@@ -302,7 +302,7 @@
                                                         @endif
                                                     </form>
 
-                                                    <form action="{{ url('/admin/xoa') }}" method="post" onsubmit="return confirm('CẢNH BÁO: Xóa vĩnh viễn sản phẩm này?');">
+                                                    <form action="{{ url('/admin/xoa') }}" method="post" onsubmit="event.preventDefault(); Swal.fire({ title: 'Xác nhận', text: 'CẢNH BÁO: Xóa vĩnh viễn sản phẩm này?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Xóa', cancelButtonText: 'Hủy', confirmButtonColor: '#d33' }).then((result) => { if (result.isConfirmed) this.submit(); });">
                                                         @csrf
                                                         <input type="hidden" name="id" value="{{ $sp->MaSP }}" />
                                                         <button type="submit" class="btn btn-outline-danger btn-sm shadow-sm px-2" title="Xóa vĩnh viễn">
@@ -374,7 +374,7 @@
                                         </td>
                                         <td class="text-center">
                                             <button class="btn btn-sm btn-outline-primary border-0" data-bs-toggle="modal" data-bs-target="#modalEdit-{{ $loai->MaLoai }}"><i class="fa-solid fa-pen-to-square"></i></button>
-                                            <a href="{{ route('admin.loaisanpham.delete', $loai->MaLoai) }}" class="btn btn-sm btn-outline-danger border-0" onclick="return confirm('Xóa {{ $loai->TenLoai }}?');">
+                                            <a href="{{ route('admin.loaisanpham.delete', $loai->MaLoai) }}" class="btn btn-sm btn-outline-danger border-0" onclick="event.preventDefault(); Swal.fire({ title: 'Xác nhận', text: 'Xóa {{ $loai->TenLoai }}?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Xóa', cancelButtonText: 'Hủy', confirmButtonColor: '#d33' }).then((result) => { if (result.isConfirmed) window.location.href = this.href; });">
                                                 <i class="fa-solid fa-trash"></i>
                                             </a>
                                         </td>

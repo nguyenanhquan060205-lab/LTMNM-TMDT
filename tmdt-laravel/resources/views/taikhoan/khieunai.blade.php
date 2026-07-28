@@ -17,7 +17,7 @@
             <input type="text"
                    id="searchInput"
                    class="form-control rounded-pill shadow-sm"
-                   placeholder="🔍 Tìm theo người gửi, sản phẩm hoặc nội dung khiếu nại..." />
+                   placeholder="Tìm theo người gửi, sản phẩm hoặc nội dung khiếu nại..." />
         </div>
     </div>
 
@@ -40,7 +40,7 @@
         <div class="tab-pane fade show active" id="ve-toi" role="tabpanel" aria-labelledby="ve-toi-tab">
             @if (!isset($dsKhieuNai) || collect($dsKhieuNai)->isEmpty())
                 <div class="alert alert-success text-center shadow-sm rounded-4">
-                    🎉 Hiện tại chưa có khiếu nại nào về sản phẩm của bạn!
+                    Hiện tại chưa có khiếu nại nào về sản phẩm của bạn.
                 </div>
             @else
                 <div class="card shadow-sm mb-4">

@@ -128,7 +128,7 @@
                                     <div class="vr mx-1 text-muted"></div>
                                     <a href="{{ route('taikhoan.huydonhang', ['id' => $item->MaHD]) }}"
                                        class="btn btn-sm text-danger fw-bold"
-                                       onclick="return confirm('Bạn có chắc muốn hủy đơn hàng này không?');">
+                                       onclick="event.preventDefault(); Swal.fire({ title: 'Xác nhận', text: 'Bạn có chắc muốn hủy đơn hàng này không?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Đồng ý', cancelButtonText: 'Hủy' }).then((result) => { if (result.isConfirmed) window.location.href = this.href; })">
                                         Hủy đơn
                                     </a>
                                 @endif

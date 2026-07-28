@@ -222,7 +222,7 @@
                                         <form action="{{ route('hoadon.xacnhansanpham', ['mahd' => $item->MaHD, 'masp' => $item->MaSP]) }}"
                                               method="post"
                                               class="d-inline"
-                                              onsubmit="return confirm('Xác nhận sản phẩm này?')">
+                                              onsubmit="event.preventDefault(); Swal.fire({ title: 'Xác nhận', text: 'Xác nhận sản phẩm này?', icon: 'question', showCancelButton: true, confirmButtonText: 'Đồng ý', cancelButtonText: 'Hủy' }).then((result) => { if (result.isConfirmed) this.submit(); })">
                                             @csrf
                                             <button type="submit" class="btn btn-outline-success btn-sm rounded-pill w-100">
                                                 <i class="fa-solid fa-check"></i> Duyệt
@@ -253,7 +253,7 @@
                 <form action="{{ route('sanpham.hoanthanhhoadon', ['id' => $hd->MaHD]) }}"
                       method="post"
                       class="d-inline"
-                      onsubmit="return confirm('Xác nhận duyệt toàn bộ sản phẩm trong hóa đơn này?')">
+                      onsubmit="event.preventDefault(); Swal.fire({ title: 'Xác nhận', text: 'Xác nhận duyệt toàn bộ sản phẩm trong hóa đơn này?', icon: 'question', showCancelButton: true, confirmButtonText: 'Đồng ý', cancelButtonText: 'Hủy' }).then((result) => { if (result.isConfirmed) this.submit(); })">
                     @csrf
                     <button type="submit" class="btn btn-success btn-lg rounded-pill shadow-sm px-4" style="font-weight: 500;">
                         <i class="fa-solid fa-check-double me-2"></i> Duyệt tất cả

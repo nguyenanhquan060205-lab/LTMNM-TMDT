@@ -688,15 +688,25 @@
     sendDanhDauDaDoc();
 
     function xoaTinNhan(idTin) {
-        if (!confirm('Bạn có chắc muốn xóa tin nhắn này?')) return;
-        let token = $('#RequestVerificationToken').val();
-        $.ajax({
-            url: '/tinnhan/xoatinnhan/' + idTin,
-            type: 'POST',
-            data: { _token: token },
-            success: function() { loadTinNhan(); },
-            error: function(xhr) {
-                Swal.fire('Lỗi', 'Không thể xóa tin nhắn: ' + (xhr.responseJSON?.error || ''), 'error');
+        Swal.fire({
+            title: 'Xác nhận',
+            text: 'Bạn có chắc muốn xóa tin nhắn này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Có, xóa đi!',
+            cancelButtonText: 'Không'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let token = $('#RequestVerificationToken').val();
+                $.ajax({
+                    url: '/tinnhan/xoatinnhan/' + idTin,
+                    type: 'POST',
+                    data: { _token: token },
+                    success: function() { loadTinNhan(); },
+                    error: function(xhr) {
+                        Swal.fire('Lỗi', 'Không thể xóa tin nhắn: ' + (xhr.responseJSON?.error || ''), 'error');
+                    }
+                });
             }
         });
     }
