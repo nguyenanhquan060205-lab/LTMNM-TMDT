@@ -157,7 +157,7 @@ PROMPT;
                     'Content-Type'   => 'application/json',
                 ])
                 ->post(
-                    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent',
+                    'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent',
                     $payload
                 );
 
@@ -180,19 +180,27 @@ PROMPT;
                         ? ['message' => 'Không tìm thấy sản phẩm nào'] 
                         : $products->toArray();
 
+                    $functionCallId = $firstPart['functionCall']['id'] ?? null;
+
                     // Chuẩn bị payload lần 2 với kết quả của function
                     $contents[] = $data['candidates'][0]['content']; // Gắn model's functionCall vào lịch sử
+                    
+                    $functionResponsePart = [
+                        'name' => 'search_db',
+                        'response' => [
+                            'name' => 'search_db',
+                            'content' => $functionResult
+                        ]
+                    ];
+                    if ($functionCallId) {
+                        $functionResponsePart['id'] = $functionCallId;
+                    }
+
                     $contents[] = [
                         'role' => 'function',
                         'parts' => [
                             [
-                                'functionResponse' => [
-                                    'name' => 'search_db',
-                                    'response' => [
-                                        'name' => 'search_db',
-                                        'content' => $functionResult
-                                    ]
-                                ]
+                                'functionResponse' => $functionResponsePart
                             ]
                         ]
                     ];
@@ -206,7 +214,7 @@ PROMPT;
                             'Content-Type'   => 'application/json',
                         ])
                         ->post(
-                            'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent',
+                            'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent',
                             $payload
                         );
 
@@ -214,6 +222,7 @@ PROMPT;
                         $data2 = $response2->json();
                         $reply = $data2['candidates'][0]['content']['parts'][0]['text'] ?? 'Lỗi sinh phản hồi từ kết quả tìm kiếm.';
                     } else {
+                        \Illuminate\Support\Facades\Log::error('Gemini API Error 2', ['status' => $response2->status(), 'body' => $response2->body()]);
                         throw new \Exception("Lỗi gọi Gemini lần 2");
                     }
                 } else {
@@ -230,6 +239,8 @@ PROMPT;
                 Session::put('ai_chat_history', $history);
 
                 return response()->json(['reply' => $reply]);
+            } else {
+                \Illuminate\Support\Facades\Log::error('Gemini API Error', ['status' => $response->status(), 'body' => $response->body()]);
             }
 
             return response()->json(['reply' => '😔 Tôi đang gặp sự cố kết nối. Vui lòng thử lại sau hoặc liên hệ Admin!']);
