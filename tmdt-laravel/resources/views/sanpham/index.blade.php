@@ -3,6 +3,48 @@
 @section('title', 'Tất cả sản phẩm')
 
 @section('content')
+<style>
+    /* Pagination Styling */
+    nav .pagination {
+        gap: 8px;
+        margin-bottom: 0;
+    }
+    nav .page-item .page-link {
+        border-radius: 8px !important;
+        border: 1px solid #e5e7eb;
+        color: #4b5563;
+        font-weight: 500;
+        padding: 8px 16px;
+        background-color: #ffffff;
+        transition: all 0.2s ease;
+    }
+    nav .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(13, 110, 253, 0.2);
+    }
+    nav .page-item:not(.active):not(.disabled) .page-link:hover {
+        background-color: #f3f4f6;
+        color: #1f2937;
+    }
+    nav .page-item.disabled .page-link {
+        background-color: #f9fafb;
+        color: #9ca3af;
+        border-color: #e5e7eb;
+    }
+    /* Hide the "Showing 1 to X of Y results" text if it looks cluttered */
+    nav p.small.text-muted, nav p.leading-5 {
+        display: none !important;
+    }
+    /* Align pagination to center if the text on the left is hidden */
+    nav > div.d-flex.justify-content-between.flex-fill {
+        justify-content: center !important;
+    }
+    nav > div.hidden.sm\:flex-1.sm\:flex.sm\:items-center.sm\:justify-between {
+        justify-content: center !important;
+    }
+</style>
 <div class="container mt-4 mb-5">
     
     <div class="row">

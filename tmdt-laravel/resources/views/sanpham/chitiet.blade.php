@@ -62,7 +62,7 @@
             <h3 class="fw-bold mb-2 text-dark">{{ $sp->TenSP }}</h3>
             <p class="fs-3 fw-bold" style="color: #0d6efd;">{{ number_format($sp->Gia, 0, ',', '.') }} ₫</p>
 
-            <p><b>Mô tả:</b> {{ $sp->MoTa }}</p>
+            <p><b>Mô tả:</b> {!! nl2br(e($sp->MoTa)) !!}</p>
 
             <p>
                 <b>Số lượng còn:</b>
