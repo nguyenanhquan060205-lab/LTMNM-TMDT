@@ -285,6 +285,31 @@
             </div>
             @endif
         </div>
+
+        @if(isset($user) && $user)
+            @php
+                $chatHistory = Session::get('ai_chat_history', []);
+            @endphp
+            @foreach($chatHistory as $msg)
+                @php
+                    $role = $msg['role'] ?? '';
+                    $parts = $msg['parts'] ?? [];
+                    $text = $parts[0]['text'] ?? null;
+                @endphp
+                @if($text)
+                    @if($role === 'user')
+                        <div class="ai-msg user">
+                            <div class="ai-bubble">{{ $text }}</div>
+                        </div>
+                    @elseif($role === 'model')
+                        <div class="ai-msg bot">
+                            <div class="ai-bot-icon">🤖</div>
+                            <div class="ai-bubble">{!! Str::markdown($text, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}</div>
+                        </div>
+                    @endif
+                @endif
+            @endforeach
+        @endif
     </div>
 
     <!-- Input -->
