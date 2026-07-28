@@ -47,6 +47,8 @@ Route::prefix('taikhoan')->name('taikhoan.')->group(function() {
     Route::post('/send-otp-email', [TaiKhoanController::class, 'sendOtpChangeEmail'])->name('sendOtpEmail');
     Route::post('/verify-otp-email', [TaiKhoanController::class, 'verifyOtpChangeEmail'])->name('verifyOtpEmail');
     Route::post('/update-new-email', [TaiKhoanController::class, 'updateNewEmail'])->name('updateNewEmail');
+    Route::post('/send-otp-add-email', [TaiKhoanController::class, 'sendOtpAddEmail'])->name('sendOtpAddEmail');
+    Route::post('/verify-otp-add-email', [TaiKhoanController::class, 'verifyOtpAddEmail'])->name('verifyOtpAddEmail');
 
     Route::get('/ctlichsu/{id}', [TaiKhoanController::class, 'ctLichSu'])->name('ct_lichsu');
     Route::get('/suadonhang/{id}', [TaiKhoanController::class, 'suaDonHang'])->name('suadonhang');

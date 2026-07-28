@@ -30,10 +30,14 @@ class TaiKhoanController extends Controller
             return back()->with('error', 'Vui lòng nhập đầy đủ thông tin đăng nhập!');
         }
 
-        $user = NguoiDung::where('TaiKhoan', $taikhoan)->first();
+        if (filter_var($taikhoan, FILTER_VALIDATE_EMAIL)) {
+            $user = NguoiDung::where('Email', $taikhoan)->first();
+        } else {
+            $user = NguoiDung::where('TaiKhoan', $taikhoan)->first();
+        }
 
         if (!$user) {
-            return back()->with('error', 'Sai tài khoản hoặc mật khẩu!');
+            return back()->with('error', 'Sai tài khoản/email hoặc mật khẩu!');
         }
 
         $isValid = false;
@@ -346,6 +350,75 @@ class TaiKhoanController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'Không tìm thấy người dùng!']);
+    }
+
+    public function sendOtpAddEmail(Request $request)
+    {
+        $user = Session::get('user');
+        if (!$user) return response()->json(['success' => false, 'message' => 'Chưa đăng nhập!']);
+
+        if (!empty($user->Email)) {
+            return response()->json(['success' => false, 'message' => 'Tài khoản của bạn đã có Email, không thể sử dụng chức năng này.']);
+        }
+
+        $newEmail = $request->input('new_email');
+        if (empty($newEmail) || !filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+            return response()->json(['success' => false, 'message' => 'Email không hợp lệ!']);
+        }
+
+        if (NguoiDung::where('Email', $newEmail)->exists()) {
+            return response()->json(['success' => false, 'message' => 'Email này đã được sử dụng bởi người khác!']);
+        }
+
+        $otp = rand(1000, 9999);
+        Session::put('otp_add_email', [
+            'code' => $otp,
+            'email' => $newEmail,
+            'expires_at' => time() + 60
+        ]);
+
+        try {
+            \Illuminate\Support\Facades\Mail::send('emails.otp', ['otp' => $otp, 'name' => $user->HoTen], function ($message) use ($newEmail) {
+                $message->to($newEmail)->subject('Mã OTP xác thực thêm Email - TechSecond');
+            });
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("OTP Mail Error: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Không thể gửi email OTP lúc này.']);
+        }
+    }
+
+    public function verifyOtpAddEmail(Request $request)
+    {
+        $userSession = Session::get('user');
+        if (!$userSession) return response()->json(['success' => false, 'message' => 'Chưa đăng nhập!']);
+
+        $inputOtp = $request->input('otp');
+        $sessionOtp = Session::get('otp_add_email');
+
+        if (!$sessionOtp) {
+            return response()->json(['success' => false, 'message' => 'Mã OTP không tồn tại hoặc đã hết hạn!']);
+        }
+
+        if (time() > $sessionOtp['expires_at']) {
+            Session::forget('otp_add_email');
+            return response()->json(['success' => false, 'message' => 'Mã OTP đã hết hạn! Vui lòng lấy mã mới.']);
+        }
+
+        if ((int)$inputOtp === (int)$sessionOtp['code']) {
+            $user = NguoiDung::find($userSession->MaKH);
+            if ($user) {
+                $user->Email = $sessionOtp['email'];
+                $user->save();
+                
+                Session::put('user', $user);
+                Session::forget('otp_add_email');
+                return response()->json(['success' => true, 'message' => 'Thêm Email thành công!']);
+            }
+            return response()->json(['success' => false, 'message' => 'Không tìm thấy người dùng!']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Mã OTP không chính xác!']);
     }
 
     public function capNhatThongTin(Request $request)

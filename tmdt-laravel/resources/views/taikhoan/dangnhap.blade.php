@@ -128,8 +128,8 @@
             <form method="post" action="{{ url('/taikhoan/dangnhap') }}">
                 @csrf
                 <div class="mb-4">
-                    <label class="form-label"><i class="fa-solid fa-user me-2 text-muted"></i>Tài khoản</label>
-                    <input name="taikhoan" class="form-control modern-input" placeholder="Nhập tên tài khoản..." required />
+                    <label class="form-label"><i class="fa-solid fa-user me-2 text-muted"></i>Tài khoản hoặc Email</label>
+                    <input name="taikhoan" class="form-control modern-input" placeholder="Nhập tên tài khoản hoặc email..." required />
                 </div>
                 <div class="mb-4">
                     <label class="form-label"><i class="fa-solid fa-lock me-2 text-muted"></i>Mật khẩu</label>
