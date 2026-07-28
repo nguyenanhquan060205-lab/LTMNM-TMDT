@@ -147,6 +147,15 @@ Route::get('/debug-log', function () {
     return 'No log file.';
 });
 
+Route::get('/test-set', function () {
+    Session::put('test_key', 'it_works_' . time());
+    return 'Session written. <a href="/test-get">Check</a>';
+});
+
+Route::get('/test-get', function () {
+    return 'Session value: ' . Session::get('test_key', 'NOT_FOUND');
+});
+
 Route::get('/test-upload', function() {
     return '<form method="POST" enctype="multipart/form-data" action="/test-upload-post"><input type="hidden" name="_token" value="'.csrf_token().'"><input type="file" name="files[]" required><input type="file" name="files[]" multiple><button type="submit">Submit</button></form>';
 });
