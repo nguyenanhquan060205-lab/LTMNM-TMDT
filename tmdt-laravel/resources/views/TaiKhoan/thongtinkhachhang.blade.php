@@ -7,11 +7,16 @@
         <div class="col-lg-10">
             <h3 class="fw-bold mb-4 text-dark text-center">Hồ sơ cá nhân</h3>
 
-            @if (session('Success'))
-                <div class="alert alert-success rounded-3 shadow-sm border-0 mb-4">{{ session('Success') }}</div>
+            @if (session('success'))
+                <div class="alert alert-success rounded-3 shadow-sm border-0 mb-4">
+                    {{ session('success') }}
+                </div>
             @endif
-            @if (session('Error'))
-                <div class="alert alert-danger rounded-3 shadow-sm border-0 mb-4">{{ session('Error') }}</div>
+
+            @if (session('error'))
+                <div class="alert alert-danger rounded-3 shadow-sm border-0 mb-4">
+                    {{ session('error') }}
+                </div>
             @endif
 
             <div class="bg-white shadow-sm border-0" style="border-radius: 20px;">

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\SanPham;
 use Illuminate\Http\Request;
 use App\Models\TinNhan;
 use App\Models\NguoiDung;
@@ -20,7 +20,27 @@ class TinNhanController extends Controller
         if (!$currentUser) return redirect()->route('taikhoan.dangnhap');
 
         $idNguoiNhan = $request->query('idNguoiNhan');
+        $maSP = $request->query('maSP');
         $mode = $request->query('mode');
+
+        $product = null;
+
+        $defaultMessage = '';
+        $MaSP = '';
+        $TenSP = '';
+        $AnhSP = '';
+
+        if ($maSP) {
+            $product = SanPham::with('hinhAnhs')->find($maSP);
+
+            if ($product) {
+                $defaultMessage = "Tôi muốn có thêm thông tin về sản phẩm \"{$product->TenSP}\".";
+                $MaSP = $product->MaSP;
+                $TenSP = $product->TenSP;
+                $anhBiaObj = collect($product->hinhAnhs)->firstWhere('AnhBia', true);
+                $AnhSP = $anhBiaObj ? $anhBiaObj->URLAnh : ($product->AnhBia ?? "noimage.jpg");
+            }
+        }
 
         $activeUser = null;
         $NguoiNhanID = 0;
@@ -71,7 +91,24 @@ class TinNhanController extends Controller
             
         $NguoiGuiID = $currentUser->MaKH;
 
-        return view('tinnhan.chat', compact('dsNguoiDung', 'admin', 'activeUser', 'mode', 'NguoiNhanID', 'NguoiNhanTen', 'NguoiGuiID', 'UserChuaDoc'));
+        return view(
+            'tinnhan.chat',
+            compact(
+                'dsNguoiDung',
+                'admin',
+                'activeUser',
+                'mode',
+                'NguoiNhanID',
+                'NguoiNhanTen',
+                'NguoiGuiID',
+                'UserChuaDoc',
+                'product',
+                'MaSP',
+                'TenSP',
+                'AnhSP',
+                'defaultMessage'
+            )
+        );
     }
 
     public function loadTinNhan($idNguoiGui, $idNguoiNhan)
@@ -80,7 +117,7 @@ class TinNhanController extends Controller
             return response()->json([]);
         }
 
-        $messages = TinNhan::with(['nguoiGui'])
+        $messages = TinNhan::with(['nguoiGui', 'sanPham.hinhAnhs'])
             ->where(function ($q) use ($idNguoiGui, $idNguoiNhan) {
                 $q->where('NguoiGui', $idNguoiGui)
                   ->where('NguoiNhan', $idNguoiNhan);
@@ -94,12 +131,21 @@ class TinNhanController extends Controller
                     $avatar = 'Default.jpg';
                 }
                 
+                $anhSP = '';
+                if ($tn->sanPham) {
+                    $anhBiaObj = collect($tn->sanPham->hinhAnhs)->firstWhere('AnhBia', true);
+                    $anhSP = $anhBiaObj ? $anhBiaObj->URLAnh : ($tn->sanPham->AnhBia ?? "noimage.jpg");
+                }
+                
                 return [
                     'MaTN' => $tn->MaTN,
                     'NguoiGui' => $tn->NguoiGui,
                     'NguoiNhan' => $tn->NguoiNhan,
                     'NoiDung' => $tn->NoiDung,
                     'Anh' => $tn->Anh,
+                    'MaSP' => $tn->MaSP,
+                    'TenSP' => $tn->sanPham ? $tn->sanPham->TenSP : '',
+                    'AnhSP' => $anhSP,
                     'Gio' => $tn->NgayGui ? \Carbon\Carbon::parse($tn->NgayGui)->setTimezone('Asia/Ho_Chi_Minh')->format('H:i d/m') : '',
                     'AvatarGui' => $avatar,
                     'DaDoc' => $tn->DaDoc ? true : false,
@@ -116,6 +162,7 @@ class TinNhanController extends Controller
 
         $nguoiNhan = $request->input('nguoiNhan');
         $noiDung = $request->input('noiDung');
+        $maSP = $request->input('maSP');
 
         if ($nguoiNhan && ($noiDung || $request->hasFile('anh'))) {
             $fileName = null;
@@ -131,6 +178,7 @@ class TinNhanController extends Controller
             $tn = TinNhan::create([
                 'NguoiGui' => $currentUser->MaKH,
                 'NguoiNhan' => $nguoiNhan,
+                'MaSP' => $maSP,
                 'NoiDung' => $noiDung,
                 'Anh' => $fileName,
                 'NgayGui' => now(),

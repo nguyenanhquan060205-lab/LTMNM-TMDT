@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         // 1. Tạo người dùng (Admin)
         NguoiDung::create([
             'TaiKhoan' => 'admin',
-            'MatKhau' => '123', // C# used plain text for now, but keeping the same for test
+            'MatKhau' => '123', 
             'HoTen' => 'Quản trị viên',
             'Email' => 'admin@gmail.com',
             'SDT' => '0123456789',

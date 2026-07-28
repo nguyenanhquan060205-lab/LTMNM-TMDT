@@ -26,7 +26,7 @@ class LoaiSanPhamController extends Controller
     public function create()
     {
         $this->checkAdmin();
-        return view('loaisanpham.create');
+        return view('admin.loaisanpham.create');
     }
 
     public function store(Request $request)
@@ -35,23 +35,23 @@ class LoaiSanPhamController extends Controller
         $request->validate(['TenLoai' => 'required|string|max:100']);
         
         LoaiSanPham::create(['TenLoai' => $request->TenLoai]);
-        return redirect()->route('loaisanpham.index')->with('success', 'Thêm loại sản phẩm thành công!');
+        return redirect()->route('admin.quanlysanpham')->with('success', 'Thêm loại sản phẩm thành công!');
     }
 
+    // 1. Mở trang Form sửa
     public function edit($id)
     {
         $this->checkAdmin();
-        $loai = LoaiSanPham::find($id);
-        if (!$loai) abort(404);
-        return view('loaisanpham.edit', compact('loai'));
+        $loai = LoaiSanPham::findOrFail($id);
+        return view('admin.loaisanpham.edit', compact('loai')); // Đảm bảo đúng đường dẫn View của bạn
     }
 
-    public function update(Request $request)
+    // 2. Xử lý Cập nhật
+    public function update(Request $request, $id) // Thêm biến $id vào đây
     {
         $this->checkAdmin();
-        $id = $request->input('id');
-        $loai = LoaiSanPham::find($id);
-        if (!$loai) abort(404);
+        
+        $loai = LoaiSanPham::findOrFail($id); // Tìm theo $id từ URL
 
         $request->validate(['TenLoaiMoi' => 'required|string|max:100']);
         $loai->TenLoai = $request->TenLoaiMoi;
@@ -60,15 +60,17 @@ class LoaiSanPhamController extends Controller
         return redirect()->route('admin.quanlysanpham')->with('success', 'Cập nhật danh mục thành công!');
     }
 
-    public function delete(Request $request)
+    // 3. Xử lý Xóa
+    public function delete($id) // Thay Request $request bằng $id
     {
         $this->checkAdmin();
-        $id = $request->input('id');
+        
         $loai = LoaiSanPham::find($id);
         if ($loai) {
             $loai->delete();
             return redirect()->route('admin.quanlysanpham')->with('success', 'Đã xoá danh mục sản phẩm!');
         }
-        return redirect()->route('admin.quanlysanpham');
+        
+        return redirect()->route('admin.quanlysanpham')->with('error', 'Không tìm thấy danh mục!');
     }
 }
