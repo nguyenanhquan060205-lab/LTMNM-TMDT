@@ -18,30 +18,6 @@ require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
 try {
-    if (isset($_GET['debug_env'])) {
-        echo "<pre>";
-        echo "APP_DEBUG from getenv: " . getenv('APP_DEBUG') . "\n";
-        echo "APP_KEY from getenv: " . getenv('APP_KEY') . "\n";
-        echo "DB_HOST from $_ENV: " . ($_ENV['DB_HOST'] ?? 'NOT SET') . "\n";
-        echo "Render env variables:\n";
-        print_r($_ENV);
-        print_r($_SERVER);
-        echo "</pre>";
-        exit;
-    }
-    if (isset($_GET['debug_file'])) {
-        echo "<pre>";
-        echo ".env exists? " . (file_exists(__DIR__.'/../.env') ? 'YES' : 'NO') . "\n";
-        if (file_exists(__DIR__.'/../.env')) {
-            echo "Contents:\n" . file_get_contents(__DIR__.'/../.env');
-        } else {
-            echo "/etc/secrets/.env exists? " . (file_exists('/etc/secrets/.env') ? 'YES' : 'NO') . "\n";
-            echo "ls -la /etc/secrets/:\n";
-            echo shell_exec('ls -la /etc/secrets/');
-        }
-        echo "</pre>";
-        exit;
-    }
     $app->handleRequest(Request::capture());
 } catch (\Throwable $e) {
     http_response_code(500);
