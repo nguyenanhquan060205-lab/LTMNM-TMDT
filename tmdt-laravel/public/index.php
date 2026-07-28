@@ -29,6 +29,19 @@ try {
         echo "</pre>";
         exit;
     }
+    if (isset($_GET['debug_file'])) {
+        echo "<pre>";
+        echo ".env exists? " . (file_exists(__DIR__.'/../.env') ? 'YES' : 'NO') . "\n";
+        if (file_exists(__DIR__.'/../.env')) {
+            echo "Contents:\n" . file_get_contents(__DIR__.'/../.env');
+        } else {
+            echo "/etc/secrets/.env exists? " . (file_exists('/etc/secrets/.env') ? 'YES' : 'NO') . "\n";
+            echo "ls -la /etc/secrets/:\n";
+            echo shell_exec('ls -la /etc/secrets/');
+        }
+        echo "</pre>";
+        exit;
+    }
     $app->handleRequest(Request::capture());
 } catch (\Throwable $e) {
     http_response_code(500);
