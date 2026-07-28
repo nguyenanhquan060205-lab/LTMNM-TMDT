@@ -160,7 +160,7 @@ PROMPT;
                     'Content-Type'   => 'application/json',
                 ])
                 ->post(
-                    'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent',
+                    'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-latest:generateContent',
                     $payload
                 );
 
@@ -217,7 +217,7 @@ PROMPT;
                             'Content-Type'   => 'application/json',
                         ])
                         ->post(
-                            'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent',
+                            'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-latest:generateContent',
                             $payload
                         );
 
@@ -250,6 +250,11 @@ PROMPT;
                 }
             } else {
                 \Illuminate\Support\Facades\Log::error('Gemini API Error', ['status' => $response->status(), 'body' => $response->body()]);
+                // Nếu lỗi 400 Bad Request, có thể do history session bị hỏng/không tương thích, xoá đi để sửa lỗi tự động
+                if ($response->status() == 400) {
+                    Session::forget('ai_chat_history');
+                    return response()->json(['reply' => '🔄 Tôi vừa được nâng cấp hệ thống nên cần khởi động lại trí nhớ. Bạn vui lòng gửi lại câu hỏi nhé!']);
+                }
             }
 
             return response()->json(['reply' => '😔 Tôi đang gặp sự cố kết nối. Vui lòng thử lại sau hoặc liên hệ Admin!']);
