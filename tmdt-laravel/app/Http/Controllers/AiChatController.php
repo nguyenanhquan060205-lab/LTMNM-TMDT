@@ -8,39 +8,6 @@ use Illuminate\Support\Facades\Session;
 
 class AiChatController extends Controller
 {
-    // =============================================
-    // Các pattern nguy hiểm cần chặn trước khi gửi lên AI
-    // =============================================
-    private function containsDangerousInput(string $text): bool
-    {
-        $dangerousPatterns = [
-            // SQL injection keywords (Bỏ các từ thông dụng dễ bị trùng như FROM, WHERE, UPDATE... chỉ giữ các cụm nguy hiểm thực sự)
-            '/\b(DROP TABLE|TRUNCATE TABLE|ALTER TABLE|UNION SELECT|INFORMATION_SCHEMA|SYS\.)\b/i',
-            // Shell / system commands
-            '/\b(system|exec|passthru|shell_exec|popen|proc_open|eval|assert|base64_decode)\b/i',
-            // Script / code injection
-            '/<script|<\/script|javascript:|data:text\/html|vbscript:/i',
-            // Attempt to read files or paths
-            '/(\.\.\/)|(\/etc\/passwd)|(\/proc\/)|(C:\\\\Windows)/i',
-            // PHP code markers
-            '/<\?php|<\?=/i',
-            // Common prompt injection tricks
-            '/ignore (all |previous |your |the )?instructions?/i',
-            '/you are now|forget (you are|your role|your instructions)/i',
-            '/pretend (you are|to be|that)/i',
-            '/act as (an?|if you are)/i',
-            '/jailbreak|DAN mode|developer mode|unrestricted/i',
-        ];
-
-        foreach ($dangerousPatterns as $pattern) {
-            if (preg_match($pattern, $text)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public function chat(Request $request)
     {
         // ==================== AUTH CHECK ====================
@@ -63,15 +30,8 @@ class AiChatController extends Controller
             return response()->json(['reply' => 'Câu hỏi của bạn quá dài. Vui lòng rút gọn lại nhé!']);
         }
 
-        // ==================== INJECTION GUARD ====================
-        if ($this->containsDangerousInput($userMessage)) {
-            return response()->json([
-                'reply' => '⚠️ Tôi không thể xử lý yêu cầu này. Nếu bạn cần hỗ trợ, vui lòng mô tả vấn đề theo cách khác hoặc liên hệ Admin.',
-            ]);
-        }
-
         // ==================== API KEY ====================
-        $apiKey = env('GEMINI_API_KEY', '');
+        $apiKey = config('services.gemini.key');
         if (!$apiKey) {
             return response()->json(['reply' => '⚙️ AI assistant chưa được cấu hình. Vui lòng liên hệ Admin để được hỗ trợ.']);
         }
@@ -200,7 +160,7 @@ PROMPT;
                     }
 
                     $contents[] = [
-                        'role' => 'function',
+                        'role' => 'user',
                         'parts' => [
                             [
                                 'functionResponse' => $functionResponsePart
@@ -234,8 +194,11 @@ PROMPT;
                 }
 
                 if ($reply) {
-                    // Convert Markdown to HTML
-                    $replyHtml = \Illuminate\Support\Str::markdown($reply);
+                    // Convert Markdown to HTML (an toàn, chống XSS)
+                    $replyHtml = \Illuminate\Support\Str::markdown($reply, [
+                        'html_input' => 'strip',
+                        'allow_unsafe_links' => false,
+                    ]);
                     
                     // Cập nhật lịch sử
                     $history[] = ['role' => 'user', 'parts' => [['text' => $userMessage]]];
@@ -247,6 +210,8 @@ PROMPT;
                     Session::put('ai_chat_history', $history);
 
                     return response()->json(['reply' => $replyHtml]);
+                } else {
+                    return response()->json(['reply' => '⚠️ Hệ thống không thể tạo phản hồi, vui lòng thử lại sau.']);
                 }
             } else {
                 \Illuminate\Support\Facades\Log::error('Gemini API Error', ['status' => $response->status(), 'body' => $response->body()]);

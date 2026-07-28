@@ -151,7 +151,7 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
 });
 
 // AI CHAT WIDGET
-Route::post('/ai/chat', [AiChatController::class, 'chat'])->name('ai.chat');
+Route::post('/ai/chat', [AiChatController::class, 'chat'])->name('ai.chat')->middleware('throttle:15,1');
 
 Route::get('/debug-log', function () {
     $logFile = storage_path('logs/laravel.log');
