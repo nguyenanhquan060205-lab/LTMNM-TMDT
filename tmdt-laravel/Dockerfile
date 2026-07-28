@@ -30,6 +30,7 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # Phân quyền cho thư mục Laravel
+RUN mkdir -p /var/www/html/storage/logs
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Trỏ thư mục gốc của Apache vào thư mục /public của Laravel
