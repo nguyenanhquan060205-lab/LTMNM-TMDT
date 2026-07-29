@@ -366,8 +366,15 @@ class TaiKhoanController extends Controller
         try {
             // Logic đổi Email đã được chuyển sang xử lý bằng AJAX OTP
 
-            if (!empty($model['SDT']) && NguoiDung::where('SDT', $model['SDT'])->where('MaKH', '!=', $model['MaKH'])->exists()) {
-                return redirect()->route($actionName)->with('error', 'Số điện thoại đã được sử dụng bởi tài khoản khác!');
+            if (!empty($model['SDT'])) {
+                // Kiểm tra định dạng số điện thoại Việt Nam (10 số, bắt đầu bằng 03, 05, 07, 08, 09)
+                if (!preg_match('/^(0[3|5|7|8|9])+([0-9]{8})$/', $model['SDT'])) {
+                    return redirect()->route($actionName)->with('error', 'Số điện thoại không hợp lệ! Vui lòng nhập 10 số (VD: 0912345678).');
+                }
+                // Kiểm tra trùng lặp SDT
+                if (NguoiDung::where('SDT', $model['SDT'])->where('MaKH', '!=', $model['MaKH'])->exists()) {
+                    return redirect()->route($actionName)->with('error', 'Số điện thoại đã được sử dụng bởi tài khoản khác!');
+                }
             }
 
             if ($request->hasFile('fileUpload')) {
@@ -407,6 +414,10 @@ class TaiKhoanController extends Controller
     {
         $user = NguoiDung::find($request->MaKH);
         if (!$user) abort(404);
+
+        if (!empty($request->SoTaiKhoan) && !preg_match('/^\d{6,20}$/', $request->SoTaiKhoan)) {
+            return redirect()->route('taikhoan.thongtinkhachhang')->with('error', 'Số tài khoản không hợp lệ! (Phải từ 6-20 chữ số, không chứa chữ cái hoặc ký tự đặc biệt)');
+        }
 
         $user->SoTaiKhoan = $request->SoTaiKhoan;
         $user->TenNganHang = $request->TenNganHang;
