@@ -294,7 +294,7 @@ class TaiKhoanController extends Controller
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("OTP Mail Error: " . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Không thể gửi email OTP lúc này.']);
+            return response()->json(['success' => false, 'message' => 'Lỗi chi tiết: ' . $e->getMessage()]);
         }
     }
 
