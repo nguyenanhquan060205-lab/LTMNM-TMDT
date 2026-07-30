@@ -179,8 +179,13 @@ PROMPT;
 
                     if ($functionName === 'search_db') {
                         $keyword = $functionArgs['keyword'] ?? '';
-                        $products = \App\Models\SanPham::where('TenSP', 'like', "%{$keyword}%")
-                            ->where('TrangThai', 'Đã duyệt')
+                        $products = \App\Models\SanPham::where('TrangThai', 'Đã duyệt')
+                            ->where(function($query) use ($keyword) {
+                                $query->where('TenSP', 'like', "%{$keyword}%")
+                                      ->orWhereHas('loaiSanPham', function($q) use ($keyword) {
+                                          $q->where('TenLoai', 'like', "%{$keyword}%");
+                                      });
+                            })
                             ->select('MaSP', 'TenSP', 'Gia', 'SoLuong')
                             ->take(5)
                             ->get();
