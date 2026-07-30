@@ -184,6 +184,14 @@ class TinNhanController extends Controller
                 'DaDoc' => false
             ]);
 
+            \App\Models\ThongBao::create([
+                'MaKH' => $nguoiNhan,
+                'TieuDe' => 'Tin nhắn mới',
+                'NoiDung' => 'Bạn có tin nhắn mới từ ' . $currentUser->HoTen,
+                'Loai' => 'TinNhan',
+                'DuongDan' => '/tinnhan/chat?idNguoiNhan=' . $currentUser->MaKH
+            ]);
+
             $tn->load(['nguoiGui', 'sanPham.hinhAnhs']);
             
             $avatar = $tn->nguoiGui->AnhDaiDien ?? 'Default.jpg';

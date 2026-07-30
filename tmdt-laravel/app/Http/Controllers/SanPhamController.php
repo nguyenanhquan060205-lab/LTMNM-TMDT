@@ -406,6 +406,14 @@ class SanPhamController extends Controller
                 $ct->save();
             }
 
+            \App\Models\ThongBao::create([
+                'MaKH' => $hd->MaKH,
+                'TieuDe' => 'Đơn hàng được xác nhận',
+                'NoiDung' => 'Shop đã xác nhận các sản phẩm của bạn trong đơn hàng #' . $hd->MaHD,
+                'Loai' => 'DonHang',
+                'DuongDan' => '/taikhoan/lichsu'
+            ]);
+
             $allDone = true;
             $allCT = CtHoaDon::where('MaHD', $id)->get();
             foreach ($allCT as $ct) {
@@ -454,6 +462,14 @@ class SanPhamController extends Controller
                 $ct->TrangThaiCT = 'Đã Huỷ';
                 $ct->save();
             }
+
+            \App\Models\ThongBao::create([
+                'MaKH' => $hd->MaKH,
+                'TieuDe' => 'Đơn hàng bị hủy',
+                'NoiDung' => 'Shop đã hủy một số sản phẩm của bạn trong đơn hàng #' . $hd->MaHD,
+                'Loai' => 'DonHang',
+                'DuongDan' => '/taikhoan/lichsu'
+            ]);
 
             $allCanceled = true;
             $allCT = CtHoaDon::where('MaHD', $id)->get();

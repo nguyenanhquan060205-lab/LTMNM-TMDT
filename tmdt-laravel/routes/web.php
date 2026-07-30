@@ -11,6 +11,7 @@ use App\Http\Controllers\HoaDonController;
 use App\Http\Controllers\KhieuNaiController;
 use App\Http\Controllers\DanhGiaController;
 use App\Http\Controllers\TinNhanController;
+use App\Http\Controllers\ThongBaoController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoaiSanPhamController;
 use App\Http\Controllers\AiChatController;
@@ -123,6 +124,11 @@ Route::prefix('tinnhan')->name('tinnhan.')->group(function() {
     Route::post('/guitinnhan', [TinNhanController::class, 'guiTinNhan'])->name('guitinnhan');
     Route::post('/xoatinnhan/{idTin}', [TinNhanController::class, 'xoaTinNhan'])->name('xoatinnhan');
     Route::post('/danhdaudadoc/{idNguoiGui}/{idNguoiNhan}', [TinNhanController::class, 'danhDauDaDoc'])->name('danhdaudadoc');
+});
+
+Route::prefix('thongbao')->name('thongbao.')->group(function() {
+    Route::get('/api/danh-sach', [ThongBaoController::class, 'layDanhSach'])->name('danhsach');
+    Route::post('/api/doc/{id}', [ThongBaoController::class, 'danhDauDaDoc'])->name('doc');
 });
 
 // ADMIN

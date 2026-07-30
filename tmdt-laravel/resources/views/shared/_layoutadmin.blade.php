@@ -108,7 +108,21 @@
             <nav class="navbar navbar-expand-lg navbar-light navbar-admin px-4 py-3">
                 <div class="container-fluid">
                     <h4 class="mb-0 fw-bold text-dark">@yield('title', 'Quản Trị')</h4>
-                    <div class="d-flex align-items-center ms-auto">
+                    <div class="d-flex align-items-center ms-auto gap-3">
+                        <!-- THÔNG BÁO -->
+                        <div class="dropdown">
+                            <a href="#" class="text-dark text-decoration-none dropdown-toggle position-relative" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 15px;">
+                                <i class="fa-solid fa-bell fs-5"></i>
+                                <span id="notification-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.65rem;">
+                                    0
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow" style="width: 320px; max-height: 400px; overflow-y: auto; right: -20px;" id="notification-list">
+                                <li><h6 class="dropdown-header">Thông báo của bạn</h6></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><div class="text-center p-3 text-muted">Đang tải...</div></li>
+                            </ul>
+                        </div>
                         <div class="dropdown">
                             <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
                                 <img src="{{ $anh }}" width="32" height="32" class="rounded-circle me-2 border shadow-sm">
@@ -138,5 +152,73 @@
         </div>
     </div>
     @yield('scripts')
+    
+    <!-- ===================== NOTIFICATION WIDGET ===================== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(Session::get('user'))
+            function fetchNotifications() {
+                fetch('{{ route("thongbao.danhsach") }}', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.error) return;
+                    let badge = document.getElementById('notification-badge');
+                    let list = document.getElementById('notification-list');
+                    
+                    if (data.chuadoc > 0) {
+                        badge.innerText = data.chuadoc > 99 ? '99+' : data.chuadoc;
+                        badge.classList.remove('d-none');
+                    } else {
+                        badge.classList.add('d-none');
+                    }
+
+                    if (data.thongbaos.length === 0) {
+                        list.innerHTML = '<li><h6 class="dropdown-header">Thông báo của bạn</h6></li><li><hr class="dropdown-divider"></li><li><div class="text-center p-3 text-muted">Chưa có thông báo nào</div></li>';
+                    } else {
+                        let html = '<li><h6 class="dropdown-header">Thông báo của bạn</h6></li><li><hr class="dropdown-divider"></li>';
+                        data.thongbaos.forEach(tb => {
+                            let isRead = tb.DaXem ? 'opacity-50' : 'fw-bold bg-light';
+                            let time = new Date(tb.ThoiGian).toLocaleString('vi-VN');
+                            let baseUrl = '{{ url("") }}';
+                            let finalUrl = tb.DuongDan.startsWith('/') ? baseUrl + tb.DuongDan : baseUrl + '/' + tb.DuongDan;
+                            
+                            html += `<li>
+                                <a class="dropdown-item ${isRead} text-wrap" href="#" onclick="readNotification(${tb.MaTB}, '${finalUrl}'); return false;" style="border-bottom: 1px solid #eee; padding: 10px;">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1" style="font-size: 0.9rem; color: #0d6efd;">${tb.TieuDe}</h6>
+                                    </div>
+                                    <p class="mb-1" style="font-size: 0.8rem; line-height: 1.4;">${tb.NoiDung}</p>
+                                    <small class="text-muted" style="font-size: 0.7rem;">${time}</small>
+                                </a>
+                            </li>`;
+                        });
+                        list.innerHTML = html;
+                    }
+                });
+            }
+
+            window.readNotification = function(id, url) {
+                fetch('{{ url("/thongbao/api/doc") }}/' + id, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                }).then(() => {
+                    window.location.href = url;
+                });
+            }
+
+            fetchNotifications();
+            setInterval(fetchNotifications, 15000); // Poll every 15s
+            @endif
+        });
+    </script>
+    <!-- =========================================================== -->
 </body>
 </html>

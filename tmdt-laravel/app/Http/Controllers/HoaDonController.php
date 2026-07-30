@@ -64,6 +64,14 @@ class HoaDonController extends Controller
                     }
                     $sp->save();
 
+                    \App\Models\ThongBao::create([
+                        'MaKH' => $sellerId,
+                        'TieuDe' => 'Đơn hàng mới',
+                        'NoiDung' => 'Bạn vừa nhận được đơn đặt hàng mới cho sản phẩm: ' . $sp->TenSP,
+                        'Loai' => 'DonHang',
+                        'DuongDan' => '/sanpham/sanphamdaban'
+                    ]);
+
                     CtHoaDon::create([
                         'MaHD' => $hd->MaHD,
                         'MaSP' => $item->MaSP,
@@ -110,6 +118,15 @@ class HoaDonController extends Controller
         $ct->TrangThaiCT = 'Đã xác nhận';
         $ct->save();
 
+        $hd = HoaDon::find($mahd);
+        \App\Models\ThongBao::create([
+            'MaKH' => $hd->MaKH,
+            'TieuDe' => 'Đơn hàng được xác nhận',
+            'NoiDung' => 'Người bán đã xác nhận sản phẩm: ' . $ct->sanPham->TenSP,
+            'Loai' => 'DonHang',
+            'DuongDan' => '/taikhoan/lichsu'
+        ]);
+
         $conCho = CtHoaDon::where('MaHD', $mahd)->where('TrangThaiCT', 'Chờ xác nhận')->exists();
         $hd = HoaDon::find($mahd);
 
@@ -148,6 +165,14 @@ class HoaDonController extends Controller
                     $sp->TrangThai = 'Đã duyệt'; // "Đang bán" is not used in previous logics, but "Đã duyệt" is used.
                 }
                 $sp->save();
+                
+                \App\Models\ThongBao::create([
+                    'MaKH' => $sp->MaKH,
+                    'TieuDe' => 'Đơn hàng bị hủy',
+                    'NoiDung' => 'Người mua đã hủy đơn hàng có chứa sản phẩm: ' . $sp->TenSP,
+                    'Loai' => 'DonHang',
+                    'DuongDan' => '/sanpham/sanphamdaban'
+                ]);
             }
             $ct->TrangThaiCT = 'Đã Huỷ';
             $ct->save();
