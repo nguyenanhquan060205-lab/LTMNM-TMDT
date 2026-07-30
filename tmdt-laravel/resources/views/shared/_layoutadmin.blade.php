@@ -90,6 +90,11 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ url('/tinnhan/index') }}" class="nav-link {{ request()->is('tinnhan*') ? 'active' : '' }}">
+                        <i class="fa fa-comments me-2"></i> Trợ giúp & Tin nhắn
+                    </a>
+                </li>
+                <li>
                     <a href="{{ url('/home') }}" class="nav-link text-info mt-4 border-top border-secondary pt-3">
                         <i class="fa fa-globe me-2"></i> Trở về trang chính
                     </a>
